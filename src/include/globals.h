@@ -15,11 +15,10 @@ struct Point {
     Point(double x = 0, double y = 0) : x(x), y(y) {}
 };
 
-typedef std::vector<std::vector<double>> matrix_t;                  //matrix for affine transformations
-typedef std::vector<Point> Vert_t;              //vertices
-typedef std::list<std::list<int>> Poly_t;                           //polygons
-//typedef std::list<Point> Node_t;                //nodes
-//typedef std::pair<Vert_t, Poly_t> FigureData_t;  
+typedef std::vector<std::vector<double>> matrix_t;      //matrix for affine transformations
+typedef std::vector<Point> Vert_t;                      //vertices
+typedef std::vector<std::vector<int>> Poly_t;           //polygons
+//typedef std::list<Point> Node_t;                      //nodes 
 
 enum class Action {
     QUIT_ACT,
@@ -28,6 +27,12 @@ enum class Action {
     LOAD_FIGURE_ACT,
     SCALE_ACT
 };
+
+typedef struct{
+    matrix_t *matrix;
+    Poly_t *polygons;
+
+} FigureData_t;
 
 typedef struct{
     Vert_t *vertices;

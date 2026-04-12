@@ -8,7 +8,7 @@ namespace s21{
 
         public:
             Obj_Parser();
-            ProjectionData_t Load_Figure(std::string filename);
+            FigureData_t Load_Figure(std::string filename);
 
     };
 }

@@ -1,15 +1,16 @@
-#include "include/globals.h"
+#include "include/main.h"
 #include "simple_canvas.hpp"
+using namespace s21;
+
+void activate_cb(GtkApplication* app, gpointer user_data) {
+    new SimpleCanvas(app);
+}
+
 int main(int argc, char* argv[]){
-    matrix_t fMatrix = {{0.0,1.0,0.0,1.0},{0.0,0.0,0.0,1.0},{1.0,0.0,0.0,1.0}};
-    Node_t nodes = {std::make_pair(0,1), std::make_pair(1,2)};
-    Poly_t polies = {{0,1,2}};
-    Figure figure = Figure(fMatrix, polies, nodes)
-    Vert_t projection = Transformer::getFigureProjection(figure.getMatrix())
-    
-    
-    gtk_init(&argc, &argv);
-    SimpleCanvas canvas;
-    gtk_main();
-    return 0;
+    GtkApplication* app = gtk_application_new("com.example.canvas",
+                                              G_APPLICATION_DEFAULT_FLAGS);
+    g_signal_connect(app, "activate", G_CALLBACK(activate_cb), nullptr);
+    int status = g_application_run(G_APPLICATION(app), argc, argv);
+    g_object_unref(app);
+    return status;
 }
