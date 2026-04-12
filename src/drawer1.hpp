@@ -10,14 +10,17 @@ namespace s21{
 class Drawer
 {
     public:
-        void draw(matrix_t);
+        void draw(ProjectionData_t);
+        void drawVert(Vert_t);
+        void drawPoly(Vert_t, Poly_t);
+        void srawNodes(Vert_t, Node_t);
         Drawer();
         ~Drawer();
 
     protected:
-        double scale;
-        double X_START;
-        double Y_START;
+        double scale_;
+        double xStart_;
+        double yStart_;
 
 }
 }
