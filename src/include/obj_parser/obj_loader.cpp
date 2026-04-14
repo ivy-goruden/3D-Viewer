@@ -77,11 +77,9 @@ namespace s21 {
 
         for (char ch : element) {
             if (ch == delimiter) {
-                if (!isNumber) {
-                    current = -1;
-                }
                 result.push_back(current);
                 isNumber = false;
+                current = 0;
             } else if (ch >= '0' && ch <= '9') {
                 current = current * 10 + (ch - '0');
                 isNumber = true;
@@ -121,9 +119,11 @@ namespace s21 {
         VertexObj_t obj;
         obj.x = data.numbers[0];
         obj.y = data.numbers[1];
-        obj.z = data.numbers[2];        
+        obj.z = data.numbers[2];
+        obj.hasWeight = false;
         if (data.numbers.size() > 3) {
             obj.w = data.numbers[3];
+            obj.hasWeight = true;
         }
         vertices.push_back(obj);
     }
@@ -133,9 +133,11 @@ namespace s21 {
 
         TextureObj_t obj;
         obj.u = data.numbers[0];
-        obj.v = data.numbers[1];        
+        obj.v = data.numbers[1];
+        obj.hasWeight = false;
         if (data.numbers.size() > 2) {
             obj.w = data.numbers[2];
+            obj.hasWeight = true;
         }
         textures.push_back(obj);
     }
@@ -145,11 +147,15 @@ namespace s21 {
 
         PointObj_t obj;
         obj.u = data.numbers[0];
+        obj.hasV = false;
+        obj.hasW = false;
         if (data.numbers.size() > 1) {
-            obj.v = data.numbers[1];      
+            obj.v = data.numbers[1];
+            obj.hasV = true;
         }  
         if (data.numbers.size() > 2) {
             obj.w = data.numbers[2];
+            obj.hasW = true;
         }
         points.push_back(obj);
     }
@@ -167,17 +173,17 @@ namespace s21 {
     void ObjLoader::readFace(char* line) {
         ParcedWords data = parseWords(line);
         if (!data.words.size()) {
-            throw std::invalid_argument("incorrect line: face line");
+            throw std::invalid_argument("Incorrect line: face line");
         }
         FaceObj_t f;
         for (size_t i = 0; i < data.words.size(); i++) {
             std::vector indexes = parseDelimitedIndexes(data.words[i], '/');
             FaceElementObj_t fe;
-            fe.vi = indexes[0] != -1 ? indexes[0] : 0;
-            fe.ti = indexes[1] != -1 ? indexes[1] : 0;
-            fe.ni = indexes[2] != -1 ? indexes[2] : 0;
+            fe.vi = indexes.size() > 0 ? indexes[0] : 0;
+            fe.ti = indexes.size() > 1 ? indexes[1] : 0;
+            fe.ni = indexes.size() > 2 ? indexes[2] : 0;
             if (!fe.vi) {
-                throw std::invalid_argument("incorrect line: face line");
+                throw std::invalid_argument("Incorrect line: face line");
             }
             f.push_back(fe);
         }
@@ -189,16 +195,16 @@ namespace s21 {
     void ObjLoader::readLine(char* line) {
         ParcedWords data = parseWords(line);
         if (!data.words.size()) {
-            throw std::invalid_argument("incorrect line: line");
+            throw std::invalid_argument("Incorrect line: line");
         }
         LineObj_t l;
         for (size_t i = 0; i < data.words.size(); i++) {
             std::vector<int> indexes = parseDelimitedIndexes(data.words[i], '/');
             LineELementObj_t le;
-            le.vi = indexes[0] != -1 ? indexes[0] : 0;
-            le.ti = indexes[1] != -1 ? indexes[1] : 0;
+            le.vi = indexes.size() > 0 ? indexes[0] : 0;
+            le.ti = indexes.size() > 1 ? indexes[1] : 0;
             if (!le.vi) {
-                throw std::invalid_argument("incorrect line: line");
+                throw std::invalid_argument("Incorrect line: line");
             }
             l.push_back(le);
         }
@@ -237,34 +243,32 @@ namespace s21 {
             }
             if (len == 0) continue;
 
-            // printf("Line %d: %s\n", lineNumber, line);
-
             int kindObj = parseObjKind(line);
             printf("Line %d: %d - %s\n", lineNumber, kindObj, line);
 
-            // switch (kindObj) {
-            //     case VERTEX:
-            //         readVertex(line);
-            //         break;
-            //     case POINT:
-            //         readPoint(line);
-            //         break;
-            //     case TEXTURE:
-            //         readTexture(line);
-            //         break;
-            //     case NORMAL:
-            //         readNormal(line);
-            //         break;
-            //     case FACE:
-            //         readFace(line);
-            //         break;
-            //     case LINE:
-            //         readLine(line);
-            //         break;
-            //     case POLIGON:
-            //         readPoligon(line);
-            //         break;
-            // }
+            switch (kindObj) {
+                case VERTEX:
+                    readVertex(line);
+                    break;
+                case POINT:
+                    readPoint(line);
+                    break;
+                case TEXTURE:
+                    readTexture(line);
+                    break;
+                case NORMAL:
+                    readNormal(line);
+                    break;
+                case FACE:
+                    readFace(line);
+                    break;
+                case LINE:
+                    readLine(line);
+                    break;
+                case POLIGON:
+                    readPoligon(line);
+                    break;
+            }
         }
         if (ferror(pObjFile)) {
             printf("Read error occurred\n");

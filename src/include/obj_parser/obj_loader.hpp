@@ -18,14 +18,18 @@ namespace s21 {
 
     struct VertexObj_t {
         double x,y,z,w;
+        bool hasWeight;
     };
 
     struct PointObj_t {
         double u,v,w;
+        bool hasV;
+        bool hasW;
     };
 
     struct TextureObj_t {
         double u,v,w;
+        bool hasWeight;
     };
 
     struct NormalObj_t {
@@ -57,6 +61,7 @@ namespace s21 {
     };
 
     class ObjLoader {
+      public:
         std::vector<VertexObj_t> vertices;
         std::vector<PointObj_t> points;
         std::vector<TextureObj_t> textures;
@@ -64,9 +69,8 @@ namespace s21 {
         std::vector<FaceObj_t> faces;
         std::vector<LineObj_t> lines;
         std::vector<PoligonObj_t> poligons;
-
+      private:
         FILE* pObjFile;
-
       public:
         ObjLoader();
         ~ObjLoader();
