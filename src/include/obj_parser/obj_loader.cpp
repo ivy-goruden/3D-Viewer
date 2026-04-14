@@ -245,7 +245,7 @@ namespace s21 {
             if (len == 0) continue;
 
             int kindObj = parseObjKind(line);
-            printf("Line %d: %d - %s\n", lineNumber, kindObj, line);
+            // printf("Line %d: %d - %s\n", lineNumber, kindObj, line);
 
             switch (kindObj) {
                 case VERTEX:

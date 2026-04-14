@@ -16,9 +16,15 @@ namespace s21{
         loader.loadObjFile(fn);
 
         for (s21::VertexObj_t v : loader.vertices) {
-            printf("%0.2f, %0.2f, %0.2f\n", v.x, v.y, v.z);
             std::vector<double> vc = {v.x, v.y, v.z};
             data.matrix->push_back(vc);
+        }
+        for (s21::FaceObj_t f : loader.faces) {
+            std::vector<int> poli;
+            for (s21::FaceElementObj_t fe : f) {
+                poli.push_back(fe.vi);
+            }
+            data.polygons->push_back(poli);
         }
 
         return data;
