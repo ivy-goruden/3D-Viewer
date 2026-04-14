@@ -1,9 +1,9 @@
 #include "figure.hpp"
-
 namespace s21{
+    Figure::Figure(matrix_t m, Poly_t p): matrix_(m), polygons_(p){}
 
-    Vert_t Figure::getVertices(){
-        return vertices_;
+    Vert_t Figure::getProjection(){
+        return projectionVertices_;
     }
     Poly_t Figure::getPolygons(){
         return polygons_;
@@ -11,13 +11,11 @@ namespace s21{
     matrix_t Figure::getMatrix(){
         return matrix_;
     }
-    void static Figure::genMatrix(){
-        //генерация матрицы 4(x,y,z,1) на N(кол-во вершин)
-    }
     int Figure::getVerticesNum(){
-        return vertices_.size();
+        return matrix_.size();
     }
     int Figure::getNodesNum(){
-        return nodes_.size();
+        //return nodes_.size();
+        return 0;
     }
 }
