@@ -1,4 +1,5 @@
 #include "obj_loader.hpp"
+
 #include <stdexcept>
 #include <vector>
 #include <sstream>
@@ -107,7 +108,7 @@ namespace s21 {
         }
     }
 
-    void ObjLoader::loadObjFile(char* fileName) {
+    void ObjLoader::loadObjFile(const char* fileName) {
         openFile(fileName);
         readObj();
         closeFile();

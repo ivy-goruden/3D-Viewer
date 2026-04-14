@@ -1,7 +1,9 @@
 #ifndef OBJ_PARSER
 #define OBJ_PARSER
+
 #include "../globals.h"
 #include <string>
+
 namespace s21{
 
     class Obj_Parser{
@@ -11,5 +13,7 @@ namespace s21{
             FigureData_t Load_Figure(std::string filename);
 
     };
+
 }
+
 #endif
