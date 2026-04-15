@@ -1,12 +1,22 @@
 #ifndef OBJ_LOADER
 #define OBJ_LOADER
 
+#include <stdexcept>
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
 #include <string>
 
 namespace s21 {
+
+    template<typename T>
+    struct ParcedData {
+        std::string obj;
+        std::vector<T> items;
+    };
+
+    typedef ParcedData<double> ParcedNumbers;
+    typedef ParcedData<std::string> ParcedWords;
 
     enum ObjKind {
         VERTEX,
@@ -53,15 +63,15 @@ namespace s21 {
 
     typedef std::vector<int> PoligonObj_t;
 
-    struct ParcedNumbers {
-        std::string obj;
-        std::vector<double> numbers;
-    };
+    // struct ParcedNumbers {
+    //     std::string obj;
+    //     std::vector<double> numbers;
+    // };
 
-    struct ParcedWords {
-        std::string obj;
-        std::vector<std::string> words;
-    };
+    // struct ParcedWords {
+    //     std::string obj;
+    //     std::vector<std::string> words;
+    // };
 
     class ObjLoader {
       public:
@@ -90,9 +100,25 @@ namespace s21 {
         void readPoligon(char* line);
       private:
         ObjKind parseObjKind(char* line);
-        ParcedNumbers parseNumbers(char* line);
-        ParcedWords parseWords(char* line);
         std::vector<int> parseDelimitedIndexes(std::string& element, char delimiter);
+
+        template<typename T>
+        ParcedData<T> parse(char* line) {
+            ParcedData<T> result;
+            std::istringstream iss(line);
+            
+            if (!(iss >> result.obj)) {
+                throw std::invalid_argument("incorrect line");
+            }
+            
+            T tmp;
+            while (iss >> tmp) {
+                result.items.push_back(tmp);
+            }
+            
+            return result;
+        }
+
     };
 
 }

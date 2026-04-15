@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cstring>
 #include <string>
+#include <format>
 
 #define MAX_LINE_SIZE 1000
 
@@ -45,32 +46,6 @@ namespace s21 {
         return kind;
     }
 
-    ParcedNumbers ObjLoader::parseNumbers(char* line) {
-        ParcedNumbers result;
-        std::istringstream iss(line);
-        if (!(iss >> result.obj)) {
-            throw std::invalid_argument("incorrect line");
-        }
-        double tmp;
-        while (iss >> tmp) {
-            result.numbers.push_back(tmp);
-        }
-        return result;
-    }
-    
-    ParcedWords ObjLoader::parseWords(char* line) {
-        ParcedWords result;
-        std::istringstream iss(line);
-        if (!(iss >> result.obj)) {
-            throw std::invalid_argument("incorrect line");
-        }
-        std::string tmp;
-        while (iss >> tmp) {
-            result.words.push_back(tmp);
-        }
-        return result;
-    }
-
     std::vector<int> ObjLoader::parseDelimitedIndexes(std::string& element, char delimiter) {
         std::vector<int> result;
         int current = 0;
@@ -95,8 +70,8 @@ namespace s21 {
     bool ObjLoader::openFile(const char* filename) {
         pObjFile = fopen(filename, "r");
         if (!pObjFile) {
-            printf("Failed to open file: %s\n", filename);
-            return false;
+            std::string message = std::format("Failed to open file: %s", filename);
+            throw std::invalid_argument(message);
         }
         return true;
     }
@@ -115,76 +90,88 @@ namespace s21 {
     }
 
     void ObjLoader::readVertex(char* line) {
-        ParcedNumbers data = parseNumbers(line);
+        ParcedNumbers data = parse<double>(line);
+        if (data.items.size() < 3) {
+            throw std::invalid_argument("Failed to read vertex");
+        }
 
         VertexObj_t obj;
-        obj.x = data.numbers[0];
-        obj.y = data.numbers[1];
-        obj.z = data.numbers[2];
+        obj.x = data.items[0];
+        obj.y = data.items[1];
+        obj.z = data.items[2];
         obj.hasWeight = false;
-        if (data.numbers.size() > 3) {
-            obj.w = data.numbers[3];
+        if (data.items.size() > 3) {
+            obj.w = data.items[3];
             obj.hasWeight = true;
         }
         vertices.push_back(obj);
     }
     
     void ObjLoader::readTexture(char* line) {
-        ParcedNumbers data = parseNumbers(line);
+        ParcedNumbers data = parse<double>(line);
+        if (data.items.size() < 2) {
+            throw std::invalid_argument("Failed to read texture");
+        }
 
         TextureObj_t obj;
-        obj.u = data.numbers[0];
-        obj.v = data.numbers[1];
+        obj.u = data.items[0];
+        obj.v = data.items[1];
         obj.hasWeight = false;
-        if (data.numbers.size() > 2) {
-            obj.w = data.numbers[2];
+        if (data.items.size() > 2) {
+            obj.w = data.items[2];
             obj.hasWeight = true;
         }
         textures.push_back(obj);
     }
     
     void ObjLoader::readPoint(char* line) {
-        ParcedNumbers data = parseNumbers(line);
+        ParcedNumbers data = parse<double>(line);
+        if (data.items.size() == 0) {
+            throw std::invalid_argument("Failed to read point");
+        }
 
         PointObj_t obj;
-        obj.u = data.numbers[0];
+        obj.u = data.items[0];
         obj.hasV = false;
         obj.hasW = false;
-        if (data.numbers.size() > 1) {
-            obj.v = data.numbers[1];
+        if (data.items.size() > 1) {
+            obj.v = data.items[1];
             obj.hasV = true;
         }  
-        if (data.numbers.size() > 2) {
-            obj.w = data.numbers[2];
+        if (data.items.size() > 2) {
+            obj.w = data.items[2];
             obj.hasW = true;
         }
         points.push_back(obj);
     }
     
     void ObjLoader::readNormal(char* line) {
-        ParcedNumbers data = parseNumbers(line);
+        ParcedNumbers data = parse<double>(line);
+        if (data.items.size() < 3) {
+            throw std::invalid_argument("Failed to read normal");
+        }
 
         NormalObj_t obj;
-        obj.i = data.numbers[0];
-        obj.j = data.numbers[1];
-        obj.k = data.numbers[2];        
+        obj.i = data.items[0];
+        obj.j = data.items[1];
+        obj.k = data.items[2];        
         normals.push_back(obj);
     }
     
     void ObjLoader::readFace(char* line) {
-        ParcedWords data = parseWords(line);
-        if (!data.words.size()) {
-            throw std::invalid_argument("Incorrect line: face line");
+        ParcedWords data = parse<std::string>(line);
+        if (!data.items.size()) {
+            throw std::invalid_argument("Failed to read face");
         }
         FaceObj_t f;
-        for (size_t i = 0; i < data.words.size(); i++) {
-            std::vector indexes = parseDelimitedIndexes(data.words[i], '/');
+        for (size_t i = 0; i < data.items.size(); i++) {
+            std::vector indexes = parseDelimitedIndexes(data.items[i], '/');
             FaceElementObj_t fe;
             fe.vi = indexes.size() > 0 ? indexes[0] : 0;
             fe.ti = indexes.size() > 1 ? indexes[1] : 0;
             fe.ni = indexes.size() > 2 ? indexes[2] : 0;
             if (!fe.vi) {
-                throw std::invalid_argument("Incorrect line: face line");
+                throw std::invalid_argument("Failed to read face");
             }
             f.push_back(fe);
         }
@@ -194,18 +181,18 @@ namespace s21 {
     }
 
     void ObjLoader::readLine(char* line) {
-        ParcedWords data = parseWords(line);
-        if (!data.words.size()) {
-            throw std::invalid_argument("Incorrect line: line");
+        ParcedWords data = parse<std::string>(line);
+        if (!data.items.size()) {
+            throw std::invalid_argument("Failed to read line");
         }
         LineObj_t l;
-        for (size_t i = 0; i < data.words.size(); i++) {
-            std::vector<int> indexes = parseDelimitedIndexes(data.words[i], '/');
+        for (size_t i = 0; i < data.items.size(); i++) {
+            std::vector<int> indexes = parseDelimitedIndexes(data.items[i], '/');
             LineELementObj_t le;
             le.vi = indexes.size() > 0 ? indexes[0] : 0;
             le.ti = indexes.size() > 1 ? indexes[1] : 0;
             if (!le.vi) {
-                throw std::invalid_argument("Incorrect line: line");
+                throw std::invalid_argument("Failed to read line");
             }
             l.push_back(le);
         }
@@ -215,20 +202,23 @@ namespace s21 {
     }
 
     void ObjLoader::readPoligon(char* line) {
-        ParcedNumbers data = parseNumbers(line);
-        PoligonObj_t p;
-        for (size_t i = 0; i < data.numbers.size(); i++) {
-            p.push_back(data.numbers[i]);
+        ParcedNumbers data = parse<double>(line);
+        if (data.items.size() == 0) {
+            throw std::invalid_argument("Failed to read poligon");
         }
-        if (data.numbers.size()) {            
+
+        PoligonObj_t p;
+        for (size_t i = 0; i < data.items.size(); i++) {
+            p.push_back(data.items[i]);
+        }
+        if (data.items.size()) {            
             poligons.push_back(p);
         }
     }
 
     void ObjLoader::readObj() {
         if (!pObjFile) {
-            printf("File not opened\n");
-            return;
+            throw std::invalid_argument("File not opened");
         }
 
         char line[MAX_LINE_SIZE];
@@ -245,7 +235,7 @@ namespace s21 {
             if (len == 0) continue;
 
             int kindObj = parseObjKind(line);
-            // printf("Line %d: %d - %s\n", lineNumber, kindObj, line);
+            printf("Line %d: %d - %s\n", lineNumber, kindObj, line);
 
             switch (kindObj) {
                 case VERTEX:
@@ -272,7 +262,7 @@ namespace s21 {
             }
         }
         if (ferror(pObjFile)) {
-            printf("Read error occurred\n");
+            throw std::invalid_argument("Read error occurred");
         }
     }
 
