@@ -63,17 +63,8 @@ namespace s21 {
 
     typedef std::vector<int> PoligonObj_t;
 
-    // struct ParcedNumbers {
-    //     std::string obj;
-    //     std::vector<double> numbers;
-    // };
-
-    // struct ParcedWords {
-    //     std::string obj;
-    //     std::vector<std::string> words;
-    // };
-
     class ObjLoader {
+        
       public:
         std::vector<VertexObj_t> vertices;
         std::vector<PointObj_t> points;
@@ -82,8 +73,10 @@ namespace s21 {
         std::vector<FaceObj_t> faces;
         std::vector<LineObj_t> lines;
         std::vector<PoligonObj_t> poligons;
+
       private:
         FILE* pObjFile;
+
       public:
         ObjLoader();
         ~ObjLoader();
@@ -98,6 +91,7 @@ namespace s21 {
         void readFace(char* line);
         void readLine(char* line);
         void readPoligon(char* line);
+
       private:
         ObjKind parseObjKind(char* line);
         std::vector<int> parseDelimitedIndexes(std::string& element, char delimiter);
