@@ -107,7 +107,7 @@ namespace s21 {
         }
     }
 
-    void ObjLoader::loadObjFile(char* fileName) {
+    void ObjLoader::loadObjFile(const char* fileName) {
         openFile(fileName);
         readObj();
         closeFile();
@@ -177,7 +177,7 @@ namespace s21 {
         }
         FaceObj_t f;
         for (size_t i = 0; i < data.words.size(); i++) {
-            std::vector indexes = parseDelimitedIndexes(data.words[i], '/');
+            std::vector<int> indexes = parseDelimitedIndexes(data.words[i], '/');
             FaceElementObj_t fe;
             fe.vi = indexes.size() > 0 ? indexes[0] : 0;
             fe.ti = indexes.size() > 1 ? indexes[1] : 0;

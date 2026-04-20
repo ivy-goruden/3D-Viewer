@@ -5,11 +5,12 @@ namespace s21{
     Transformer::Transformer(){}
     Vert_t Transformer::getFigureProjection(matrix_t m){
         //returns a list of vertices in new position
-        Vert_t projection = {};
+        Vert_t projection;
         for(int i =0; i < m.size(); i++){
             Point coord = Point{m[i][0],m[i][1]};
             projection.push_back(coord);
         }
+
         return projection;
     }
 

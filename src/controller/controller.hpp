@@ -1,14 +1,15 @@
-#include "include/globals.h"
+#include "../include/globals.h"
+#include "../include/figure/figure.hpp"
 namespace s21{
 
     class Controller{
         protected:
-            Figure figure;
+            Figure figure_;
         public:
-            Controller();
-            loadFigure(string filename);
-            rotateFigure();
-            moveFigure();
-            scaleFigure();
-    }
+            Controller(Figure);
+            Vert_t loadFigure(const char* filename);
+            Vert_t rotateFigure(double x, double y, double z);
+            // moveFigure();
+            // scaleFigure();
+    };
 }

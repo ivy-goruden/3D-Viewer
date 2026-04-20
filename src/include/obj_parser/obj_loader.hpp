@@ -1,3 +1,6 @@
+#ifndef OBJ_LOADER
+#define OBJ_LOADER
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
@@ -76,7 +79,7 @@ namespace s21 {
         ~ObjLoader();
         bool openFile(const char* filename);
         void closeFile();
-        void loadObjFile(char* fileName);
+        void loadObjFile(const char* fileName);
         void readObj();
         void readVertex(char* line);
         void readTexture(char* line);
@@ -93,3 +96,4 @@ namespace s21 {
     };
 
 }
+#endif

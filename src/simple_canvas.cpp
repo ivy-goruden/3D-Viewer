@@ -1,29 +1,21 @@
 #include "simple_canvas.hpp"
-#include "include/main.h"
-#include <gtk/gtk.h>
-#include <cmath>
+
 // Реализация методов класса SimpleCanvas для GTK4
 
-SimpleCanvas::SimpleCanvas(GtkApplication* app) {
-    // Создаём окно
-    GtkWidget* window = gtk_window_new();
-    gtk_window_set_title(GTK_WINDOW(window), "Algorithm Testing Canvas");
-    gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
-    gtk_window_set_application(GTK_WINDOW(window), app);
-
-    // Создаём область рисования
-    drawing_area = gtk_drawing_area_new();
-    gtk_window_set_child(GTK_WINDOW(window), drawing_area);
+SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
 
     // Устанавливаем функцию рисования (вместо сигнала "draw")
     gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(drawing_area),
-                                   SimpleCanvas::on_draw_static,
+                                   on_draw_static,
                                    this, nullptr);
 
-    // Подключаем сигнал закрытия окна
-    g_signal_connect(window, "destroy", G_CALLBACK(on_window_destroy), nullptr);
-
-    gtk_window_present(GTK_WINDOW(window));
+    scale_ = 100;
+    xStart_ = 50;
+    yStart_ = 50;
+    angleX_ = X2_d;
+    angleY_ = Y2_d;
+    angleZ_ = Z2_d;
+    widget_ = drawing_area;
 }
 
 SimpleCanvas::~SimpleCanvas() {
@@ -58,47 +50,53 @@ void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
     cairo_fill(cr);
 }
 
-void SimpleCanvas::my_algorithm(cairo_t* cr) {
-    // Пример отрисовки: точки, линии, полигон
-    draw_dot(cr, 100, 100);
-    draw_dot(cr, 200, 150);
-    draw_dot(cr, 300, 200);
-
-    draw_line(cr, 100, 100, 400, 100);
-    draw_line(cr, 400, 100, 400, 300);
-
-    std::vector<Point> polygon;
-    polygon.emplace_back(500, 100);
-    polygon.emplace_back(600, 150);
-    polygon.emplace_back(550, 250);
-    polygon.emplace_back(450, 200);
-    draw_polygon(cr, polygon);
-    s21::matrix_t fMatrix = {{0.0,1.0,0.0,1.0},{0.0,0.0,0.0,1.0},{1.0,0.0,0.0,1.0}};
-    s21::Poly_t polies = {{0,1,2}};
-    s21::Figure figure = s21::Figure(fMatrix, polies);
-    s21::Vert_t projection = s21::Transformer::getFigureProjection(figure.getMatrix());
-    
-
-    // Здесь можно добавить свои тестовые фигуры
-}
-
-// Статическая функция отрисовки для GTK4
-void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr,
-                                  int width, int height, gpointer user_data) {
-    SimpleCanvas* canvas = static_cast<SimpleCanvas*>(user_data);
-
-    // Белый фон
-    cairo_set_source_rgb(cr, 1, 1, 1);
-    cairo_paint(cr);
-
-    // Вызов алгоритма пользователя
-    canvas->my_algorithm(cr);
-}
-
-// Обработчик закрытия окна
-void SimpleCanvas::on_window_destroy(GtkWidget* widget, gpointer data) {
-    GApplication* app = g_application_get_default();
-    if (app) {
-        g_application_quit(app);
+void SimpleCanvas::drawVert(cairo_t* cr){
+    for (const auto& point : projection_) {
+        cairo_new_path(cr);
+        cairo_arc(cr, point.x, point.y, 0.1, 0, 2 * M_PI);
+        cairo_fill(cr);
     }
+}
+
+void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer user_data) {
+    SimpleCanvas* self = static_cast<SimpleCanvas*>(user_data);
+    self->onDraw(cr, width, height);
+}
+
+void SimpleCanvas::loadFigure(const char* filename) {
+    projection_ = c_->loadFigure(filename);
+}
+
+void SimpleCanvas::redraw(){
+    gtk_widget_queue_draw(GTK_WIDGET(widget_));
+}
+
+void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
+    // Очистка фона (белый)
+    cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+    cairo_paint(cr);
+    
+    // Центрируем систему координат
+    cairo_translate(cr, xStart_, yStart_);
+    // Масштабируем (подберите под свой размер фигуры)
+    cairo_scale(cr, scale_, scale_);
+    
+    // Рисуем точки из проекции
+    cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); // красный
+
+    drawVert(cr);
+
+}
+
+void SimpleCanvas::setScale(double scale){
+    scale_ = scale;
+}
+
+void SimpleCanvas::rotate(double x, double y, double z){
+    projection_ = c_->rotateFigure(x,y,z);
+}
+
+void SimpleCanvas::setProjection(s21::Vert_t proj){
+    projection_ = proj;
+    gtk_widget_queue_draw(GTK_WIDGET(widget_));
 }

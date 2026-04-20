@@ -1,9 +1,11 @@
 #ifndef SIMPLE_CANVAS_HPP
 #define SIMPLE_CANVAS_HPP
 
-#include <gtk/gtk.h>
 #include <vector>
+#include "include/main.h"
+#include <gtk/gtk.h>
 #include <cmath>
+#include "controller/controller.hpp"
 
 struct Point {
     double x, y;
@@ -13,7 +15,7 @@ struct Point {
 class SimpleCanvas {
 public:
     // Конструктор принимает GtkApplication
-    SimpleCanvas(GtkApplication* app);
+    SimpleCanvas(GtkWidget* drawing_area);
     ~SimpleCanvas();
 
     // Примитивы рисования
@@ -21,8 +23,14 @@ public:
     void draw_polygon(cairo_t* cr, const std::vector<Point>& points);
     void draw_dot(cairo_t* cr, double x, double y);
 
-    // Ваш алгоритм (реализуйте в .cpp)
-    void my_algorithm(cairo_t* cr);
+    void drawVert(cairo_t* cr);
+    void loadFigure(const char* filename);
+    void onDraw(cairo_t* cr, int width, int height);
+
+    void setScale(double);
+    void rotate(double x, double y, double z);
+    void setProjection(s21::Vert_t);
+    void redraw();
 
 private:
     GtkWidget* drawing_area;
@@ -33,6 +41,12 @@ private:
     double scale_;
     double xStart_;
     double yStart_;
+    double angleX_;
+    double angleY_;
+    double angleZ_;
+    s21::Vert_t projection_;
+    GtkWidget* widget_;
+    s21::Controller* c_;
 
 };
 

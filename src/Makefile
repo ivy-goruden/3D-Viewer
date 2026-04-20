@@ -8,7 +8,8 @@ OLD = $(shell find ./ -name "*.o")
 	g++ -c $< -o $@
 
 all: clean 3Dtransformer.a
-	g++ $(CXXFLAGS) simple_canvas.cpp main.cpp -o game $(GTKFLAGS) -lm -L. -l3Dtransformer
+	g++ $(CXXFLAGS) simple_canvas.cpp controller/controller.cpp main.cpp -o game $(GTKFLAGS) -lm -L. -l3Dtransformer
+# 	valgrind --leak-check=full --track-origins=yes -s ./game
 	./game
 
 install:
