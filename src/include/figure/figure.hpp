@@ -1,23 +1,30 @@
+#ifndef FIGURE
+#define FIGURE
+
+#include "../globals.h"
+#include "../obj_parser/obj_loader.hpp"
+
 namespace s21{
 
-class Figure(){
+class Figure{
     protected:
-        Vert_t vertices_;
-        Poly_t polygons_;
-        Node_t nodes_;
-        matrix_t matrix_;
+        Poly_t polygons_;               //list of iterators for the vertices connected in polys
+        //Node_t nodes_;                  //pairs of iterators of the connected vertices
+        matrix_t matrix_;               //matrix of original figure for transformation
+        Vert_t projectionVertices_;    //transformed projection of original figure
 
     
     public:
-        Figure(Vert_t v, Poly_t p): vertices_(v), polygons_(p);
-        Vert_t getVertices();
+        Figure(matrix_t, Poly_t);
+        Figure(ObjLoader);
         Poly_t getPolygons();
-        Node_t getNodes();
+        //Node_t getNodes();
         matrix_t getMatrix();
         int getVerticesNum();
         int getNodesNum();
-    private:
-        void static genMatrix();
-}
+        Vert_t getProjection();
+};
 
 }
+
+#endif

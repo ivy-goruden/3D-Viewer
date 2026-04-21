@@ -1,13 +1,19 @@
-#include "../figure/figure.h"
-namespace s21{
+#ifndef OBJ_PARSER
+#define OBJ_PARSER
 
-    typedef std::pair<Poly_t, Vert_t> FigureData_t;
+#include "../globals.h"
+#include <string>
+
+namespace s21{
 
     class Obj_Parser{
 
         public:
             Obj_Parser();
-            FigureData_t Load_Figure(string filename);
+            FigureData_t Load_Figure(std::string filename);
 
-    }
+    };
+
 }
+
+#endif
