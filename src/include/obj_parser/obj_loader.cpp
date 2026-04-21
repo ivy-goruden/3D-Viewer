@@ -165,7 +165,7 @@ namespace s21 {
         }
         FaceObj_t f;
         for (size_t i = 0; i < data.items.size(); i++) {
-            std::vector indexes = parseDelimitedIndexes(data.items[i], '/');
+            std::vector<int> indexes = parseDelimitedIndexes(data.items[i], '/');
             FaceElementObj_t fe;
             fe.vi = indexes.size() > 0 ? indexes[0] : 0;
             fe.ti = indexes.size() > 1 ? indexes[1] : 0;

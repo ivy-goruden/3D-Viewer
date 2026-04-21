@@ -2,6 +2,7 @@
 #define FIGURE
 
 #include "../globals.h"
+#include "../obj_parser/obj_loader.hpp"
 
 namespace s21{
 
@@ -15,6 +16,7 @@ class Figure{
     
     public:
         Figure(matrix_t, Poly_t);
+        Figure(ObjLoader);
         Poly_t getPolygons();
         //Node_t getNodes();
         matrix_t getMatrix();
