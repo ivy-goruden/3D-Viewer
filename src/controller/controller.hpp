@@ -12,6 +12,7 @@ namespace s21{
             Controller();
             Vert_t loadFigure(const char* filename);
             Vert_t rotateFigure(double x, double y, double z);
+            Vert_t toggleProjection();
             // moveFigure();
             // scaleFigure();
     };

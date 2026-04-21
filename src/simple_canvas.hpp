@@ -29,8 +29,8 @@ public:
 
     void setScale(double);
     void rotate(double x, double y, double z);
-    void setProjection(s21::Vert_t);
     void redraw();
+    void toggleProjection();
 
 private:
     GtkWidget* drawing_area;

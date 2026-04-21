@@ -4,13 +4,15 @@ CXXFLAGS =  -std=c++20
 GTKFLAGS = `pkg-config --cflags --libs gtk4`
 OLD = $(shell find ./ -name "*.o")
 
+SOURCE := callbacks/callbacks.cpp config/config.cpp simple_canvas.cpp controller/controller.cpp main.cpp
+
 %.o: %.c
 	g++ $(CXXFLAGS) -c $< -o $@
 
 all: clean 3Dtransformer.a
-	g++ $(CXXFLAGS) simple_canvas.cpp controller/controller.cpp main.cpp -o game $(GTKFLAGS) -lm -L. -l3Dtransformer
-	valgrind --leak-check=full --track-origins=yes -s ./game
-# 	./game
+	g++ $(CXXFLAGS) $(SOURCE) -o game $(GTKFLAGS) -lm -L. -l3Dtransformer
+# 	valgrind --leak-check=full --track-origins=yes -s ./game
+	./game
 
 install:
 

@@ -23,7 +23,7 @@ struct Point {
 typedef std::vector<std::vector<double>> matrix_t;      //matrix for affine transformations
 typedef std::vector<Point> Vert_t;                      //vertices
 typedef std::vector<std::vector<int>> Poly_t;           //polygons
-//typedef std::list<Point> Node_t;                      //nodes
+typedef std::vector<Point> Node_t;                      //nodes
 
 enum class Action {
     QUIT_ACT,

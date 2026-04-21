@@ -32,5 +32,11 @@ namespace s21{
         }
         return s21::Transformer::getPerspectiveProjection(original);
     }
+
+    Vert_t Controller::toggleProjection(){
+        parallel_projection_ = !parallel_projection_;
+        Vert_t projection_ = getFigureProjection(figure_->getMatrix());
+        return projection_;
+    }
 }
 
