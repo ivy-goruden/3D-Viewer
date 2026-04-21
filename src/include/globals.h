@@ -8,6 +8,10 @@
 #define MOVE_SCOPE 0.1
 #define SCALING_FACTOR 0.1
 #define ROTATE_SCOPE 10
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 namespace s21{
 
 struct Point {

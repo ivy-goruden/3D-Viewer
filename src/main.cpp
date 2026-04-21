@@ -16,36 +16,57 @@ void on_window_destroy(GtkWidget* widget, gpointer data) {
 }
 
 static void on_load_button_clicked(GtkWidget *button, gpointer user_data) {
-    auto* canvas_ptr = static_cast<std::shared_ptr<SimpleCanvas>*>(user_data);
-    (*canvas_ptr)->loadFigure("./assets/cube.obj");
-    (*canvas_ptr)->redraw();
+    GtkWidget* window = GTK_WIDGET(user_data);
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+        g_object_get_data(G_OBJECT(window), "canvas"));
+    if (canvas) {
+        (*canvas)->loadFigure("./assets/cube.obj");
+        (*canvas)->redraw();
+    }
+    
 }
 
 static void on_down_scale_clicked(GtkWidget *button, gpointer user_data) {
-    auto* canvas_ptr = static_cast<std::shared_ptr<SimpleCanvas>*>(user_data);
-    (*canvas_ptr)->setScale(20.0);
-    (*canvas_ptr)->redraw();
+    GtkWidget* window = GTK_WIDGET(user_data);
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+        g_object_get_data(G_OBJECT(window), "canvas"));
+    (*canvas)->setScale(20.0);
+    (*canvas)->redraw();
 }
 
 static void on_up_scale_clicked(GtkWidget *button, gpointer user_data) {
-    auto* canvas_ptr = static_cast<std::shared_ptr<SimpleCanvas>*>(user_data);
-    (*canvas_ptr)->setScale(100.0);
-    (*canvas_ptr)->redraw();
+    GtkWidget* window = GTK_WIDGET(user_data);
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+        g_object_get_data(G_OBJECT(window), "canvas"));
+    (*canvas)->setScale(100.0);
+    (*canvas)->redraw();
 }
 
 static void on_rotateA_clicked(GtkWidget *button, gpointer user_data) {
-    auto* canvas_ptr = static_cast<std::shared_ptr<SimpleCanvas>*>(user_data);
-    (*canvas_ptr)->rotate(135,90,0);
-    (*canvas_ptr)->redraw();
+    GtkWidget* window = GTK_WIDGET(user_data);
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+        g_object_get_data(G_OBJECT(window), "canvas"));
+    (*canvas)->rotate(135,90,0);
+    (*canvas)->redraw();
 }
 
 static void on_rotateB_clicked(GtkWidget *button, gpointer user_data) {
-    auto* canvas_ptr = static_cast<std::shared_ptr<SimpleCanvas>*>(user_data);
-    (*canvas_ptr)->rotate(0,0,0);
-    (*canvas_ptr)->redraw();
+    GtkWidget* window = GTK_WIDGET(user_data);
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+        g_object_get_data(G_OBJECT(window), "canvas"));
+    (*canvas)->rotate(0,0,0);
+    (*canvas)->redraw();
 }
 
-void addControls(GtkWidget* box, std::shared_ptr<SimpleCanvas>* canvas){
+static void on_rotateC_clicked(GtkWidget *button, gpointer user_data) {
+    GtkWidget* window = GTK_WIDGET(user_data);
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+        g_object_get_data(G_OBJECT(window), "canvas"));
+    (*canvas)->rotate(0,0,45);
+    (*canvas)->redraw();
+}
+
+void addControls(GtkWidget* box, GtkWidget* window){
     // Create the button
     GtkWidget *button = gtk_button_new_with_label("Hello World");
     GtkWidget *load_btn = gtk_button_new_with_label("Load OBJ");
@@ -53,12 +74,14 @@ void addControls(GtkWidget* box, std::shared_ptr<SimpleCanvas>* canvas){
     GtkWidget *downscale = gtk_button_new_with_label("-");
     GtkWidget *rotateA = gtk_button_new_with_label("rotateA");
     GtkWidget *rotateB = gtk_button_new_with_label("rotateB");
+    GtkWidget *rotateC = gtk_button_new_with_label("rotateC");
 
-    g_signal_connect(upscale, "clicked", G_CALLBACK(on_up_scale_clicked), canvas);
-    g_signal_connect(downscale, "clicked", G_CALLBACK(on_down_scale_clicked), canvas);
-    g_signal_connect(load_btn, "clicked", G_CALLBACK(on_load_button_clicked), canvas);
-    g_signal_connect(rotateA, "clicked", G_CALLBACK(on_down_scale_clicked), canvas);
-    g_signal_connect(rotateB, "clicked", G_CALLBACK(on_load_button_clicked), canvas);
+    g_signal_connect(upscale, "clicked", G_CALLBACK(on_up_scale_clicked), window);
+    g_signal_connect(downscale, "clicked", G_CALLBACK(on_down_scale_clicked), window);
+    g_signal_connect(load_btn, "clicked", G_CALLBACK(on_load_button_clicked), window);
+    g_signal_connect(rotateA, "clicked", G_CALLBACK(on_rotateA_clicked), window);
+    g_signal_connect(rotateB, "clicked", G_CALLBACK(on_rotateB_clicked), window);
+    g_signal_connect(rotateC, "clicked", G_CALLBACK(on_rotateC_clicked), window);
 
 
     // Add button to box
@@ -69,7 +92,7 @@ void addControls(GtkWidget* box, std::shared_ptr<SimpleCanvas>* canvas){
     gtk_box_append(GTK_BOX(box), rotateB);
 }
 
-void activate_cb(GtkApplication* app, gpointer user_data) {
+void config_GTK(GtkApplication* app, gpointer user_data) {
     
     GtkWidget* window = gtk_window_new();
     gtk_window_set_title(GTK_WINDOW(window), "Algorithm Testing Canvas");
@@ -85,14 +108,13 @@ void activate_cb(GtkApplication* app, gpointer user_data) {
     gtk_box_append(GTK_BOX(box), drawing_area);
     gtk_box_append(GTK_BOX(box), controls);
 
-    // Создаём shared_ptr для объекта
-    auto canvas = std::make_shared<SimpleCanvas>(drawing_area);
+    auto canvas_shared = std::make_shared<SimpleCanvas>(drawing_area);
     
     // Сохраняем shared_ptr в куче, чтобы передать в колбэки
-    auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas);
+    auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas_shared);
     
     // Привязываем к окну, чтобы удалить shared_ptr при уничтожении окна
-    g_object_set_data_full(G_OBJECT(window), "canvas_ptr", canvas_ptr,
+    g_object_set_data_full(G_OBJECT(window), "canvas", canvas_ptr,
                            [](gpointer data) {
                                delete static_cast<std::shared_ptr<SimpleCanvas>*>(data);
                            });
@@ -102,9 +124,8 @@ void activate_cb(GtkApplication* app, gpointer user_data) {
     gtk_widget_set_halign(controls, GTK_ALIGN_CENTER);
     gtk_window_set_child(GTK_WINDOW(window), box);
 
-    addControls(controls, canvas_ptr);
+    addControls(controls, window);
 
-    gtk_box_append(GTK_BOX(box), drawing_area);
     gtk_window_present(GTK_WINDOW(window));
     g_signal_connect(window, "destroy", G_CALLBACK(on_window_destroy), nullptr);
 }
@@ -114,7 +135,7 @@ void activate_cb(GtkApplication* app, gpointer user_data) {
 int main(int argc, char* argv[]){
     GtkApplication* app = gtk_application_new("com.example.canvas",
                                               G_APPLICATION_DEFAULT_FLAGS);
-    g_signal_connect(app, "activate", G_CALLBACK(activate_cb), nullptr);
+    g_signal_connect(app, "activate", G_CALLBACK(config_GTK), nullptr);
     int status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
     return status;

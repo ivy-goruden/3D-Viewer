@@ -4,9 +4,9 @@ namespace s21{
 
     class Controller{
         protected:
-            Figure figure_;
+            Figure *figure_ = nullptr;
         public:
-            Controller(Figure);
+            Controller();
             Vert_t loadFigure(const char* filename);
             Vert_t rotateFigure(double x, double y, double z);
             // moveFigure();

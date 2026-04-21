@@ -16,6 +16,7 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     angleY_ = Y2_d;
     angleZ_ = Z2_d;
     widget_ = drawing_area;
+    c_ = new s21::Controller();
 }
 
 SimpleCanvas::~SimpleCanvas() {
