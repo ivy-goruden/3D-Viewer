@@ -1,6 +1,7 @@
 #include "obj_parser.hpp"
 
 #include "obj_loader.hpp"
+#include <memory>
 
 namespace s21{
 
