@@ -84,7 +84,6 @@ namespace s21 {
     }
 
     void ObjLoader::loadObjFile(const char* fileName) {
-    void ObjLoader::loadObjFile(const char* fileName) {
         openFile(fileName);
         readObj();
         closeFile();
