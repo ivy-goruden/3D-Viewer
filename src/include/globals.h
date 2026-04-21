@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include <list>
+#include <memory>
 #include <cstdio>
 #define MOVE_SCOPE 0.1
 #define SCALING_FACTOR 0.1
@@ -32,10 +33,9 @@ enum class Action {
     SCALE_ACT
 };
 
-typedef struct{
-    matrix_t *matrix;
-    Poly_t *polygons;
-
+typedef struct {
+    std::unique_ptr<matrix_t> matrix;
+    std::unique_ptr<Poly_t> polygons;
 } FigureData_t;
 
 typedef struct{
