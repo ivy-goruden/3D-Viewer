@@ -5,6 +5,9 @@ namespace s21{
     class Controller{
         protected:
             Figure *figure_ = nullptr;
+            bool parallel_projection_ = false;
+
+            Vert_t getFigureProjection(const matrix_t original);
         public:
             Controller();
             Vert_t loadFigure(const char* filename);
