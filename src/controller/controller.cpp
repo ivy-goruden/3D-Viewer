@@ -11,7 +11,7 @@ namespace s21{
         loader.loadObjFile(filename);
         s21::Figure *figure  = new s21::Figure(loader);
         figure_ = figure;
-        Vert_t projection_ = s21::Transformer::getFigureProjection(figure_->getMatrix());
+        Vert_t projection_ = getFigureProjection(figure_->getMatrix());
         return projection_;
     }
 
@@ -19,11 +19,24 @@ namespace s21{
         Vert_t projection_ = Vert_t();
         if (figure_ != nullptr){
             matrix_t rotate = s21::Transformer::Rotate(x,y,z, figure_->getMatrix());
-            projection_ = s21::Transformer::getFigureProjection(rotate);
+            projection_ = getFigureProjection(rotate);
             
         }
         return projection_;
 
+    }
+
+    Vert_t Controller::getFigureProjection(const matrix_t original){
+        if (parallel_projection_){
+            return s21::Transformer::getParallelProjection(original);
+        }
+        return s21::Transformer::getPerspectiveProjection(original);
+    }
+
+    Vert_t Controller::toggleProjection(){
+        parallel_projection_ = !parallel_projection_;
+        Vert_t projection_ = getFigureProjection(figure_->getMatrix());
+        return projection_;
     }
 }
 

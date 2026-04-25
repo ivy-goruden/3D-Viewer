@@ -97,7 +97,6 @@ void SimpleCanvas::rotate(double x, double y, double z){
     projection_ = c_->rotateFigure(x,y,z);
 }
 
-void SimpleCanvas::setProjection(s21::Vert_t proj){
-    projection_ = proj;
-    gtk_widget_queue_draw(GTK_WIDGET(widget_));
+void SimpleCanvas::toggleProjection(){
+    projection_ = c_->toggleProjection();
 }
