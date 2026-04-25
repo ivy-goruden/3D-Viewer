@@ -2,7 +2,7 @@
 <!-- Created with Cambalache 1.0 -->
 <interface>
   <!-- interface-name 3dviewer.ui -->
-  <requires lib="gtk" version="4.20"/>
+  <requires lib="gtk" version="4.0"/>
   <requires lib="gtk+" version="4.0"/>
   <object class="GtkApplicationWindow" id="main">
     <property name="default-height">700</property>
@@ -44,6 +44,18 @@
           <object class="GtkBox">
             <property name="vexpand">1</property>
             <child>
+              <object class="GtkBox" id="paper_box">
+                <property name="hexpand">1</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkDrawingArea" id="paper">
+                    <property name="margin-end">15</property>
+                    <property name="vexpand">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
               <object class="GtkGrid">
                 <property name="column-spacing">8</property>
                 <property name="margin-end">30</property>
@@ -56,17 +68,6 @@
                     <layout>
                       <property name="column">0</property>
                       <property name="row">0</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkSpinButton" id="retate_x_spinner">
-                    <property name="focusable">1</property>
-                    <property name="numeric">True</property>
-                    <property name="wrap">True</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">1</property>
                     </layout>
                   </object>
                 </child>
@@ -98,7 +99,38 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="retate_y_spinner">
+                  <object class="GtkLabel">
+                    <property name="label" translatable="yes">Приблизить / Удалить:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">8</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="rotate_x_spinner">
+                    <property name="focusable">1</property>
+                    <property name="numeric">True</property>
+                    <property name="wrap">True</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">1</property>
+                    </layout>
+                    <property name="snap-to-ticks">True</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment">
+                        <property name="lower">0</property>
+                        <property name="upper">100</property>
+                        <property name="page-increment">5</property>
+                        <property name="page-size">0</property>
+                        <property name="step-increment">1</property>
+                        <property name="value">0</property>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="rotate_y_spinner">
                     <property name="focusable">1</property>
                     <property name="numeric">True</property>
                     <property name="wrap">True</property>
@@ -106,10 +138,21 @@
                       <property name="column">0</property>
                       <property name="row">3</property>
                     </layout>
+                    <property name="snap-to-ticks">True</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment">
+                        <property name="lower">0</property>
+                        <property name="upper">100</property>
+                        <property name="page-increment">5</property>
+                        <property name="page-size">0</property>
+                        <property name="step-increment">1</property>
+                        <property name="value">0</property>
+                      </object>
+                    </property>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="retate_z_spinner">
+                  <object class="GtkSpinButton" id="rotate_z_spinner">
                     <property name="focusable">1</property>
                     <property name="numeric">True</property>
                     <property name="wrap">True</property>
@@ -117,6 +160,17 @@
                       <property name="column">0</property>
                       <property name="row">5</property>
                     </layout>
+                    <property name="snap-to-ticks">True</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment">
+                        <property name="lower">0</property>
+                        <property name="upper">100</property>
+                        <property name="page-increment">5</property>
+                        <property name="page-size">0</property>
+                        <property name="step-increment">1</property>
+                        <property name="value">0</property>
+                      </object>
+                    </property>
                   </object>
                 </child>
                 <child>
@@ -128,15 +182,17 @@
                       <property name="column">0</property>
                       <property name="row">7</property>
                     </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="label" translatable="yes">Приблизить / Удалить:</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">8</property>
-                    </layout>
+                    <property name="snap-to-ticks">True</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment">
+                        <property name="lower">0</property>
+                        <property name="upper">100</property>
+                        <property name="page-increment">5</property>
+                        <property name="page-size">0</property>
+                        <property name="step-increment">1</property>
+                        <property name="value">0</property>
+                      </object>
+                    </property>
                   </object>
                 </child>
                 <child>
@@ -148,18 +204,17 @@
                       <property name="column">0</property>
                       <property name="row">9</property>
                     </layout>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkBox" id="paper_box">
-                <property name="hexpand">1</property>
-                <property name="orientation">vertical</property>
-                <child>
-                  <object class="GtkDrawingArea" id="paper">
-                    <property name="margin-end">15</property>
-                    <property name="vexpand">1</property>
+                    <property name="snap-to-ticks">True</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment">
+                        <property name="lower">0</property>
+                        <property name="upper">100</property>
+                        <property name="page-increment">5</property>
+                        <property name="page-size">0</property>
+                        <property name="step-increment">1</property>
+                        <property name="value">0</property>
+                      </object>
+                    </property>
                   </object>
                 </child>
               </object>
