@@ -10,13 +10,19 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
                                    this, nullptr);
 
     scale_ = 100;
-    xStart_ = 50;
-    yStart_ = 50;
-    angleX_ = X2_d;
-    angleY_ = Y2_d;
-    angleZ_ = Z2_d;
+    xStart_ = 100;
+    yStart_ = 100;
     widget_ = drawing_area;
     c_ = new s21::Controller();
+    dotColor_ = Color(1,0,0);
+    lineColor_ = Color(0,1,0);
+    polyColor_ = Color(0,0,1);
+    bgColor_ = Color(1,1,1);
+    fillPoly_ = true;
+    lineWidth_ = 0.1;
+    vertWidth_ = 0.1;
+    vertType_ = None;
+    lineType_ = Solid;
 }
 
 SimpleCanvas::~SimpleCanvas() {
@@ -24,38 +30,72 @@ SimpleCanvas::~SimpleCanvas() {
 }
 
 void SimpleCanvas::draw_line(cairo_t* cr, double x1, double y1, double x2, double y2) {
-    cairo_set_source_rgb(cr, 0, 1, 0); // Зелёный
-    cairo_set_line_width(cr, 2);
+    cairo_set_source_rgb(cr, lineColor_.r, lineColor_.g, lineColor_.b);
     cairo_move_to(cr, x1, y1);
     cairo_line_to(cr, x2, y2);
+    if (lineType_ == Dotted){
+        double dashes[] = {lineWidth_*2, lineWidth_};
+        int num_dashes = 2;
+        double offset = 0.0;
+        cairo_set_dash(cr, dashes, num_dashes, offset);
+    }
+
     cairo_stroke(cr);
 }
 
-void SimpleCanvas::draw_polygon(cairo_t* cr, const std::vector<Point>& points) {
+void SimpleCanvas::draw_polygon(cairo_t* cr, const std::vector<s21::Point>& points) {
     if (points.size() < 3) return;
 
-    cairo_set_source_rgb(cr, 1, 0, 0); // Красный
-    cairo_set_line_width(cr, 2);
+    cairo_set_source_rgb(cr, polyColor_.r, polyColor_.g, polyColor_.b);
 
     cairo_move_to(cr, points[0].x, points[0].y);
     for (size_t i = 1; i < points.size(); ++i) {
         cairo_line_to(cr, points[i].x, points[i].y);
     }
     cairo_close_path(cr);
-    cairo_stroke(cr);
+    if (fillPoly_){
+        cairo_fill(cr);
+    }else{
+        cairo_stroke(cr);
+    }
+
 }
 
 void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
-    cairo_arc(cr, x, y, 5, 0, 2 * M_PI);
-    cairo_set_source_rgb(cr, 0, 0, 1); // Синий
+    switch(vertType_){
+        case Circle:
+            cairo_arc(cr, x, y, vertWidth_, 0, 2 * M_PI);
+        case Rect:
+            double d = vertWidth_*std::sqrt(2)/2;
+            cairo_rectangle (cr, x-d, y-d, 2*d, 2*d);
+    }
+    cairo_set_source_rgb(cr, dotColor_.r, dotColor_.g, dotColor_.b);
     cairo_fill(cr);
 }
 
 void SimpleCanvas::drawVert(cairo_t* cr){
     for (const auto& point : projection_) {
-        cairo_new_path(cr);
-        cairo_arc(cr, point.x, point.y, 0.1, 0, 2 * M_PI);
-        cairo_fill(cr);
+        draw_dot(cr, point.x, point.y);
+    }
+}
+
+void SimpleCanvas::drawEdges(cairo_t* cr){
+    s21::Edge_t edges = c_->getEdges();
+    for (s21::Seg_t s: edges){
+        g_print("%d-%d\n", s.start, s.end);
+        draw_line(cr, projection_[s.start].x, projection_[s.start].y, projection_[s.end].x, projection_[s.end].y);
+
+    }
+}
+
+void SimpleCanvas::drawFaces(cairo_t* cr){
+    s21::Poly_t poly = c_->getPolygons();
+    for(auto dots: poly){
+        std::vector<s21::Point> points;
+        for(int n: dots){
+            points.push_back(projection_[n]);
+        }
+        draw_polygon(cr, points);
     }
 }
 
@@ -73,18 +113,14 @@ void SimpleCanvas::redraw(){
 }
 
 void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
-    // Очистка фона (белый)
-    cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+    cairo_set_source_rgb(cr, bgColor_.r, bgColor_.g, bgColor_.b);
     cairo_paint(cr);
-    
-    // Центрируем систему координат
+    cairo_set_line_width(cr, lineWidth_);
     cairo_translate(cr, xStart_, yStart_);
-    // Масштабируем (подберите под свой размер фигуры)
     cairo_scale(cr, scale_, scale_);
-    
-    // Рисуем точки из проекции
-    cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); // красный
 
+    drawFaces(cr);
+    drawEdges(cr);
     drawVert(cr);
 
 }
@@ -93,10 +129,22 @@ void SimpleCanvas::setScale(double scale){
     scale_ = scale;
 }
 
-void SimpleCanvas::rotate(double x, double y, double z){
-    projection_ = c_->rotateFigure(x,y,z);
+void SimpleCanvas::rotateAbs(double x, double y, double z){
+    projection_ = c_->rotateAbsolute(x,y,z);
 }
-
+void SimpleCanvas::rotateX(double x){
+    projection_ = c_->rotateX(x);
+}
+void SimpleCanvas::rotateY(double y){
+    projection_ = c_->rotateY(y);
+}
+void SimpleCanvas::rotateZ(double z){
+    projection_ = c_->rotateZ(z);
+}
 void SimpleCanvas::toggleProjection(){
     projection_ = c_->toggleProjection();
+}
+
+void SimpleCanvas::togglePolyFill(){
+    fillPoly_ = !fillPoly_;
 }

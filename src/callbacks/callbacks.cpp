@@ -28,27 +28,27 @@ void Callbacks::on_up_scale_clicked(GtkWidget *button, gpointer user_data) {
     (*canvas)->redraw();
 }
 
-void Callbacks::on_rotateA_clicked(GtkWidget *button, gpointer user_data) {
+void Callbacks::on_AbsRotate_clicked(GtkWidget *button, gpointer user_data) {
     GtkWidget* window = GTK_WIDGET(user_data);
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
         g_object_get_data(G_OBJECT(window), "canvas"));
-    (*canvas)->rotate(135,90,0);
+    (*canvas)->rotateAbs(135,90,0);
     (*canvas)->redraw();
 }
 
-void Callbacks::on_rotateB_clicked(GtkWidget *button, gpointer user_data) {
+void Callbacks::on_rotateX_clicked(GtkWidget *button, gpointer user_data) {
     GtkWidget* window = GTK_WIDGET(user_data);
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
         g_object_get_data(G_OBJECT(window), "canvas"));
-    (*canvas)->rotate(0,0,0);
+    (*canvas)->rotateX(15.0);
     (*canvas)->redraw();
 }
 
-void Callbacks::on_rotateC_clicked(GtkWidget *button, gpointer user_data) {
+void Callbacks::on_rotateY_clicked(GtkWidget *button, gpointer user_data) {
     GtkWidget* window = GTK_WIDGET(user_data);
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
         g_object_get_data(G_OBJECT(window), "canvas"));
-    (*canvas)->rotate(0,0,45);
+    (*canvas)->rotateY(15);
     (*canvas)->redraw();
 }
 

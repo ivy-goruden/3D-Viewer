@@ -1,11 +1,9 @@
 #include "figure.hpp"
 namespace s21{
-    Figure::Figure(matrix_t m, Poly_t p, Node_t n): matrix_(m), polygons_(p), nodes_(n){
+    Figure::Figure(matrix_t m, Poly_t p, Edge_t n): matrix_(m), polygons_(p), edges_(n){
         projectionVertices_ = Vert_t();
     }
-
     Figure::Figure(ObjLoader loader){
-        polygons_ = Poly_t();
         projectionVertices_ = Vert_t();
 
         matrix_t m = matrix_t();
@@ -14,11 +12,35 @@ namespace s21{
         }
         matrix_ = std::move(m);
 
-        Node_t l = Node_t();
-        // for (const auto& line : loader.lines) {
-        //     l.push_back(Point(line.vi, line.ti));
-        // }
-        nodes_ = std::move(l);
+        Edge_t l = Edge_t();
+        for (const auto& line : loader.lines) {
+            if (line.size() <2) {continue;}
+            for (auto i = 0; i < line.size()-1; i++){
+                int start = line[i].vi-1;
+                int end = line[i+1].vi-1;
+                printf("strt: %d, end: %d", start, end);
+                if (start >=0 && start < matrix_.size() && end >=0 && end <matrix_.size()){
+                    Seg_t segment = Seg_t(start, end);
+                    l.push_back(segment);
+                }
+            }
+        }
+        Unique(l);
+        edges_ = std::move(l);
+        polygons_ = Poly_t();
+        for (FaceObj_t face: loader.faces){
+            std::vector<int> poly;
+            for (FaceElementObj_t el: face){
+                poly.push_back(el.vi-1);
+            }
+            polygons_.push_back(poly);
+        }
+    }
+
+    void Figure::Unique(Edge_t &vec){
+        std::sort(vec.begin(), vec.end());
+        auto last = std::unique(vec.begin(), vec.end());
+        vec.erase(last, vec.end());
     }
 
     Vert_t Figure::getProjection(){
@@ -33,12 +55,11 @@ namespace s21{
     int Figure::getVerticesNum(){
         return matrix_.size();
     }
-    Node_t Figure::getNodes(){
-        return nodes_;
+    Edge_t Figure::getEdges(){
+        return edges_;
     }
 
     int Figure::getNodesNum(){
-        //return nodes_.size();
-        return 0;
+        return edges_.size();
     }
 }

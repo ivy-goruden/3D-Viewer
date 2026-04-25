@@ -10,9 +10,9 @@ public:
     static void on_load_button_clicked(GtkWidget *button, gpointer user_data);
     static void on_down_scale_clicked(GtkWidget *button, gpointer user_data);
     static void on_up_scale_clicked(GtkWidget *button, gpointer user_data);
-    static void on_rotateA_clicked(GtkWidget *button, gpointer user_data);
-    static void on_rotateB_clicked(GtkWidget *button, gpointer user_data);
-    static void on_rotateC_clicked(GtkWidget *button, gpointer user_data);
+    static void on_AbsRotate_clicked(GtkWidget *button, gpointer user_data);
+    static void on_rotateX_clicked(GtkWidget *button, gpointer user_data);
+    static void on_rotateY_clicked(GtkWidget *button, gpointer user_data);
     static void on_perspectiveOn_clicked(GtkWidget *button, gpointer user_data);
     static void print_hello(GtkWidget *widget, gpointer data);
 };

@@ -16,9 +16,12 @@ namespace s21{
 
     Vert_t Transformer::getPerspectiveProjection(matrix_t m){
         //returns a list of vertices in new position
+        double camera_distance = 3.0;
         Vert_t projection;
         for(int i =0; i < m.size(); i++){
-            Point coord = Point{m[i][0]/m[i][2],m[i][1]/m[i][2]};
+            double z = m[i][2] + camera_distance;
+            if (z<= 0) continue; 
+            Point coord = Point{m[i][0]/z,m[i][1]/z};
             projection.push_back(coord);
         }
 
