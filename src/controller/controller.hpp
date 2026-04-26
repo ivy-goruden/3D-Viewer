@@ -23,6 +23,9 @@ namespace s21{
 
             Edge_t getEdges();
             Poly_t getPolygons();
+            double getAngleX();
+            double getAngleY();
+            double getAngleZ();
             // moveFigure();
             // scaleFigure();
     };

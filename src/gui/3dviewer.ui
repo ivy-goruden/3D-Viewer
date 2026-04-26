@@ -2,7 +2,7 @@
 <!-- Created with Cambalache 1.0 -->
 <interface>
   <!-- interface-name 3dviewer.ui -->
-  <requires lib="gtk" version="4.0"/>
+  <requires lib="gtk" version="4.1"/>
   <requires lib="gtk+" version="4.0"/>
   <object class="GtkApplicationWindow" id="main">
     <property name="default-height">700</property>
@@ -38,11 +38,19 @@
                 <property name="receives-default">1</property>
               </object>
             </child>
+            <child>
+              <object class="GtkButton" id="color_button">
+                <property name="focusable">1</property>
+                <property name="label" translatable="yes">Цвет</property>
+                <property name="receives-default">1</property>
+              </object>
+            </child>
           </object>
         </child>
         <child>
           <object class="GtkBox">
             <property name="vexpand">1</property>
+
             <child>
               <object class="GtkBox" id="paper_box">
                 <property name="hexpand">1</property>
@@ -55,12 +63,13 @@
                 </child>
               </object>
             </child>
+
             <child>
               <object class="GtkGrid">
                 <property name="column-spacing">8</property>
                 <property name="margin-end">30</property>
                 <property name="margin-start">30</property>
-                <property name="row-spacing">8</property>
+                <property name="row-spacing">10</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="justify">center</property>
@@ -120,7 +129,7 @@
                     <property name="adjustment">
                       <object class="GtkAdjustment">
                         <property name="lower">0</property>
-                        <property name="upper">100</property>
+                        <property name="upper">360</property>
                         <property name="page-increment">5</property>
                         <property name="page-size">0</property>
                         <property name="step-increment">1</property>
@@ -142,7 +151,7 @@
                     <property name="adjustment">
                       <object class="GtkAdjustment">
                         <property name="lower">0</property>
-                        <property name="upper">100</property>
+                        <property name="upper">360</property>
                         <property name="page-increment">5</property>
                         <property name="page-size">0</property>
                         <property name="step-increment">1</property>
@@ -164,7 +173,7 @@
                     <property name="adjustment">
                       <object class="GtkAdjustment">
                         <property name="lower">0</property>
-                        <property name="upper">100</property>
+                        <property name="upper">360</property>
                         <property name="page-increment">5</property>
                         <property name="page-size">0</property>
                         <property name="step-increment">1</property>
@@ -207,8 +216,8 @@
                     <property name="snap-to-ticks">True</property>
                     <property name="adjustment">
                       <object class="GtkAdjustment">
-                        <property name="lower">0</property>
-                        <property name="upper">100</property>
+                        <property name="lower">-1000</property>
+                        <property name="upper">10000</property>
                         <property name="page-increment">5</property>
                         <property name="page-size">0</property>
                         <property name="step-increment">1</property>
@@ -219,6 +228,130 @@
                 </child>
               </object>
             </child>
+
+            <child>
+              <object class="GtkGrid">
+                <property name="column-spacing">8</property>
+                <property name="margin-end">30</property>
+                <property name="margin-start">30</property>
+                <property name="row-spacing">10</property>
+                <child>
+                  <object class="GtkLabel" id="line_label">
+                    <property name="label">Тип линии:</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSwitch" id="line_switch">
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="active">false</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">1</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="proj_label">
+                    <property name="label">Тип проекции:</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">2</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSwitch" id="proj_switch">
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="active">false</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">3</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="poli_fill_label">
+                    <property name="label">Заполнять полигоны:</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">4</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSwitch" id="poli_fill_switch">
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="active">false</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">5</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkFrame" id="vert_mode_frame">
+                    <property name="label">Вид вершин:</property>
+                    <property name="margin-top">12</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">6</property>
+                    </layout>
+                    <child>
+                      <!-- Контейнер для кнопок внутри рамки -->
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-top">12</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <!-- Первая радиокнопка (лидер группы) -->
+                          <object class="GtkCheckButton" id="vert_mode_none">
+                            <property name="label">Не отображать вершины</property>
+                            <property name="active">true</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">17</property>
+                            </layout>
+                          </object>                  
+                        </child>
+                        <child>
+                          <!-- Вторая радиокнопка (с group, указывающим на первую) -->
+                          <object class="GtkCheckButton" id="vert_mode_rect">
+                            <property name="label">Отображать квадраты</property>
+                            <property name="group">vert_mode_none</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">18</property>
+                            </layout>
+                          </object>                  
+                        </child>
+                        <child>
+                          <!-- Третья радиокнопка (также с group) -->
+                          <object class="GtkCheckButton" id="vert_mode_circ">
+                            <property name="label">Отображать круги</property>
+                            <property name="group">vert_mode_none</property>
+                            <layout>
+                              <property name="column">0</property>
+                              <property name="row">19</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+
           </object>
         </child>
         <child>

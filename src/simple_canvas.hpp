@@ -42,6 +42,9 @@ public:
     void rotateAbs(double x, double y, double z);
     void togglePolyFill();
 
+    double getAngleX();
+    double getAngleY();
+    double getAngleZ();
 
 private:
     GtkWidget* drawing_area;

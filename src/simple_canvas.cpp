@@ -132,19 +132,35 @@ void SimpleCanvas::setScale(double scale){
 void SimpleCanvas::rotateAbs(double x, double y, double z){
     projection_ = c_->rotateAbsolute(x,y,z);
 }
+
 void SimpleCanvas::rotateX(double x){
     projection_ = c_->rotateX(x);
 }
+
 void SimpleCanvas::rotateY(double y){
     projection_ = c_->rotateY(y);
 }
+
 void SimpleCanvas::rotateZ(double z){
     projection_ = c_->rotateZ(z);
 }
+
 void SimpleCanvas::toggleProjection(){
     projection_ = c_->toggleProjection();
 }
 
 void SimpleCanvas::togglePolyFill(){
     fillPoly_ = !fillPoly_;
+}
+
+double SimpleCanvas::getAngleX() {
+    return c_->getAngleX();
+}
+
+double SimpleCanvas::getAngleY() {
+    return c_->getAngleY();
+}
+
+double SimpleCanvas::getAngleZ() {
+    return c_->getAngleZ();
 }

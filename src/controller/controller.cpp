@@ -5,10 +5,22 @@
 
 namespace s21{
 
-    Controller::Controller(){
+    Controller::Controller() {
         angleX_ = X2_d;
         angleY_ = Y2_d;
         angleZ_ = Z2_d;
+    }
+
+    double Controller::getAngleX() {
+        return angleX_;
+    }
+
+    double Controller::getAngleY() {
+        return angleY_;
+    }
+
+    double Controller::getAngleZ() {
+        return angleZ_;
     }
 
     Vert_t Controller::loadFigure(const char* filename){
