@@ -10,15 +10,15 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
                                    this, nullptr);
 
     scale_ = 100;
-    xStart_ = 100;
-    yStart_ = 100;
+    xStart_ = 0;
+    yStart_ = 0;
     widget_ = drawing_area;
     c_ = new s21::Controller();
     dotColor_ = Color(1,0,0);
     lineColor_ = Color(0,1,0);
     polyColor_ = Color(0,0,1);
     bgColor_ = Color(1,1,1);
-    fillPoly_ = true;
+    fillPoly_ = false;
     lineWidth_ = 0.1;
     vertWidth_ = 0.1;
     vertType_ = None;
@@ -116,7 +116,7 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
     cairo_set_source_rgb(cr, bgColor_.r, bgColor_.g, bgColor_.b);
     cairo_paint(cr);
     cairo_set_line_width(cr, lineWidth_);
-    cairo_translate(cr, xStart_, yStart_);
+    cairo_translate(cr, width/2+xStart_, height/2+yStart_);
     cairo_scale(cr, scale_, scale_);
 
     drawFaces(cr);
@@ -127,6 +127,14 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
 
 void SimpleCanvas::setScale(double scale){
     scale_ = scale;
+}
+
+void SimpleCanvas::setPosX(double x){
+    xStart_ = x;
+}
+
+void SimpleCanvas::setPosY(double y){
+    yStart_ = y;
 }
 
 void SimpleCanvas::rotateAbs(double x, double y, double z){

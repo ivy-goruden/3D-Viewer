@@ -9,10 +9,7 @@ SOURCE := callbacks/callbacks.cpp config/config.cpp simple_canvas.cpp controller
 %.o: %.c
 	g++ $(CXXFLAGS) -c $< -o $@
 
-all: clean 3Dtransformer.a
-	g++ $(CXXFLAGS) $(SOURCE) -o game.out $(GTKFLAGS) -lm -L. -l3Dtransformer
-# 	valgrind --leak-check=full --track-origins=yes -s ./game.out
-	./game.out
+all: gtk02run
 
 install:
 
@@ -41,3 +38,8 @@ gtk02: 3Dtransformer.a
 
 gtk02run: gtk02
 	./gtk02.app
+
+valgrind:
+# 	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
+#   --suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp --suppressions=my.supp --leak-check=full --show-leak-kinds=definite,indirect --gen-suppressions=all --track-origins=yes -s ./gtk02.app
+	valgrind --leak-check=full ./gtk02.app 2>&1 | grep -E "definitely.*gtk02.app|lost.*gtk02.app" || true
