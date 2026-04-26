@@ -72,7 +72,19 @@ void GuiApp::activate(GtkApplication* app) {
     zSpinnerButton = gtk_builder_get_object(builder, "rotate_z_spinner");
     shiftSpinnerButton = gtk_builder_get_object(builder, "shift_spinner");
     zoomSpinnerButton = gtk_builder_get_object(builder, "zoom_spinner");
+    paper = gtk_builder_get_object(builder, "paper");
     g_object_unref(builder);
+
+    auto canvas_shared = std::make_shared<SimpleCanvas>(GTK_WIDGET(paper));
+    
+    // Сохраняем shared_ptr в куче, чтобы передать в колбэки
+    auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas_shared);
+    
+    // Привязываем к окну, чтобы удалить shared_ptr при уничтожении окна
+    g_object_set_data_full(G_OBJECT(window), "canvas", canvas_ptr,
+                           [](gpointer data) {
+                               delete static_cast<std::shared_ptr<SimpleCanvas>*>(data);
+                           });
 
     g_signal_connect(openButton, "clicked", G_CALLBACK(onOpenButtonClick), this);
     g_signal_connect(saveButton, "clicked", G_CALLBACK(onSaveButtonClick), this);
@@ -107,6 +119,11 @@ void GuiApp::xSpinnerValueChanged(GtkSpinButton* btn) {
 void GuiApp::ySpinnerValueChanged(GtkSpinButton* btn) {
     double value = gtk_spin_button_get_value(btn);
     g_print("%s: %.0f\n", "ySpinnerValueVhanged", value);
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+        g_object_get_data(window, "canvas"));
+    (*canvas)->rotateY(value);
+    (*canvas)->redraw();
+
 }
 
 void GuiApp::zSpinnerValueChanged(GtkSpinButton* btn) {

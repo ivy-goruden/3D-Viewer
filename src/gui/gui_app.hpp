@@ -2,6 +2,7 @@
 #define GUI_APP
 
 #include <gtk/gtk.h>
+#include "../simple_canvas.hpp"
 
 class GuiApp {
   private:
@@ -15,6 +16,7 @@ class GuiApp {
     GObject* zSpinnerButton;
     GObject* shiftSpinnerButton;
     GObject* zoomSpinnerButton;
+    GObject* paper;
     static void onActivate(GtkApplication *app, gpointer user_data);
     static void onOpenButtonClick(GtkButton* btn, gpointer user_data);
     static void onSaveButtonClick(GtkButton* btn, gpointer user_data);

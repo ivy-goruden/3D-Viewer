@@ -36,8 +36,8 @@ gtk01:
 gtk01run: gtk01
 	./gtk01.app
 
-gtk02:
-	g++ $(CXXFLAGS) gtk02.cpp gui/gui_app.cpp -o gtk02.app $(GTKFLAGS) -lm
+gtk02: 3Dtransformer.a
+	g++ $(CXXFLAGS) gtk02.cpp gui/gui_app.cpp  simple_canvas.cpp controller/controller.cpp -L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
 
 gtk02run: gtk02
 	./gtk02.app
