@@ -10,16 +10,16 @@ SOURCE := callbacks/callbacks.cpp config/config.cpp simple_canvas.cpp controller
 	g++ $(CXXFLAGS) -c $< -o $@
 
 all: clean 3Dtransformer.a
-	g++ $(CXXFLAGS) $(SOURCE) -o game $(GTKFLAGS) -lm -L. -l3Dtransformer
-# 	valgrind --leak-check=full --track-origins=yes -s ./game
-	./game
+	g++ $(CXXFLAGS) $(SOURCE) -o game.out $(GTKFLAGS) -lm -L. -l3Dtransformer
+# 	valgrind --leak-check=full --track-origins=yes -s ./game.out
+	./game.out
 
 install:
 
 uninstall:
 
 clean:
-	rm -rf *.a $(OLD) game
+	rm -rf *.a $(OLD) game.out
 
 dvi:
 
