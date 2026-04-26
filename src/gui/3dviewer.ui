@@ -2,7 +2,7 @@
 <!-- Created with Cambalache 1.0 -->
 <interface>
   <!-- interface-name 3dviewer.ui -->
-  <requires lib="gtk" version="4.1"/>
+  <requires lib="gtk" version="4.10"/>
   <requires lib="gtk+" version="4.0"/>
   <object class="GtkApplicationWindow" id="main">
     <property name="default-height">700</property>
