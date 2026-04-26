@@ -3,8 +3,10 @@ LIB_OBJS := $(LIB_SOURCE:.cpp=.o)
 CXXFLAGS =  -std=c++20
 GTKFLAGS = `pkg-config --cflags --libs gtk4`
 OLD = $(shell find ./ -name "*.o")
-
+TESTS := $(shell find tests/ -name "*.cpp")
+TESTS_OBJS := $(TESTS:.cpp=.o)
 SOURCE := callbacks/callbacks.cpp config/config.cpp simple_canvas.cpp controller/controller.cpp main.cpp
+GTEST_LIBS = -lgtest -lgtest_main -pthread
 
 %.o: %.c
 	g++ $(CXXFLAGS) -c $< -o $@
@@ -22,7 +24,9 @@ dvi:
 
 dist:
  
-tests:
+tests:$(TESTS_OBJS) 3Dtransformer.a
+	g++ $(TESTS_OBJS) -L. -l3Dtransformer -o tests.out $(GTEST_LIBS)
+	./tests.out
 
 3Dtransformer.a: $(LIB_OBJS)
 	ar rcs lib3Dtransformer.a $^
