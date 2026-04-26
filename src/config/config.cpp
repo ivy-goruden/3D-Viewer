@@ -15,18 +15,18 @@ void Config::addControls(GtkWidget* box, GtkWidget* window){
     GtkWidget *load_btn = gtk_button_new_with_label("Load OBJ");
     GtkWidget *upscale = gtk_button_new_with_label("+");
     GtkWidget *downscale = gtk_button_new_with_label("-");
-    GtkWidget *rotateA = gtk_button_new_with_label("rotateA");
-    GtkWidget *rotateB = gtk_button_new_with_label("rotateB");
-    GtkWidget *rotateC = gtk_button_new_with_label("rotateC");
+    GtkWidget *rotateA = gtk_button_new_with_label("AbsRotate");
+    GtkWidget *rotateB = gtk_button_new_with_label("rotateX-15");
+    GtkWidget *rotateC = gtk_button_new_with_label("rotateY-15");
     GtkWidget *perspectiveOn = gtk_button_new_with_label("PerspectiveOn");
     GtkWidget *perspectiveOff = gtk_button_new_with_label("PerspectiveOff");
 
     g_signal_connect(upscale, "clicked", G_CALLBACK(Callbacks::on_up_scale_clicked), window);
     g_signal_connect(downscale, "clicked", G_CALLBACK(Callbacks::on_down_scale_clicked), window);
     g_signal_connect(load_btn, "clicked", G_CALLBACK(Callbacks::on_load_button_clicked), window);
-    g_signal_connect(rotateA, "clicked", G_CALLBACK(Callbacks::on_rotateA_clicked), window);
-    g_signal_connect(rotateB, "clicked", G_CALLBACK(Callbacks::on_rotateB_clicked), window);
-    g_signal_connect(rotateC, "clicked", G_CALLBACK(Callbacks::on_rotateC_clicked), window);
+    g_signal_connect(rotateA, "clicked", G_CALLBACK(Callbacks::on_AbsRotate_clicked), window);
+    g_signal_connect(rotateB, "clicked", G_CALLBACK(Callbacks::on_rotateX_clicked), window);
+    g_signal_connect(rotateC, "clicked", G_CALLBACK(Callbacks::on_rotateY_clicked), window);
     g_signal_connect(perspectiveOn, "clicked", G_CALLBACK(Callbacks::on_perspectiveOn_clicked), window);
     // g_signal_connect(perspectiveOff, "clicked", G_CALLBACK(on_perspectiveOff_clicked), window);
 

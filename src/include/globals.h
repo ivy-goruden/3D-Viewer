@@ -20,10 +20,21 @@ struct Point {
     Point(double x = 0, double y = 0) : x(x), y(y) {}
 };
 
+struct Seg_t {
+    int start, end;
+    bool operator==(const Seg_t& other) const {
+        return (start == other.start && end == other.end);
+    }
+    bool operator<(const Seg_t& other) const {
+        if (start != other.start) return start < other.start;
+        return end < other.end;
+    }
+};
+
 typedef std::vector<std::vector<double>> matrix_t;      //matrix for affine transformations
-typedef std::vector<Point> Vert_t;                      //vertices
+typedef std::vector<Point> Vert_t;                      //vertices вершины
 typedef std::vector<std::vector<int>> Poly_t;           //polygons
-typedef std::vector<Point> Node_t;                      //nodes
+typedef std::vector<Seg_t> Edge_t;                      //edges грани
 
 enum class Action {
     QUIT_ACT,

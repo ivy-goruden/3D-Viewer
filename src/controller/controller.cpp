@@ -1,10 +1,15 @@
 #include "controller.hpp"
 #include "../include/obj_parser/obj_loader.hpp"
 #include "../include/affine_transformer/transformer.hpp"
+#include <cmath>
 
 namespace s21{
 
-    Controller::Controller(){}
+    Controller::Controller(){
+        angleX_ = X2_d;
+        angleY_ = Y2_d;
+        angleZ_ = Z2_d;
+    }
 
     Vert_t Controller::loadFigure(const char* filename){
         s21::ObjLoader loader = s21::ObjLoader();
@@ -26,6 +31,30 @@ namespace s21{
 
     }
 
+    Vert_t Controller::rotateX(double x){
+        angleX_ = std::fmod(angleX_+x,360.0);
+        return rotateFigure(angleX_, angleY_, angleZ_);
+
+    }
+    Vert_t Controller::rotateY(double y){
+        angleY_ = std::fmod(angleY_+y,360.0);
+        return rotateFigure(angleX_, angleY_, angleZ_);
+
+    }
+    Vert_t Controller::rotateZ(double z){
+        angleZ_ = std::fmod(angleZ_+z,360.0);
+        return rotateFigure(angleX_, angleY_, angleZ_);
+
+    }
+
+    Vert_t Controller::rotateAbsolute(double x, double y, double z){
+        angleX_ = std::fmod(x,360.0);
+        angleY_ = std::fmod(y,360.0);
+        angleZ_ = std::fmod(z,360.0);
+        return rotateFigure(angleX_, angleY_, angleZ_);
+
+    }
+
     Vert_t Controller::getFigureProjection(const matrix_t original){
         if (parallel_projection_){
             return s21::Transformer::getParallelProjection(original);
@@ -35,8 +64,30 @@ namespace s21{
 
     Vert_t Controller::toggleProjection(){
         parallel_projection_ = !parallel_projection_;
-        Vert_t projection_ = getFigureProjection(figure_->getMatrix());
-        return projection_;
+        Vert_t projection;
+        if (figure_ != nullptr){
+            projection = getFigureProjection(figure_->getMatrix());
+        }
+        return projection;
     }
+
+    Edge_t Controller::getEdges(){
+        Edge_t edges;
+        if (figure_ != nullptr){
+            edges = figure_->getEdges();
+        }
+        return edges;
+        
+    }
+
+    Poly_t Controller::getPolygons(){
+        Poly_t polygon;
+        if (figure_ != nullptr){
+            polygon = figure_->getPolygons();
+        }
+        return polygon;
+        
+    }
+    
 }
 
