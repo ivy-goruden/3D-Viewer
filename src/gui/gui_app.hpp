@@ -2,6 +2,7 @@
 #define GUI_APP
 
 #include <gtk/gtk.h>
+#include "open_dialog.hpp"
 #include "../simple_canvas.hpp"
 
 class GuiApp {
@@ -24,6 +25,7 @@ class GuiApp {
     GObject* rectModeCheck;
     GObject* circModeCheck;
     GObject* colorButton;
+    OpenDialog* openDialog;
     static void onColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onColorSelected(GObject *source, GAsyncResult *result, gpointer user_data);
     static void onActivate(GtkApplication *app, gpointer user_data);
@@ -39,9 +41,8 @@ class GuiApp {
     static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
-    static void onOpenFileSelected(GtkButton* btn, gpointer user_data);
-
   public:
+    
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -60,7 +61,7 @@ class GuiApp {
     void vertModeToggled(GtkCheckButton* btn, Shape vertMode);
     void colorButtonClick(GtkButton* btn);
     void colorSelect(double red, double green, double blue, double alpha);
-    void openFileSelect(std::string path);
+    void openFileSelected(const std::string& path);
 };
 
 #endif

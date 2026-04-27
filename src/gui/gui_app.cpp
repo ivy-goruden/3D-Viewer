@@ -1,7 +1,7 @@
 #include "gui_app.hpp"
 #include <gtk/gtk.h>
 #include <iostream>
-#include "open_dialog.cpp"
+#include "open_dialog.hpp"
 
 void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
@@ -133,15 +133,6 @@ void GuiApp::activate(GtkApplication* app) {
     g_object_set_data(G_OBJECT(circModeCheck), "mode", GINT_TO_POINTER(Circle));
     g_object_unref(builder);
 
-    auto canvas_shared = std::make_shared<SimpleCanvas>(GTK_WIDGET(paper));    
-    // Сохраняем shared_ptr в куче, чтобы передать в колбэки
-    auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas_shared);    
-    // Привязываем к окну, чтобы удалить shared_ptr при уничтожении окна
-    g_object_set_data_full(G_OBJECT(window), "canvas", canvas_ptr,
-                           [](gpointer data) {
-                               delete static_cast<std::shared_ptr<SimpleCanvas>*>(data);
-                           });
-
     g_signal_connect(openButton, "clicked", G_CALLBACK(onOpenButtonClick), this);
     g_signal_connect(saveButton, "clicked", G_CALLBACK(onSaveButtonClick), this);
     g_signal_connect(resetButton, "clicked", G_CALLBACK(onResetButtonClick), this);
@@ -160,17 +151,28 @@ void GuiApp::activate(GtkApplication* app) {
 
     gtk_window_set_application(GTK_WINDOW(window), app);
     gtk_window_present(GTK_WINDOW(window));
+
+    openDialog = new OpenDialog(GTK_WINDOW(window));
+    openDialog->setOnFileSelected([this](const std::string& path) {
+        this->openFileSelected(path);
+    });
+
+    auto canvas_shared = std::make_shared<SimpleCanvas>(GTK_WIDGET(paper));    
+    // Сохраняем shared_ptr в куче, чтобы передать в колбэки
+    auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas_shared);    
+    // Привязываем к окну, чтобы удалить shared_ptr при уничтожении окна
+    g_object_set_data_full(G_OBJECT(window), "canvas", canvas_ptr,
+        [](gpointer data) {
+            delete static_cast<std::shared_ptr<SimpleCanvas>*>(data);
+        });
 }
 
 void GuiApp::openButtonClick(GtkButton* btn) {
     g_print("open button\n");
-    OpenDialog dialog(GTK_WINDOW(window));
-    dialog.open();
-    // if (dialog.getDialogResult()) {
-        // g_print("%s\n", dialog.getPath().c_str());
-    // } else {
-    //     g_print("%s\n", "Ничего не выбрано");
-    // }
+
+    if (!openDialog->isActive()) {
+        openDialog->open();    
+    }
 }
 
 void GuiApp::saveButtonClick(GtkButton* btn) {
@@ -261,7 +263,7 @@ void GuiApp::vertModeToggled(GtkCheckButton* btn, Shape vertMode) {
     g_print("%d\n", vertMode);
 }
 
-void GuiApp::openFileSelect(std::string path) {
+void GuiApp::openFileSelected(const std::string& path) {
     g_print("%s\n", path.c_str());
 
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(g_object_get_data(window, "canvas"));
