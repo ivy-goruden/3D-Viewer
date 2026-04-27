@@ -85,12 +85,10 @@ void GuiApp::onFillSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer use
     self->fillSwitchActivate(sw);
 }
 
-// enum Shape{None, Circle, Rect};
 void GuiApp::onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data) {
     if (!gtk_check_button_get_active(btn)) {
         return;
     }
-    
     GuiApp *self = static_cast<GuiApp*>(user_data);
     Shape vertMode = Shape(GPOINTER_TO_INT(g_object_get_data(G_OBJECT(btn), "mode")));
     self->vertModeToggled(btn, vertMode);
