@@ -39,6 +39,7 @@ class GuiApp {
     static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
+    static void onOpenFileSelected(GtkButton* btn, gpointer user_data);
 
   public:
     GuiApp();
@@ -59,6 +60,7 @@ class GuiApp {
     void vertModeToggled(GtkCheckButton* btn, Shape vertMode);
     void colorButtonClick(GtkButton* btn);
     void colorSelect(double red, double green, double blue, double alpha);
+    void openFileSelect(std::string path);
 };
 
 #endif

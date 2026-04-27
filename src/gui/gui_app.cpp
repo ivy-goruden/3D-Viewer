@@ -1,6 +1,7 @@
 #include "gui_app.hpp"
 #include <gtk/gtk.h>
 #include <iostream>
+#include "open_dialog.cpp"
 
 void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
@@ -163,12 +164,13 @@ void GuiApp::activate(GtkApplication* app) {
 
 void GuiApp::openButtonClick(GtkButton* btn) {
     g_print("open button\n");
-
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(g_object_get_data(window, "canvas"));
-    if (canvas) {
-        (*canvas)->loadFigure("./assets/cube.obj");
-        (*canvas)->redraw();
-    }
+    OpenDialog dialog(GTK_WINDOW(window));
+    dialog.open();
+    // if (dialog.getDialogResult()) {
+        // g_print("%s\n", dialog.getPath().c_str());
+    // } else {
+    //     g_print("%s\n", "Ничего не выбрано");
+    // }
 }
 
 void GuiApp::saveButtonClick(GtkButton* btn) {
@@ -257,4 +259,14 @@ void GuiApp::fillSwitchActivate(GtkSwitch* sw) {
 
 void GuiApp::vertModeToggled(GtkCheckButton* btn, Shape vertMode) {
     g_print("%d\n", vertMode);
+}
+
+void GuiApp::openFileSelect(std::string path) {
+    g_print("%s\n", path.c_str());
+
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(g_object_get_data(window, "canvas"));
+    if (canvas) {
+        (*canvas)->loadFigure(path.c_str());
+        (*canvas)->redraw();
+    }
 }
