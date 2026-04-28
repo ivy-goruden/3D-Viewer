@@ -5,6 +5,48 @@
 #include "open_dialog.hpp"
 #include "../simple_canvas.hpp"
 
+class Command abstract {
+    Command();
+    ~Command();
+    void execute();
+};
+
+class OpenCommand extend Command {
+    OpenCommand();
+    ~OpenCommand();
+    void execute();
+}
+
+class SaveCommand extend Command {
+    SaveCommand();
+    ~SaveCommand();
+    void execute();
+}
+
+class ResetCommand extend Command {
+    ResetCommand();
+    ~ResetCommand();
+    void execute();
+}
+
+class RorateCommand extend Command {
+    RorateCommand();
+    ~RorateCommand();
+    void execute();
+}
+
+class ShiftCommand extend Command {
+    ShiftCommand();
+    ~ShiftCommand();
+    void execute();
+}
+
+class ZoomCommand extend Command {
+    ZoomCommand();
+    ~ZoomCommand();
+    void execute();
+}
+
 class GuiApp {
   private:
     GtkApplication *app;
@@ -41,8 +83,8 @@ class GuiApp {
     static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
-  public:
-    
+
+  public:    
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -62,6 +104,33 @@ class GuiApp {
     void colorButtonClick(GtkButton* btn);
     void colorSelect(double red, double green, double blue, double alpha);
     void openFileSelected(const std::string& path);
+
+  private:
+    Command* openCommand;
+    Command* saveCommand;
+    Command* resetCommand;
+    Command* colorCommand;
+    Command* rotateCommand;
+    Command* shiftCommand;
+    Command* zoomCommand;
+
+  public:
+    void setOpenCommand(Command* cmd);
+    void setSaveCommand(Command* cmd);
+    void setResetCommand(Command* cmd);
+    void setColorCommand(Command* cmd);
+    void setRotateCommand(Command* cmd);
+    void setShiftCommand(Command* cmd);
+    void setZoomCommand(Command* cmd);
+    
+  public:
+    void executeOpenCommand();
+    void executeSaveCommand();
+    void executeResetCommand();
+    void executeColorCommand();
+    void executeRotateCommand();
+    void executeShiftCommand();
+    void executeZoomCommand();
 };
 
 #endif
