@@ -6,21 +6,22 @@
 void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->activate(app);
+    self->createCommands();
 }
 
 void GuiApp::onOpenButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->openButtonClick(btn);
+    self->executeCommand(self->openCommand);
 }
 
 void GuiApp::onSaveButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->saveButtonClick(btn);
+    self->executeCommand(self->saveCommand);
 }
 
 void GuiApp::onResetButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->resetButtonClick(btn);
+    self->executeCommand(self->resetCommand);
 }
 
 void GuiApp::onColorButtonClick(GtkButton* btn, gpointer user_data) {
@@ -47,7 +48,7 @@ void GuiApp::onColorSelected(GObject *source, GAsyncResult *result, gpointer use
 
 void GuiApp::onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->xSpinnerValueChanged(btn);
+    self->executeCommand(self->rotateXCommand);
 }
 
 void GuiApp::onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
@@ -78,7 +79,6 @@ void GuiApp::onLineSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer use
 void GuiApp::onProjSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->projSwitchActivate(sw);
-
 }
 
 void GuiApp::onFillSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
@@ -106,7 +106,6 @@ GuiApp::~GuiApp() {
 int GuiApp::run(int argc, char **argv) {
     g_signal_connect(app, "activate", G_CALLBACK(onActivate), this);
     return g_application_run(G_APPLICATION(app), argc, argv);
-
 }
 
 void GuiApp::activate(GtkApplication* app) {
@@ -168,24 +167,15 @@ void GuiApp::activate(GtkApplication* app) {
 }
 
 void GuiApp::openButtonClick(GtkButton* btn) {
-    g_print("open button\n");
-
-    if (!openDialog->isActive()) {
-        openDialog->open();    
-    }
+    
 }
 
 void GuiApp::saveButtonClick(GtkButton* btn) {
-    g_print("save button\n");
+
 }
 
 void GuiApp::resetButtonClick(GtkButton* btn) {
-    g_print("reset button\n");
 
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(window, "canvas"));
-    (*canvas)->rotateAbs(0, 0, 0);
-    (*canvas)->redraw();
 }
 
 void GuiApp::colorButtonClick(GtkButton* btn) {
@@ -200,13 +190,7 @@ void GuiApp::colorSelect(double red, double green, double blue, double alpha) {
 }
 
 void GuiApp::xSpinnerValueChanged(GtkSpinButton* btn) {
-    double value = gtk_spin_button_get_value(btn);
-    g_print("%s: %.0f\n", "xSpinnerValueVhanged", value);
 
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(window, "canvas"));
-    (*canvas)->rotateAbs(value, (*canvas)->getAngleY(), (*canvas)->getAngleZ());
-    (*canvas)->redraw();
 }
 
 void GuiApp::ySpinnerValueChanged(GtkSpinButton* btn) {
@@ -266,9 +250,26 @@ void GuiApp::vertModeToggled(GtkCheckButton* btn, Shape vertMode) {
 void GuiApp::openFileSelected(const std::string& path) {
     g_print("%s\n", path.c_str());
 
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(g_object_get_data(window, "canvas"));
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+        g_object_get_data(window, "canvas"));
     if (canvas) {
         (*canvas)->loadFigure(path.c_str());
         (*canvas)->redraw();
     }
 }
+
+void GuiApp::createCommands() {
+    this->openCommand = new OpenCommand(this);
+    this->saveCommand = new SaveCommand(this);
+    this->resetCommand = new ResetCommand(this);
+    this->rotateXCommand = new RorateXCommand(this);
+    this->shiftCommand = new ShiftCommand(this);
+    this->zoomCommand = new ZoomCommand(this);
+}
+
+void GuiApp::executeCommand(Command *cmd) {
+    if (cmd) {
+        cmd->execute();
+    }
+}
+

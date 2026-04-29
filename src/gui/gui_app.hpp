@@ -3,52 +3,28 @@
 
 #include <gtk/gtk.h>
 #include "open_dialog.hpp"
+#include "command.hpp"
 #include "../simple_canvas.hpp"
-
-class Command abstract {
-    Command();
-    ~Command();
-    void execute();
-};
-
-class OpenCommand extend Command {
-    OpenCommand();
-    ~OpenCommand();
-    void execute();
-}
-
-class SaveCommand extend Command {
-    SaveCommand();
-    ~SaveCommand();
-    void execute();
-}
-
-class ResetCommand extend Command {
-    ResetCommand();
-    ~ResetCommand();
-    void execute();
-}
-
-class RorateCommand extend Command {
-    RorateCommand();
-    ~RorateCommand();
-    void execute();
-}
-
-class ShiftCommand extend Command {
-    ShiftCommand();
-    ~ShiftCommand();
-    void execute();
-}
-
-class ZoomCommand extend Command {
-    ZoomCommand();
-    ~ZoomCommand();
-    void execute();
-}
 
 class GuiApp {
   private:
+    static void onColorButtonClick(GtkButton* btn, gpointer user_data);
+    static void onColorSelected(GObject *source, GAsyncResult *result, gpointer user_data);
+    static void onActivate(GtkApplication *app, gpointer user_data);
+    static void onOpenButtonClick(GtkButton* btn, gpointer user_data);
+    static void onSaveButtonClick(GtkButton* btn, gpointer user_data);
+    static void onResetButtonClick(GtkButton* btn, gpointer user_data);
+    static void onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onZSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onShiftSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onLineSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
+    static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
+    static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
+    static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
+
+  public:    
     GtkApplication *app;
     GObject* window;
     GObject* openButton;
@@ -68,23 +44,6 @@ class GuiApp {
     GObject* circModeCheck;
     GObject* colorButton;
     OpenDialog* openDialog;
-    static void onColorButtonClick(GtkButton* btn, gpointer user_data);
-    static void onColorSelected(GObject *source, GAsyncResult *result, gpointer user_data);
-    static void onActivate(GtkApplication *app, gpointer user_data);
-    static void onOpenButtonClick(GtkButton* btn, gpointer user_data);
-    static void onSaveButtonClick(GtkButton* btn, gpointer user_data);
-    static void onResetButtonClick(GtkButton* btn, gpointer user_data);
-    static void onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
-    static void onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
-    static void onZSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
-    static void onShiftSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
-    static void onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
-    static void onLineSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
-    static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
-    static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
-    static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
-
-  public:    
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -110,27 +69,13 @@ class GuiApp {
     Command* saveCommand;
     Command* resetCommand;
     Command* colorCommand;
-    Command* rotateCommand;
+    Command* rotateXCommand;
     Command* shiftCommand;
     Command* zoomCommand;
+    void createCommands();
 
   public:
-    void setOpenCommand(Command* cmd);
-    void setSaveCommand(Command* cmd);
-    void setResetCommand(Command* cmd);
-    void setColorCommand(Command* cmd);
-    void setRotateCommand(Command* cmd);
-    void setShiftCommand(Command* cmd);
-    void setZoomCommand(Command* cmd);
-    
-  public:
-    void executeOpenCommand();
-    void executeSaveCommand();
-    void executeResetCommand();
-    void executeColorCommand();
-    void executeRotateCommand();
-    void executeShiftCommand();
-    void executeZoomCommand();
+    void executeCommand(Command* cmd);
 };
 
 #endif
