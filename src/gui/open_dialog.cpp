@@ -11,14 +11,10 @@ OpenDialog::OpenDialog(GtkWindow* window_) {
     filters = g_list_store_new(GTK_TYPE_FILE_FILTER);
     obj_filter = createObjFilter();
     text_filter = createTextFilter();
-    image_filter = createImageFilter();
-    pdf_filter = createPdfFilter();
     all_filter = createAllFilesFilter();
     
     g_list_store_append(filters, obj_filter);
     g_list_store_append(filters, text_filter);
-    // g_list_store_append(filters, image_filter);
-    // g_list_store_append(filters, pdf_filter);
     g_list_store_append(filters, all_filter);
 
     gtk_file_dialog_set_filters(dialog, G_LIST_MODEL(filters));
@@ -48,7 +44,7 @@ void OpenDialog::onOpenFileSelected(GObject *source, GAsyncResult *result, gpoin
     
     if (file) {
         char* cstr = g_file_get_path(file);
-        self->openFileSelect(cstr);
+        self->openFileSelected(cstr);
         g_object_unref(file);
     } else if (error) {
         self->active = false;
@@ -77,25 +73,6 @@ GtkFileFilter* OpenDialog::createTextFilter() {
     return filter;
 }
 
-GtkFileFilter* OpenDialog::createImageFilter() {
-    GtkFileFilter *filter = gtk_file_filter_new();
-    gtk_file_filter_set_name(filter, "Изображения");
-    gtk_file_filter_add_mime_type(filter, "image/png");
-    gtk_file_filter_add_mime_type(filter, "image/jpeg");
-    gtk_file_filter_add_mime_type(filter, "image/jpg");
-    gtk_file_filter_add_mime_type(filter, "image/gif");
-    // gtk_file_filter_add_pixbuf_formats(filter);
-    return filter;
-}
-
-GtkFileFilter* OpenDialog::createPdfFilter() {
-    GtkFileFilter *filter = gtk_file_filter_new();
-    gtk_file_filter_set_name(filter, "PDF документы");
-    gtk_file_filter_add_mime_type(filter, "application/pdf");
-    gtk_file_filter_add_pattern(filter, "*.pdf");
-    return filter;
-}
-
 GtkFileFilter* OpenDialog::createAllFilesFilter() {
     GtkFileFilter *filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, "Все файлы");
@@ -103,7 +80,7 @@ GtkFileFilter* OpenDialog::createAllFilesFilter() {
     return filter;
 }
 
-void OpenDialog::openFileSelect(char* p) {
+void OpenDialog::openFileSelected(char* p) {
     active = false;
     if (onFileSelected) {
         std::string selectedFile = p;

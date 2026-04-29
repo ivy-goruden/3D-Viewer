@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include <iostream>
 #include "open_dialog.hpp"
+#include "color_dialog.hpp"
 
 void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
@@ -24,28 +25,6 @@ void GuiApp::onResetButtonClick(GtkButton* btn, gpointer user_data) {
     self->executeCommand(self->resetCommand);
 }
 
-void GuiApp::onColorButtonClick(GtkButton* btn, gpointer user_data) {
-    GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->colorButtonClick(btn);
-}
-
-void GuiApp::onColorSelected(GObject *source, GAsyncResult *result, gpointer user_data) {
-    GuiApp *self = static_cast<GuiApp*>(user_data);
-    
-    GtkColorDialog *dialog = GTK_COLOR_DIALOG(source);
-    GError *error = NULL;    
-    GdkRGBA *color = gtk_color_dialog_choose_rgba_finish(dialog, result, &error);
-    if (color) {
-        self->colorSelect(color->red, color->green, color->blue, color->alpha);
-        g_free(color);
-    } else if (error) {
-        if (!g_error_matches(error, GTK_DIALOG_ERROR, GTK_DIALOG_ERROR_CANCELLED)) {
-            g_printerr("Ошибка: %s\n", error->message);
-        }
-        g_error_free(error);
-    }
-}
-
 void GuiApp::onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->executeCommand(self->rotateXCommand);
@@ -53,46 +32,52 @@ void GuiApp::onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
 
 void GuiApp::onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->ySpinnerValueChanged(btn);
+    self->executeCommand(self->rotateYCommand);
 }
 
 void GuiApp::onZSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->zSpinnerValueChanged(btn);
+    self->executeCommand(self->rotateZCommand);
 }
 
 void GuiApp::onShiftSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->shiftSpinnerValueChanged(btn);
+    self->executeCommand(self->shiftCommand);
 }
 
 void GuiApp::onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->zoomSpinnerValueChanged(btn);
+    self->executeCommand(self->zoomCommand);
 }
 
 void GuiApp::onLineSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->lineSwitchActivate(sw);
+    self->executeCommand(self->lineSwitchCommand);
 }
 
 void GuiApp::onProjSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->projSwitchActivate(sw);
+    self->executeCommand(self->projSwitchCommand);
 }
 
 void GuiApp::onFillSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->fillSwitchActivate(sw);
+    self->executeCommand(self->fillSwitchCommand);
 }
 
 void GuiApp::onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data) {
     if (!gtk_check_button_get_active(btn)) {
         return;
     }
-    GuiApp *self = static_cast<GuiApp*>(user_data);
     Shape vertMode = Shape(GPOINTER_TO_INT(g_object_get_data(G_OBJECT(btn), "mode")));
-    self->vertModeToggled(btn, vertMode);
+    GuiApp *self = static_cast<GuiApp*>(user_data);
+    self->getAppData().setVertMode(vertMode);
+    self->executeCommand(self->vertModeCommand);
+}
+
+void GuiApp::onColorButtonClick(GtkButton* btn, gpointer user_data) {
+    GuiApp *self = static_cast<GuiApp*>(user_data);
+    self->executeCommand(self->colorCommand);
 }
 
 GuiApp::GuiApp() {
@@ -156,6 +141,11 @@ void GuiApp::activate(GtkApplication* app) {
         this->openFileSelected(path);
     });
 
+    colorDialog = new ColorDialog(GTK_WINDOW(window));
+    colorDialog->setOnColorSelectedCallback([this](double red, double green, double blue, double alpha) {
+        this->colorSelected(red, green, blue, alpha);
+    });
+
     auto canvas_shared = std::make_shared<SimpleCanvas>(GTK_WIDGET(paper));    
     // Сохраняем shared_ptr в куче, чтобы передать в колбэки
     auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas_shared);    
@@ -166,90 +156,12 @@ void GuiApp::activate(GtkApplication* app) {
         });
 }
 
-void GuiApp::openButtonClick(GtkButton* btn) {
-    
-}
-
-void GuiApp::saveButtonClick(GtkButton* btn) {
-
-}
-
-void GuiApp::resetButtonClick(GtkButton* btn) {
-
-}
-
-void GuiApp::colorButtonClick(GtkButton* btn) {
-    g_print("color button\n");
-    GtkColorDialog *dialog = gtk_color_dialog_new();
-    gtk_color_dialog_set_title(dialog, "Выберите цвет");
-    gtk_color_dialog_choose_rgba(dialog, GTK_WINDOW(window), NULL, NULL, onColorSelected, this);
-}
-
-void GuiApp::colorSelect(double red, double green, double blue, double alpha) {
+void GuiApp::colorSelected(double red, double green, double blue, double alpha) {
     g_print("Выбран цвет: r=%.2f g=%.2f b=%.2f a=%.2f\n", red, green, blue, alpha);
-}
-
-void GuiApp::xSpinnerValueChanged(GtkSpinButton* btn) {
-
-}
-
-void GuiApp::ySpinnerValueChanged(GtkSpinButton* btn) {
-    double value = gtk_spin_button_get_value(btn);    
-    g_print("%s: %.0f\n", "ySpinnerValueVhanged", value);
-
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(window, "canvas"));
-    (*canvas)->rotateAbs((*canvas)->getAngleX(), value, (*canvas)->getAngleZ());
-    (*canvas)->redraw();
-}
-
-void GuiApp::zSpinnerValueChanged(GtkSpinButton* btn) {
-    double value = gtk_spin_button_get_value(btn);
-    g_print("%s: %.0f\n", "zSpinnerValueVhanged", value);
-
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(window, "canvas"));
-    (*canvas)->rotateAbs((*canvas)->getAngleX(), (*canvas)->getAngleY(), value);
-    (*canvas)->redraw();
-}
-
-void GuiApp::shiftSpinnerValueChanged(GtkSpinButton* btn) {
-    double value = gtk_spin_button_get_value(btn);
-    g_print("%s: %.0f\n", "shiftSpinnerValueVhanged", value);
-}
-
-void GuiApp::zoomSpinnerValueChanged(GtkSpinButton* btn) {
-    double value = gtk_spin_button_get_value(btn);
-    g_print("%s: %.0f\n", "zoomSpinnerValueVhanged", value);
-
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(window, "canvas"));
-    (*canvas)->setScale(value);
-    (*canvas)->redraw();
-}
-
-void GuiApp::lineSwitchActivate(GtkSwitch* sw) {
-    gboolean active = gtk_switch_get_active(sw);
-    g_print("%d\n", active);
-}
-
-void GuiApp::projSwitchActivate(GtkSwitch* sw) {
-    gboolean active = gtk_switch_get_active(sw);
-    g_print("%d\n", active);
-}
-
-void GuiApp::fillSwitchActivate(GtkSwitch* sw) {
-    gboolean active = gtk_switch_get_active(sw);
-    g_print("%d\n", active);
-}
-
-void GuiApp::vertModeToggled(GtkCheckButton* btn, Shape vertMode) {
-    g_print("%d\n", vertMode);
 }
 
 void GuiApp::openFileSelected(const std::string& path) {
     g_print("%s\n", path.c_str());
-
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
         g_object_get_data(window, "canvas"));
     if (canvas) {
@@ -258,13 +170,28 @@ void GuiApp::openFileSelected(const std::string& path) {
     }
 }
 
+AppData& GuiApp::getAppData() {
+    return appData;
+}
+
+const AppData& GuiApp::getAppData() const {
+    return appData;
+}
+
 void GuiApp::createCommands() {
     this->openCommand = new OpenCommand(this);
     this->saveCommand = new SaveCommand(this);
     this->resetCommand = new ResetCommand(this);
-    this->rotateXCommand = new RorateXCommand(this);
+    this->rotateXCommand = new RotateXCommand(this);
+    this->rotateYCommand = new RotateYCommand(this);
+    this->rotateZCommand = new RotateZCommand(this);
     this->shiftCommand = new ShiftCommand(this);
     this->zoomCommand = new ZoomCommand(this);
+    this->lineSwitchCommand = new LineSwitchCommand(this);
+    this->projSwitchCommand = new ProjSwitchCommand(this);
+    this->fillSwitchCommand = new FillSwitchCommand(this);
+    this->vertModeCommand = new VertModeCommand(this);
+    this->colorCommand = new ColorCommand(this);
 }
 
 void GuiApp::executeCommand(Command *cmd) {
@@ -272,4 +199,3 @@ void GuiApp::executeCommand(Command *cmd) {
         cmd->execute();
     }
 }
-

@@ -3,11 +3,26 @@
 
 #include <gtk/gtk.h>
 #include "open_dialog.hpp"
+#include "color_dialog.hpp"
 #include "command.hpp"
 #include "../simple_canvas.hpp"
 
+struct AppData {
+  private:
+    Shape vertMode;    
+  public:
+    AppData() : vertMode(None) {}
+    Shape getVertMode() const {
+        return vertMode;
+    }
+    void setVertMode(Shape mode) {
+        vertMode = mode;
+    }
+};
+
 class GuiApp {
   private:
+    AppData appData;
     static void onColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onColorSelected(GObject *source, GAsyncResult *result, gpointer user_data);
     static void onActivate(GtkApplication *app, gpointer user_data);
@@ -44,34 +59,30 @@ class GuiApp {
     GObject* circModeCheck;
     GObject* colorButton;
     OpenDialog* openDialog;
+    ColorDialog* colorDialog;
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
     void activate(GtkApplication *app);
-    void openButtonClick(GtkButton* btn);
-    void saveButtonClick(GtkButton* btn);
-    void resetButtonClick(GtkButton* btn);
-    void xSpinnerValueChanged(GtkSpinButton* btn);
-    void ySpinnerValueChanged(GtkSpinButton* btn);
-    void zSpinnerValueChanged(GtkSpinButton* btn);
-    void shiftSpinnerValueChanged(GtkSpinButton* btn);
-    void zoomSpinnerValueChanged(GtkSpinButton* btn);
-    void lineSwitchActivate(GtkSwitch* sw);
-    void projSwitchActivate(GtkSwitch* sw);
-    void fillSwitchActivate(GtkSwitch* sw);
-    void vertModeToggled(GtkCheckButton* btn, Shape vertMode);
-    void colorButtonClick(GtkButton* btn);
-    void colorSelect(double red, double green, double blue, double alpha);
+    void colorSelected(double red, double green, double blue, double alpha);
     void openFileSelected(const std::string& path);
+    AppData& getAppData();
+    const AppData& getAppData() const;
 
   private:
     Command* openCommand;
     Command* saveCommand;
     Command* resetCommand;
-    Command* colorCommand;
     Command* rotateXCommand;
+    Command* rotateYCommand;
+    Command* rotateZCommand;
     Command* shiftCommand;
     Command* zoomCommand;
+    Command* lineSwitchCommand;
+    Command* projSwitchCommand;
+    Command* fillSwitchCommand;
+    Command* vertModeCommand;
+    Command* colorCommand;
     void createCommands();
 
   public:
