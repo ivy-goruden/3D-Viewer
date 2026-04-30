@@ -2,6 +2,7 @@
 
 #include <gtk/gtk.h>
 #include <string>
+#include "app_data.hpp"
 
 void ColorDialog::setOnColorSelectedCallback(ColorSelectedCallback callback) {
     onColorSelectedCallback = callback;
@@ -25,11 +26,20 @@ void ColorDialog::onColorSelected(GObject *source, GAsyncResult *result, gpointe
     }
 }
 
-void ColorDialog::open() {
+void ColorDialog::open(Rgb color) {
+    g_print("Нач цвет: r=%.2f g=%.2f b=%.2f a=%.2f\n", color.red, color.green, color.blue, color.alpha);
+
+    GdkRGBA initial_color = {
+        .red = float(color.red),
+        .green = float(color.green),
+        .blue = float(color.blue),
+        .alpha = float(color.alpha)
+    };
+
     active = true;
     GtkColorDialog *dialog = gtk_color_dialog_new();
     gtk_color_dialog_set_title(dialog, "Выберите цвет");
-    gtk_color_dialog_choose_rgba(dialog, GTK_WINDOW(window), NULL, NULL, onColorSelected, this);
+    gtk_color_dialog_choose_rgba(dialog, GTK_WINDOW(window), &initial_color, NULL, onColorSelected, this);
     active = false;
 }
 

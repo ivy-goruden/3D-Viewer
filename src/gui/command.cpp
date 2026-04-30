@@ -1,6 +1,7 @@
 #include "command.hpp"
 
 #include "gui_app.hpp"
+#include "app_data.hpp"
 
 void OpenCommand::execute() {
     if (!app->openDialog->isActive()) {
@@ -13,31 +14,27 @@ void SaveCommand::execute() {
 }
 
 void ResetCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs(0, 0, 0);
-    (*canvas)->redraw();
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->rotateAbs(0, 0, 0);
+    canvas->redraw();
 }
 
 void RotateXCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs(app->getAppData().getAngleX(), (*canvas)->getAngleY(), (*canvas)->getAngleZ());
-    (*canvas)->redraw();
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->rotateAbs(app->getAppData().getAngleX(), canvas->getAngleY(), canvas->getAngleZ());
+    canvas->redraw();
 }
 
 void RotateYCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs((*canvas)->getAngleX(), app->getAppData().getAngleY(), (*canvas)->getAngleZ());
-    (*canvas)->redraw();
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->rotateAbs(canvas->getAngleX(), app->getAppData().getAngleY(), canvas->getAngleZ());
+    canvas->redraw();
 }
 
 void RotateZCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs((*canvas)->getAngleX(), (*canvas)->getAngleY(), app->getAppData().getAngleZ());
-    (*canvas)->redraw();
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->rotateAbs(canvas->getAngleX(), canvas->getAngleY(), app->getAppData().getAngleZ());
+    canvas->redraw();   
 }
 
 void ShiftCommand::execute() {
@@ -47,10 +44,10 @@ void ShiftCommand::execute() {
 }
 
 void ZoomCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->setScale(app->getAppData().getZoom());
-    (*canvas)->redraw();    
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setZoom(app->getAppData().getZoom());
+    canvas->redraw();
+    g_print("%d\n",app->getAppData().getZoom() );
 }
 
 void LineSwitchCommand::execute() {
@@ -78,7 +75,30 @@ void VertModeCommand::execute() {
 }
 
 void ColorCommand::execute() {
+    app->colorDialog->setOnColorSelectedCallback(
+        [this](double red, double green, double blue, double alpha) {
+            app->colorSelected(red, green, blue, alpha);
+        }
+    );
     if (!app->colorDialog->isActive()) {
-        app->colorDialog->open();    
+        app->colorDialog->open(app->getAppData().getColor());
     }
 }
+
+void BgColorCommand::execute() {
+    app->colorDialog->setOnColorSelectedCallback(
+        [this](double red, double green, double blue, double alpha) {
+            app->bgcolorSelected(red, green, blue, alpha);
+        }
+    );
+    if (!app->colorDialog->isActive()) {
+        app->colorDialog->open(app->getAppData().getBgColor());
+    }
+}
+
+void WeightCommand::execute() {
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setLineWidth(app->getAppData().getWeight()*0.01);
+    canvas->redraw();
+}
+

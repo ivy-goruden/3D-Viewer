@@ -1,6 +1,8 @@
 #ifndef COMMAND_APP
 #define COMMAND_APP
 
+#include "app_data.hpp"
+
 class GuiApp;
 
 class Command {
@@ -86,6 +88,18 @@ class VertModeCommand : public Command {
 class ColorCommand : public Command {
   public:
     ColorCommand(GuiApp* app) : Command(app) {};
+    void execute() override;
+};
+
+class BgColorCommand : public Command {
+  public:
+    BgColorCommand(GuiApp* app) : Command(app) {};
+    void execute() override;
+};
+
+class WeightCommand : public Command {
+  public:
+    WeightCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 

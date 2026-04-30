@@ -9,6 +9,7 @@ namespace s21{
             double angleX_;
             double angleY_;
             double angleZ_;
+            double camera_;
 
             Vert_t getFigureProjection(const matrix_t original);
             Vert_t rotateFigure(double x, double y, double z);
@@ -26,6 +27,10 @@ namespace s21{
             double getAngleX();
             double getAngleY();
             double getAngleZ();
+            void setCamera(double camera);
+            void setAngleX(int angle);
+            void setAngleY(int angle);
+            void setAngleZ(int angle);
             // moveFigure();
             // scaleFigure();
     };

@@ -8,8 +8,8 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(drawing_area),
                                    on_draw_static,
                                    this, nullptr);
-
-    scale_ = 100;
+    camera_ = 10.0;
+    scale_ = 50;
     xStart_ = 0;
     yStart_ = 0;
     widget_ = drawing_area;
@@ -19,7 +19,7 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     polyColor_ = Rgb(0,0,1,1);
     bgColor_ = Rgb(1,1,1,1);
     fillPoly_ = false;
-    lineWidth_ = 0.1;
+    lineWidth_ = 0.01;
     vertWidth_ = 0.1;
     vertType_ = None;
     lineType_ = Solid;
@@ -64,9 +64,9 @@ void SimpleCanvas::draw_polygon(cairo_t* cr, const std::vector<s21::Point>& poin
 void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
     switch(vertType_){
         case Circle:
-            cairo_arc(cr, x, y, vertWidth_, 0, 2 * M_PI);
+            cairo_arc(cr, x, y, lineWidth_, 0, 2 * M_PI);
         case Rect:
-            double d = vertWidth_*std::sqrt(2)/2;
+            double d = lineWidth_*std::sqrt(2)/2;
             cairo_rectangle (cr, x-d, y-d, 2*d, 2*d);
     }
     cairo_set_source_rgb(cr, dotColor_.red, dotColor_.green, dotColor_.blue);
@@ -188,6 +188,14 @@ void SimpleCanvas::setLineType(int type){
 
 void SimpleCanvas::setBgColor(Rgb color){
     bgColor_ = color;
+}
+
+void SimpleCanvas::setLineWidth(double width){
+    lineWidth_ = width;
+}
+
+void SimpleCanvas::setZoom(int zoom){
+    c_->setCamera(camera_-zoom);
 }
 
 double SimpleCanvas::getAngleX() {

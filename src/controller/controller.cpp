@@ -9,6 +9,7 @@ namespace s21{
         angleX_ = X2_d;
         angleY_ = Y2_d;
         angleZ_ = Z2_d;
+        camera_ = 10;
     }
 
     double Controller::getAngleX() {
@@ -21,6 +22,16 @@ namespace s21{
 
     double Controller::getAngleZ() {
         return angleZ_;
+    }
+
+    void Controller::setAngleX(int angle){
+        angleX_ = angle;
+    }
+    void Controller::setAngleY(int angle){
+        angleY_ = angle;
+    }
+    void Controller::setAngleZ(int angle){
+        angleZ_ = angle;
     }
 
     Vert_t Controller::loadFigure(const char* filename){
@@ -69,9 +80,9 @@ namespace s21{
 
     Vert_t Controller::getFigureProjection(const matrix_t original){
         if (parallel_projection_){
-            return s21::Transformer::getParallelProjection(original);
+            return s21::Transformer::getParallelProjection(original, camera_);
         }
-        return s21::Transformer::getPerspectiveProjection(original);
+        return s21::Transformer::getPerspectiveProjection(original, camera_);
     }
 
     Vert_t Controller::toggleProjection(){
@@ -99,6 +110,10 @@ namespace s21{
         }
         return polygon;
         
+    }
+
+    void Controller::setCamera(double camera){
+        camera_ = camera;
     }
     
 }
