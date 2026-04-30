@@ -35,6 +35,8 @@ public:
     // Элементы управления
     void loadFigure(const char* filename);
     void setScale(double);
+    void setPosX(double);
+    void setPosY(double);
     void toggleProjection();
     void rotateX(double);
     void rotateY(double);
