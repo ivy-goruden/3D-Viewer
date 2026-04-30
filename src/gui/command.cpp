@@ -41,7 +41,9 @@ void RotateZCommand::execute() {
 }
 
 void ShiftCommand::execute() {
-    g_print("%s: %d\n", "shiftSpinnerValueVhanged", app->getAppData().getShift());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setPosX(app->getAppData().getShift());
+    canvas->redraw();
 }
 
 void ZoomCommand::execute() {
@@ -52,19 +54,27 @@ void ZoomCommand::execute() {
 }
 
 void LineSwitchCommand::execute() {
-    g_print("%d\n", app->getAppData().getLineSwitch());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setLineType(app->getAppData().getLineSwitch());
+    canvas->redraw();
 }
 
-void ProjSwitchCommand::execute() {
-    g_print("%d\n", app->getAppData().getProjSwitch());
+void ProjSwitchCommand::execute(){
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->toggleProjection();
+    canvas->redraw();
 }
 
 void FillSwitchCommand::execute() {
-    g_print("%d\n", app->getAppData().getFillSwitch());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->togglePolyFill();
+    canvas->redraw();
 }
 
 void VertModeCommand::execute() {
-    g_print("%d\n", app->getAppData().getVertMode());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setVertType(app->getAppData().getVertMode());
+    canvas->redraw();
 }
 
 void ColorCommand::execute() {

@@ -5,14 +5,8 @@
 #include "open_dialog.hpp"
 #include "color_dialog.hpp"
 #include "command.hpp"
-#include "../simple_canvas.hpp"
-
-struct Rgb {
-    double red;
-    double green;
-    double blue;
-    double alpha;
-};
+#include "simple_canvas.hpp"
+#include "gui_globals.h"
 
 struct AppData {
   private:
@@ -155,6 +149,7 @@ class GuiApp {
     void openFileSelected(const std::string& path);
     AppData& getAppData();
     const AppData& getAppData() const;
+    SimpleCanvas* getCanvas();
 
   private:
     Command* openCommand;

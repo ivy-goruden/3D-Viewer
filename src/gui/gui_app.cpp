@@ -174,7 +174,10 @@ void GuiApp::activate(GtkApplication* app) {
 
 void GuiApp::colorSelected(double red, double green, double blue, double alpha) {
     g_print("Выбран цвет: r=%.2f g=%.2f b=%.2f a=%.2f\n", red, green, blue, alpha);
-    getAppData().setColor(Rgb{red, green, blue, alpha});
+    Rgb color = Rgb{red, green, blue, alpha};
+    getAppData().setColor(color);
+    getCanvas()->setBgColor(color);
+
 }
 
 void GuiApp::openFileSelected(const std::string& path) {
@@ -216,4 +219,10 @@ void GuiApp::executeCommand(Command *cmd) {
     if (cmd) {
         cmd->execute();
     }
+}
+
+SimpleCanvas* GuiApp::getCanvas(){
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+    g_object_get_data(window, "canvas"));
+    return canvas ? canvas->get() : nullptr;
 }

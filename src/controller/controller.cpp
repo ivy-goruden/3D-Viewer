@@ -78,7 +78,7 @@ namespace s21{
         parallel_projection_ = !parallel_projection_;
         Vert_t projection;
         if (figure_ != nullptr){
-            projection = getFigureProjection(figure_->getMatrix());
+            projection = rotateFigure(angleX_, angleY_, angleZ_);
         }
         return projection;
     }
