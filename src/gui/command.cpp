@@ -20,57 +20,47 @@ void ResetCommand::execute() {
 }
 
 void RotateXCommand::execute() {
-    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(app->xSpinnerButton));
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
         g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs(value, (*canvas)->getAngleY(), (*canvas)->getAngleZ());
+    (*canvas)->rotateAbs(app->getAppData().getAngleX(), (*canvas)->getAngleY(), (*canvas)->getAngleZ());
     (*canvas)->redraw();
 }
 
 void RotateYCommand::execute() {
-    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(app->ySpinnerButton));
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
         g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs((*canvas)->getAngleX(), value, (*canvas)->getAngleZ());
+    (*canvas)->rotateAbs((*canvas)->getAngleX(), app->getAppData().getAngleY(), (*canvas)->getAngleZ());
     (*canvas)->redraw();
 }
 
 void RotateZCommand::execute() {
-    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(app->zSpinnerButton));
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
         g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs((*canvas)->getAngleX(), (*canvas)->getAngleY(), value);
+    (*canvas)->rotateAbs((*canvas)->getAngleX(), (*canvas)->getAngleY(), app->getAppData().getAngleZ());
     (*canvas)->redraw();
 }
 
 void ShiftCommand::execute() {
-    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(app->shiftSpinnerButton));
-    g_print("%s: %.0f\n", "shiftSpinnerValueVhanged", value);
+    g_print("%s: %d\n", "shiftSpinnerValueVhanged", app->getAppData().getShift());
 }
 
 void ZoomCommand::execute() {
-    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(app->zoomSpinnerButton));
     auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
         g_object_get_data(app->window, "canvas"));
-    (*canvas)->setScale(value);
+    (*canvas)->setScale(app->getAppData().getZoom());
     (*canvas)->redraw();    
 }
 
 void LineSwitchCommand::execute() {
-    bool active = gtk_switch_get_active(GTK_SWITCH(app->lineSwitch));
-    g_print("%d\n", active);
-
+    g_print("%d\n", app->getAppData().getLineSwitch());
 }
 
 void ProjSwitchCommand::execute() {
-    bool active = gtk_switch_get_active(GTK_SWITCH(app->projSwitch));
-    g_print("%d\n", active);
-
+    g_print("%d\n", app->getAppData().getProjSwitch());
 }
 
 void FillSwitchCommand::execute() {
-    bool active = gtk_switch_get_active(GTK_SWITCH(app->fillSwitch));
-    g_print("%d\n", active);
+    g_print("%d\n", app->getAppData().getFillSwitch());
 }
 
 void VertModeCommand::execute() {

@@ -27,41 +27,57 @@ void GuiApp::onResetButtonClick(GtkButton* btn, gpointer user_data) {
 
 void GuiApp::onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
+    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->xSpinnerButton));
+    self->getAppData().setAngleX(value);
     self->executeCommand(self->rotateXCommand);
 }
 
 void GuiApp::onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
+    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->ySpinnerButton));
+    self->getAppData().setAngleY(value);
     self->executeCommand(self->rotateYCommand);
 }
 
 void GuiApp::onZSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
+    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->zSpinnerButton));
+    self->getAppData().setAngleZ(value);
     self->executeCommand(self->rotateZCommand);
 }
 
 void GuiApp::onShiftSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
+    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->shiftSpinnerButton));
+    self->getAppData().setShift(value);
     self->executeCommand(self->shiftCommand);
 }
 
 void GuiApp::onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
+    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->zoomSpinnerButton));
+    self->getAppData().setZoom(value);
     self->executeCommand(self->zoomCommand);
 }
 
 void GuiApp::onLineSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
+    bool active = gtk_switch_get_active(GTK_SWITCH(self->lineSwitch));
+    self->getAppData().setLineSwitch(active);
     self->executeCommand(self->lineSwitchCommand);
 }
 
 void GuiApp::onProjSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
+    bool active = gtk_switch_get_active(GTK_SWITCH(self->projSwitch));
+    self->getAppData().setProjSwitch(active);
     self->executeCommand(self->projSwitchCommand);
 }
 
 void GuiApp::onFillSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
+    bool active = gtk_switch_get_active(GTK_SWITCH(self->fillSwitch));
+    self->getAppData().setFillSwitch(active);
     self->executeCommand(self->fillSwitchCommand);
 }
 
