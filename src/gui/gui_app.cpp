@@ -3,6 +3,7 @@
 #include <iostream>
 #include "open_dialog.hpp"
 #include "color_dialog.hpp"
+#include "app_data.hpp"
 
 void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
@@ -96,6 +97,18 @@ void GuiApp::onColorButtonClick(GtkButton* btn, gpointer user_data) {
     self->executeCommand(self->colorCommand);
 }
 
+void GuiApp::onBgColorButtonClick(GtkButton* btn, gpointer user_data) {
+    GuiApp *self = static_cast<GuiApp*>(user_data);
+    self->executeCommand(self->bgcolorCommand);
+}
+
+void GuiApp::onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
+    GuiApp *self = static_cast<GuiApp*>(user_data);
+    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->weightSpinnerButton));
+    self->getAppData().setWeight(value);
+    self->executeCommand(self->weightCommand);
+}
+
 GuiApp::GuiApp() {
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
@@ -116,6 +129,7 @@ void GuiApp::activate(GtkApplication* app) {
     saveButton = gtk_builder_get_object(builder, "save_button");
     resetButton = gtk_builder_get_object(builder, "reset_button");
     colorButton = gtk_builder_get_object(builder, "color_button");
+    bgcolorButton = gtk_builder_get_object(builder, "bgcolor_button");
     xSpinnerButton = gtk_builder_get_object(builder, "rotate_x_spinner");
     ySpinnerButton = gtk_builder_get_object(builder, "rotate_y_spinner");
     zSpinnerButton = gtk_builder_get_object(builder, "rotate_z_spinner");
@@ -131,12 +145,14 @@ void GuiApp::activate(GtkApplication* app) {
     g_object_set_data(G_OBJECT(noneModeCheck), "mode", GINT_TO_POINTER(None));
     g_object_set_data(G_OBJECT(rectModeCheck), "mode", GINT_TO_POINTER(Rect));
     g_object_set_data(G_OBJECT(circModeCheck), "mode", GINT_TO_POINTER(Circle));
+    weightSpinnerButton = gtk_builder_get_object(builder, "weight_spinner");
     g_object_unref(builder);
 
     g_signal_connect(openButton, "clicked", G_CALLBACK(onOpenButtonClick), this);
     g_signal_connect(saveButton, "clicked", G_CALLBACK(onSaveButtonClick), this);
     g_signal_connect(resetButton, "clicked", G_CALLBACK(onResetButtonClick), this);
     g_signal_connect(colorButton, "clicked", G_CALLBACK(onColorButtonClick), this);
+    g_signal_connect(bgcolorButton, "clicked", G_CALLBACK(onBgColorButtonClick), this);
     g_signal_connect(xSpinnerButton, "value_changed", G_CALLBACK(onXSpinnerValueChanged), this);
     g_signal_connect(ySpinnerButton, "value_changed", G_CALLBACK(onYSpinnerValueChanged), this);
     g_signal_connect(zSpinnerButton, "value_changed", G_CALLBACK(onZSpinnerValueChanged), this);
@@ -148,6 +164,7 @@ void GuiApp::activate(GtkApplication* app) {
     g_signal_connect(noneModeCheck, "notify::active", G_CALLBACK(onVertModeToggled), this);
     g_signal_connect(rectModeCheck, "notify::active", G_CALLBACK(onVertModeToggled), this);
     g_signal_connect(circModeCheck, "notify::active", G_CALLBACK(onVertModeToggled), this);
+    g_signal_connect(weightSpinnerButton, "value_changed", G_CALLBACK(onWeightSpinnerValueChanged), this);
 
     gtk_window_set_application(GTK_WINDOW(window), app);
     gtk_window_present(GTK_WINDOW(window));
@@ -158,9 +175,6 @@ void GuiApp::activate(GtkApplication* app) {
     });
 
     colorDialog = new ColorDialog(GTK_WINDOW(window));
-    colorDialog->setOnColorSelectedCallback([this](double red, double green, double blue, double alpha) {
-        this->colorSelected(red, green, blue, alpha);
-    });
 
     auto canvas_shared = std::make_shared<SimpleCanvas>(GTK_WIDGET(paper));    
     // Сохраняем shared_ptr в куче, чтобы передать в колбэки
@@ -175,6 +189,11 @@ void GuiApp::activate(GtkApplication* app) {
 void GuiApp::colorSelected(double red, double green, double blue, double alpha) {
     g_print("Выбран цвет: r=%.2f g=%.2f b=%.2f a=%.2f\n", red, green, blue, alpha);
     getAppData().setColor(Rgb{red, green, blue, alpha});
+}
+
+void GuiApp::bgcolorSelected(double red, double green, double blue, double alpha) {
+    g_print("Выбран цвет фона: r=%.2f g=%.2f b=%.2f a=%.2f\n", red, green, blue, alpha);
+    getAppData().setBgColor(Rgb{red, green, blue, alpha});
 }
 
 void GuiApp::openFileSelected(const std::string& path) {
@@ -210,6 +229,8 @@ void GuiApp::createCommands() {
     this->fillSwitchCommand = new FillSwitchCommand(this);
     this->vertModeCommand = new VertModeCommand(this);
     this->colorCommand = new ColorCommand(this);
+    this->bgcolorCommand = new BgColorCommand(this);
+    this->weightCommand = new WeightCommand(this);
 }
 
 void GuiApp::executeCommand(Command *cmd) {

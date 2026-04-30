@@ -2,6 +2,7 @@
 
 #include <gtk/gtk.h>
 #include <string>
+#include "app_data.hpp"
 
 OpenDialog::OpenDialog(GtkWindow* window_) {
     dialog = gtk_file_dialog_new();

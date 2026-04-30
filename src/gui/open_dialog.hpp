@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include <string>
 #include <functional>
+#include "app_data.hpp"
 
 class OpenDialog {
   public:

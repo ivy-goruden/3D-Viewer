@@ -2,116 +2,18 @@
 #define GUI_APP
 
 #include <gtk/gtk.h>
+#include "rgb.hpp"
+#include "app_data.hpp"
 #include "open_dialog.hpp"
 #include "color_dialog.hpp"
 #include "command.hpp"
 #include "../simple_canvas.hpp"
 
-struct Rgb {
-    double red;
-    double green;
-    double blue;
-    double alpha;
-};
-
-struct AppData {
-  private:
-    std::string path;
-    int angleX;
-    int angleY;
-    int angleZ;
-    int shift;
-    int zoom;
-    bool lineSwitch;
-    bool projSwitch;
-    bool fillSwitch;
-    Shape vertMode;
-    Rgb color;
-  public:
-    AppData() {
-      angleX = 0;
-      angleY = 0;
-      angleZ = 0;
-      shift = 0;
-      zoom = 0;
-      lineSwitch = false;
-      projSwitch = false;
-      fillSwitch = false;
-      vertMode = None;
-      color = Rgb{0,0,0,0};
-    }
-    std::string getPath() const {
-        return path;
-    }
-    int getAngleX() const {
-        return angleX;
-    }
-    int getAngleY() const {
-        return angleY;
-    }
-    int getAngleZ() const {
-        return angleZ;
-    }
-    int getShift() const {
-        return shift;
-    }
-    int getZoom() const {
-        return zoom;
-    }
-    bool getLineSwitch() const {
-        return lineSwitch;
-    }
-    bool getProjSwitch() const {
-        return projSwitch;
-    }
-    bool getFillSwitch() const {
-        return fillSwitch;
-    }
-    Shape getVertMode() const {
-        return vertMode;
-    }
-    Rgb getColor() const {
-        return color;
-    }
-    void setPath(std::string val) {
-        path = val;
-    }
-    void setAngleX(int val) {
-        angleX = val;
-    }
-    void setAngleY(int val) {
-        angleY = val;
-    }
-    void setAngleZ(int val) {
-        angleZ = val;
-    }
-    void setShift(int val) {
-        shift = val;
-    }
-    void setZoom(int val) {
-        zoom = val;
-    }
-    void setLineSwitch(bool val) {
-        lineSwitch = val;
-    }
-    void setProjSwitch(bool val) {
-        projSwitch = val;
-    }
-    void setFillSwitch(bool val) {
-        fillSwitch = val;
-    }
-    void setVertMode(Shape mode) {
-        vertMode = mode;
-    }
-    void setColor(Rgb color) {
-        color = color;
-    }
-};
-
 class GuiApp {
   private:
     AppData appData;
     static void onColorButtonClick(GtkButton* btn, gpointer user_data);
+    static void onBgColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onActivate(GtkApplication *app, gpointer user_data);
     static void onOpenButtonClick(GtkButton* btn, gpointer user_data);
     static void onSaveButtonClick(GtkButton* btn, gpointer user_data);
@@ -125,6 +27,7 @@ class GuiApp {
     static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
+    static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
 
   public:    
     GtkApplication *app;
@@ -145,6 +48,8 @@ class GuiApp {
     GObject* rectModeCheck;
     GObject* circModeCheck;
     GObject* colorButton;
+    GObject* bgcolorButton;
+    GObject* weightSpinnerButton;
     OpenDialog* openDialog;
     ColorDialog* colorDialog;
     GuiApp();
@@ -152,6 +57,7 @@ class GuiApp {
     int run(int argc, char **argv);
     void activate(GtkApplication *app);
     void colorSelected(double red, double green, double blue, double alpha);
+    void bgcolorSelected(double red, double green, double blue, double alpha);
     void openFileSelected(const std::string& path);
     AppData& getAppData();
     const AppData& getAppData() const;
@@ -170,6 +76,8 @@ class GuiApp {
     Command* fillSwitchCommand;
     Command* vertModeCommand;
     Command* colorCommand;
+    Command* bgcolorCommand;
+    Command* weightCommand;
     void createCommands();
 
   public:

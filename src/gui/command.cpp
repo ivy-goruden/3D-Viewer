@@ -1,6 +1,7 @@
 #include "command.hpp"
 
 #include "gui_app.hpp"
+#include "app_data.hpp"
 
 void OpenCommand::execute() {
     if (!app->openDialog->isActive()) {
@@ -68,7 +69,27 @@ void VertModeCommand::execute() {
 }
 
 void ColorCommand::execute() {
+    app->colorDialog->setOnColorSelectedCallback(
+        [this](double red, double green, double blue, double alpha) {
+            app->colorSelected(red, green, blue, alpha);
+        }
+    );
     if (!app->colorDialog->isActive()) {
-        app->colorDialog->open();    
+        app->colorDialog->open(app->getAppData().getColor());
     }
+}
+
+void BgColorCommand::execute() {
+    app->colorDialog->setOnColorSelectedCallback(
+        [this](double red, double green, double blue, double alpha) {
+            app->bgcolorSelected(red, green, blue, alpha);
+        }
+    );
+    if (!app->colorDialog->isActive()) {
+        app->colorDialog->open(app->getAppData().getBgColor());
+    }
+}
+
+void WeightCommand::execute() {
+    g_print("%s: %d\n", "weightSpinnerValueVhanged", app->getAppData().getWeight());
 }

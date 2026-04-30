@@ -4,6 +4,8 @@
 #include <gtk/gtk.h>
 #include <string>
 #include <functional>
+#include "rgb.hpp"
+#include "app_data.hpp"
 
 class ColorDialog {
   public:
@@ -22,7 +24,7 @@ class ColorDialog {
     ~ColorDialog() {};
     void setOnColorSelectedCallback(ColorSelectedCallback callback);
     bool isActive();
-    void open();
+    void open(Rgb color);
 };
 
 #endif
