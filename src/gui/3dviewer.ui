@@ -6,7 +6,7 @@
   <requires lib="gtk+" version="4.0"/>
   <object class="GtkApplicationWindow" id="main">
     <property name="default-height">700</property>
-    <property name="default-width">900</property>
+    <property name="default-width">1200</property>
     <child>
       <object class="GtkBox">
         <property name="orientation">vertical</property>
@@ -88,51 +88,6 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkLabel">
-                    <property name="label" translatable="yes">Поворот Y:</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">2</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="label" translatable="yes">Поворот Z:</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">4</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="label" translatable="yes">Сдвинуть:</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">6</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="label" translatable="yes">Приблизить / Удалить:</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">8</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="label" translatable="yes">Толщина линии:</property>
-                    <layout>
-                      <property name="column">0</property>
-                      <property name="row">10</property>
-                    </layout>
-                  </object>
-                </child>
-                <child>
                   <object class="GtkSpinButton" id="rotate_x_spinner">
                     <property name="focusable">1</property>
                     <property name="numeric">True</property>
@@ -152,6 +107,15 @@
                         <property name="value">0</property>
                       </object>
                     </property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label" translatable="yes">Поворот Y:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">2</property>
+                    </layout>
                   </object>
                 </child>
                 <child>
@@ -177,6 +141,15 @@
                   </object>
                 </child>
                 <child>
+                  <object class="GtkLabel">
+                    <property name="label" translatable="yes">Поворот Z:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">4</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkSpinButton" id="rotate_z_spinner">
                     <property name="focusable">1</property>
                     <property name="numeric">True</property>
@@ -196,6 +169,15 @@
                         <property name="value">0</property>
                       </object>
                     </property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label" translatable="yes">Сдвинуть:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">6</property>
+                    </layout>
                   </object>
                 </child>
                 <child>
@@ -221,13 +203,53 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkSpinButton" id="zoom_spinner">
+                  <object class="GtkLabel">
+                    <property name="label" translatable="yes">Сдвинуть по верт:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">8</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="shift_v_spinner">
                     <property name="focusable">1</property>
                     <property name="numeric">True</property>
                     <property name="wrap">True</property>
                     <layout>
                       <property name="column">0</property>
                       <property name="row">9</property>
+                    </layout>
+                    <property name="snap-to-ticks">True</property>
+                    <property name="adjustment">
+                      <object class="GtkAdjustment">
+                        <property name="lower">0</property>
+                        <property name="upper">100</property>
+                        <property name="page-increment">5</property>
+                        <property name="page-size">0</property>
+                        <property name="step-increment">1</property>
+                        <property name="value">0</property>
+                      </object>
+                    </property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label" translatable="yes">Приблизить / Удалить:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">10</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="zoom_spinner">
+                    <property name="focusable">1</property>
+                    <property name="numeric">True</property>
+                    <property name="wrap">True</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">11</property>
                     </layout>
                     <property name="snap-to-ticks">True</property>
                     <property name="adjustment">
@@ -243,13 +265,22 @@
                   </object>
                 </child>
                 <child>
+                  <object class="GtkLabel">
+                    <property name="label" translatable="yes">Толщина линии:</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">12</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkSpinButton" id="weight_spinner">
                     <property name="focusable">1</property>
                     <property name="numeric">True</property>
                     <property name="wrap">False</property>
                     <layout>
                       <property name="column">0</property>
-                      <property name="row">11</property>
+                      <property name="row">13</property>
                     </layout>
                     <property name="snap-to-ticks">True</property>
                     <property name="adjustment">
@@ -353,30 +384,18 @@
                           <object class="GtkCheckButton" id="vert_mode_none">
                             <property name="label">Не отображать вершины</property>
                             <property name="active">true</property>
-                            <layout>
-                              <property name="column">0</property>
-                              <property name="row">17</property>
-                            </layout>
                           </object>                  
                         </child>
                         <child>
                           <object class="GtkCheckButton" id="vert_mode_rect">
                             <property name="label">Отображать квадраты</property>
                             <property name="group">vert_mode_none</property>
-                            <layout>
-                              <property name="column">0</property>
-                              <property name="row">18</property>
-                            </layout>
                           </object>                  
                         </child>
                         <child>
                           <object class="GtkCheckButton" id="vert_mode_circ">
                             <property name="label">Отображать круги</property>
                             <property name="group">vert_mode_none</property>
-                            <layout>
-                              <property name="column">0</property>
-                              <property name="row">19</property>
-                            </layout>
                           </object>
                         </child>
                       </object>

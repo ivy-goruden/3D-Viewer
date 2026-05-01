@@ -22,14 +22,17 @@ class GuiApp {
     static void onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onZSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onShiftSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onShiftVSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onLineSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
     static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onStatusUpdate();
 
-  public:    
+  public:
+    std::string ui_file;
     GtkApplication *app;
     GObject* window;
     GObject* openButton;
@@ -39,6 +42,7 @@ class GuiApp {
     GObject* ySpinnerButton;
     GObject* zSpinnerButton;
     GObject* shiftSpinnerButton;
+    GObject* shiftVSpinnerButton;
     GObject* zoomSpinnerButton;
     GObject* paper;
     GObject* lineSwitch;
@@ -63,6 +67,7 @@ class GuiApp {
     void updateStatusBar();
     AppData& getAppData();
     const AppData& getAppData() const;
+    void emitStatusUpdate();
 
   private:
     Command* openCommand;

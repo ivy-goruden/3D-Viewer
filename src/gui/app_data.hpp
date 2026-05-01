@@ -15,6 +15,7 @@ struct AppData {
     int angleY;
     int angleZ;
     int shift;
+    int shiftV;
     int zoom;
     bool lineSwitch;
     bool projSwitch;
@@ -29,6 +30,7 @@ struct AppData {
       angleY = 0;
       angleZ = 0;
       shift = 0;
+      shiftV = 0;
       zoom = 0;
       lineSwitch = false;
       projSwitch = false;
@@ -51,6 +53,9 @@ struct AppData {
         return angleZ;
     }
     int getShift() const {
+        return shift;
+    }
+    int getShiftV() const {
         return shift;
     }
     int getZoom() const {
@@ -91,6 +96,9 @@ struct AppData {
     }
     void setShift(int val) {
         shift = val;
+    }
+    void setShiftV(int val) {
+        shiftV = val;
     }
     void setZoom(int val) {
         zoom = val;
