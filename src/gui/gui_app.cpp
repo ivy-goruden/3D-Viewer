@@ -146,6 +146,7 @@ void GuiApp::activate(GtkApplication* app) {
     g_object_set_data(G_OBJECT(rectModeCheck), "mode", GINT_TO_POINTER(Rect));
     g_object_set_data(G_OBJECT(circModeCheck), "mode", GINT_TO_POINTER(Circle));
     weightSpinnerButton = gtk_builder_get_object(builder, "weight_spinner");
+    statusLabel = gtk_builder_get_object(builder, "status_label");
     g_object_unref(builder);
 
     g_signal_connect(openButton, "clicked", G_CALLBACK(onOpenButtonClick), this);
@@ -168,7 +169,8 @@ void GuiApp::activate(GtkApplication* app) {
 
     gtk_window_set_application(GTK_WINDOW(window), app);
     gtk_window_present(GTK_WINDOW(window));
-
+    updateStatusBar();
+    
     openDialog = new OpenDialog(GTK_WINDOW(window));
     openDialog->setOnFileSelected([this](const std::string& path) {
         this->openFileSelected(path);
@@ -205,6 +207,11 @@ void GuiApp::openFileSelected(const std::string& path) {
         (*canvas)->loadFigure(path.c_str());
         (*canvas)->redraw();
     }
+}
+
+void GuiApp::updateStatusBar() {
+    g_print("%s\n", getAppData().toString().c_str());
+    gtk_label_set_text(GTK_LABEL(statusLabel), getAppData().toString().c_str());
 }
 
 AppData& GuiApp::getAppData() {

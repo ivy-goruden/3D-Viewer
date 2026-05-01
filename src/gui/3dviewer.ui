@@ -342,7 +342,6 @@
                       <property name="row">6</property>
                     </layout>
                     <child>
-                      <!-- Контейнер для кнопок внутри рамки -->
                       <object class="GtkBox">
                         <property name="orientation">vertical</property>
                         <property name="margin-start">12</property>
@@ -351,7 +350,6 @@
                         <property name="margin-bottom">12</property>
                         <property name="spacing">6</property>
                         <child>
-                          <!-- Первая радиокнопка (лидер группы) -->
                           <object class="GtkCheckButton" id="vert_mode_none">
                             <property name="label">Не отображать вершины</property>
                             <property name="active">true</property>
@@ -362,7 +360,6 @@
                           </object>                  
                         </child>
                         <child>
-                          <!-- Вторая радиокнопка (с group, указывающим на первую) -->
                           <object class="GtkCheckButton" id="vert_mode_rect">
                             <property name="label">Отображать квадраты</property>
                             <property name="group">vert_mode_none</property>
@@ -373,7 +370,6 @@
                           </object>                  
                         </child>
                         <child>
-                          <!-- Третья радиокнопка (также с group) -->
                           <object class="GtkCheckButton" id="vert_mode_circ">
                             <property name="label">Отображать круги</property>
                             <property name="group">vert_mode_none</property>
@@ -393,11 +389,23 @@
           </object>
         </child>
         <child>
-          <object class="GtkStatusbar" id="status_bar">
-            <property name="margin-bottom">6</property>
+          <object class="GtkBox">
+            <property name="margin-bottom">10</property>
             <property name="margin-end">10</property>
             <property name="margin-start">10</property>
-            <property name="margin-top">6</property>
+            <property name="margin-top">10</property>
+            <property name="orientation">horizontal</property>
+            <property name="hexpand">1</property>
+            <property name="halign">fill</property>
+            <child>
+              <object class="GtkLabel" id="status_label">
+                <property name="label" translatable="yes"></property>
+                <property name="hexpand">1</property>
+                <property name="halign">start</property>
+                <property name="vexpand">0</property>
+                <property name="valign">center</property>
+              </object>
+            </child>
           </object>
         </child>
       </object>

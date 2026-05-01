@@ -50,6 +50,7 @@ class GuiApp {
     GObject* colorButton;
     GObject* bgcolorButton;
     GObject* weightSpinnerButton;
+    GObject* statusLabel;
     OpenDialog* openDialog;
     ColorDialog* colorDialog;
     GuiApp();
@@ -59,6 +60,7 @@ class GuiApp {
     void colorSelected(double red, double green, double blue, double alpha);
     void bgcolorSelected(double red, double green, double blue, double alpha);
     void openFileSelected(const std::string& path);
+    void updateStatusBar();
     AppData& getAppData();
     const AppData& getAppData() const;
 

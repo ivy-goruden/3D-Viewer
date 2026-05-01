@@ -1,6 +1,8 @@
 #ifndef APP_DATA
 #define APP_DATA
 
+#include <format>
+#include <string>
 #include "rgb.hpp"
 #include "../simple_canvas.hpp"
 
@@ -113,6 +115,10 @@ struct AppData {
     }
     void setWeight(int val) {
         weight = val;
+    }
+    std::string toString() {
+        std::string sPath = path == "" ? "не выбран" : path;
+        return std::format("Файл: {} | Толщина линии: {}", sPath, weight);
     }
 };
 

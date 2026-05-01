@@ -25,8 +25,6 @@ OpenDialog::OpenDialog(GtkWindow* window_) {
 OpenDialog::~OpenDialog() {
     g_object_unref(obj_filter);
     g_object_unref(text_filter);
-    g_object_unref(image_filter);
-    g_object_unref(pdf_filter);
     g_object_unref(all_filter);
     g_object_unref(filters);
     g_object_unref(dialog);
