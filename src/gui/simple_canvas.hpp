@@ -29,7 +29,7 @@ public:
     // Элементы управления
     void loadFigure(const char* filename);
     void setScale(double);
-    void setZoom(int);
+    void setZoom(double);
     void setPosX(double);
     void setPosY(double);
     void toggleProjection();
@@ -41,10 +41,13 @@ public:
     void setVertType(int type);
     void setLineType(int type);
     void setBgColor(Rgb color);
+    void setVertColor(Rgb color);
     void setLineWidth(double width);
     double getAngleX();
     double getAngleY();
     double getAngleZ();
+    int getEdgesNum();
+    int getVerticesNum();
 
 private:
     GtkWidget* drawing_area;
@@ -69,7 +72,6 @@ private:
     bool fillPoly_;
     Shape vertType_;
     Stroke lineType_;
-    double camera_;
 };
 
 #endif // SIMPLE_CANVAS_HPP

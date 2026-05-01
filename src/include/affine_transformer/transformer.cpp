@@ -3,27 +3,25 @@
 namespace s21{
 
     Transformer::Transformer(){}
-    Vert_t Transformer::getParallelProjection(matrix_t m, double camera){
+    Vert_t Transformer::getParallelProjection(matrix_t m, double scale){
         //returns a list of vertices in new position
         Vert_t projection;
         for(int i =0; i < m.size(); i++){
-            Point coord = Point{m[i][0]/camera,m[i][1]/camera};
+            Point coord = Point{m[i][0]*scale,m[i][1]*scale};
             projection.push_back(coord);
         }
-
         return projection;
     }
 
-    Vert_t Transformer::getPerspectiveProjection(matrix_t m, double camera){
+    Vert_t Transformer::getPerspectiveProjection(matrix_t m, double camera, double scale){
         //returns a list of vertices in new position
         Vert_t projection;
         for(int i =0; i < m.size(); i++){
             double z = m[i][2] + camera;
             if (z<= 0) continue; 
-            Point coord = Point{m[i][0]/z,m[i][1]/z};
+            Point coord = Point{m[i][0]/z*scale,m[i][1]/z*scale};
             projection.push_back(coord);
         }
-
         return projection;
     }
 

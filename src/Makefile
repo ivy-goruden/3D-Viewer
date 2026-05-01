@@ -45,6 +45,6 @@ gtk02run: gtk02
 	./gtk02.app
 
 valgrind:
-# 	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
-#   --suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp --suppressions=my.supp --leak-check=full --show-leak-kinds=definite,indirect --gen-suppressions=all --track-origins=yes -s ./gtk02.app
-	valgrind --leak-check=full ./gtk02.app 2>&1 | grep -E "definitely.*gtk02.app|lost.*gtk02.app" || true
+	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
+  --suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp --suppressions=my.supp --leak-check=full --show-leak-kinds=definite,indirect --track-origins=yes -s ./gtk02.app
+# 	valgrind --leak-check=full ./gtk02.app 2>&1 | grep -E "definitely.*gtk02.app|lost.*gtk02.app" || true

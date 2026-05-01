@@ -52,6 +52,9 @@ class GuiApp {
     GObject* weightSpinnerButton;
     OpenDialog* openDialog;
     ColorDialog* colorDialog;
+    GObject* status_vert;
+    GObject* status_file;
+    GObject* status_edges;
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -59,6 +62,7 @@ class GuiApp {
     void colorSelected(double red, double green, double blue, double alpha);
     void bgcolorSelected(double red, double green, double blue, double alpha);
     void openFileSelected(const std::string& path);
+    void updateStatusBar();
     AppData& getAppData();
     const AppData& getAppData() const;
     SimpleCanvas* getCanvas();

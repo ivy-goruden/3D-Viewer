@@ -10,28 +10,25 @@ namespace s21{
             double angleY_;
             double angleZ_;
             double camera_;
+            double scale_;
 
             Vert_t getFigureProjection(const matrix_t original);
-            Vert_t rotateFigure(double x, double y, double z);
         public:
             Controller();
             Vert_t loadFigure(const char* filename);
-            Vert_t rotateAbsolute(double x, double y, double z);
-            Vert_t rotateX(double);
-            Vert_t rotateY(double);
-            Vert_t rotateZ(double);
-            Vert_t toggleProjection();
-
+            Vert_t getFigure();
+            
+            void toggleProjection();
             Edge_t getEdges();
             Poly_t getPolygons();
             double getAngleX();
             double getAngleY();
             double getAngleZ();
-            void setCamera(double camera);
             void setAngleX(int angle);
             void setAngleY(int angle);
             void setAngleZ(int angle);
-            // moveFigure();
-            // scaleFigure();
+            void setScale(double scale);
+            int getEdgesNum();
+            int getVerticesNum();
     };
 }

@@ -45,9 +45,8 @@ void ShiftCommand::execute() {
 
 void ZoomCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setZoom(app->getAppData().getZoom());
+    canvas->setZoom(double(app->getAppData().getZoom())/100);
     canvas->redraw();
-    g_print("%d\n",app->getAppData().getZoom() );
 }
 
 void LineSwitchCommand::execute() {
