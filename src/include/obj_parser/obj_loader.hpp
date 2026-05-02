@@ -26,6 +26,7 @@ namespace s21 {
         FACE,
         LINE,
         POLIGON,
+        GROUP,
         OBJKIND_NUM
     };
 
@@ -57,11 +58,18 @@ namespace s21 {
         int vi,ti;
     };
 
+    struct GroupElement_t {
+        ObjKind kind;
+        int index;
+    };
+
     typedef std::vector<FaceElementObj_t> FaceObj_t;
 
     typedef std::vector<LineELementObj_t> LineObj_t;
 
     typedef std::vector<int> PoligonObj_t;
+
+    typedef std::vector<GroupElement_t> Group_t;
 
     class ObjLoader {
         
@@ -73,9 +81,11 @@ namespace s21 {
         std::vector<FaceObj_t> faces;
         std::vector<LineObj_t> lines;
         std::vector<PoligonObj_t> poligons;
+        std::vector<Group_t> groups;
 
       private:
         FILE* pObjFile;
+        int currentGroupIndex = -1;
 
       public:
         ObjLoader();
@@ -91,6 +101,9 @@ namespace s21 {
         void readFace(char* line);
         void readLine(char* line);
         void readPoligon(char* line);
+        int addGroup();
+        void addToGroup(int index_, ObjKind kind_);
+        int sizeByKind(int groupIndex, ObjKind kind);
 
       private:
         ObjKind parseObjKind(char* line);

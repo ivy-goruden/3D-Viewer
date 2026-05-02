@@ -42,6 +42,7 @@ namespace s21 {
         else if (strcmp("f", sKind) == 0) kind = FACE;
         else if (strcmp("l", sKind) == 0) kind = LINE;
         else if (strcmp("p", sKind) == 0) kind = POLIGON;
+        else if (strcmp("g", sKind) == 0) kind = GROUP;
 
         return kind;
     }
@@ -177,6 +178,7 @@ namespace s21 {
         }
         if (f.size()) {
             faces.push_back(f);
+            addToGroup(faces.size() - 1, FACE);
         }
     }
 
@@ -216,6 +218,33 @@ namespace s21 {
         }
     }
 
+    int ObjLoader::addGroup() {
+        Group_t g;
+        groups.push_back(g);
+        currentGroupIndex = groups.size() - 1;
+        return currentGroupIndex;
+    }
+
+    void ObjLoader::addToGroup(int index_, ObjKind kind_) {
+        if (currentGroupIndex != -1) {
+            GroupElement_t e;
+            e.kind = kind_;
+            e.index = index_;
+            groups.at(currentGroupIndex).push_back(e);
+        }
+    }
+
+    int ObjLoader::sizeByKind(int groupIndex, ObjKind kind) {
+        int c = 0;
+        s21::Group_t g = groups.at(groupIndex);
+        for (s21::GroupElement_t e : g) {
+            if (e.kind == kind) {
+                c++;
+            }
+        }
+        return c;
+    }
+
     void ObjLoader::readObj() {
         if (!pObjFile) {
             throw std::invalid_argument("File not opened");
@@ -235,7 +264,9 @@ namespace s21 {
             if (len == 0) continue;
 
             int kindObj = parseObjKind(line);
-            printf("Line %d: %d - %s\n", lineNumber, kindObj, line);
+            if (kindObj == GROUP) {
+                printf("Line %d: %d - %s\n", lineNumber, kindObj, line);
+            }
 
             switch (kindObj) {
                 case VERTEX:
@@ -258,6 +289,9 @@ namespace s21 {
                     break;
                 case POLIGON:
                     readPoligon(line);
+                    break;
+                case GROUP:
+                    addGroup();
                     break;
             }
         }

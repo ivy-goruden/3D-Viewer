@@ -45,6 +45,12 @@ gtk02: 3Dtransformer.a
 gtk02run: gtk02
 	./gtk02.app
 
+loader:
+	g++ $(CXXFLAGS) loader_test.cpp include/obj_parser/obj_loader.cpp -o loader.app $(GTKFLAGS) -lm
+
+loaderrun: loader
+	./loader.app
+
 valgrind:
 # 	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
 #   --suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp --suppressions=my.supp --leak-check=full --show-leak-kinds=definite,indirect --gen-suppressions=all --track-origins=yes -s ./gtk02.app
