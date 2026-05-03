@@ -80,6 +80,7 @@ class GuiApp {
     Command* rotateYCommand;
     Command* rotateZCommand;
     Command* shiftCommand;
+    Command* shiftVCommand;
     Command* zoomCommand;
     Command* lineSwitchCommand;
     Command* projSwitchCommand;

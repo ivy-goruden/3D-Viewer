@@ -56,7 +56,7 @@ struct AppData {
         return shift;
     }
     int getShiftV() const {
-        return shift;
+        return shiftV;
     }
     int getZoom() const {
         return zoom;

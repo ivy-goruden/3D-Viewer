@@ -62,7 +62,7 @@ void GuiApp::onShiftVSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data)
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->shiftVSpinnerButton));
     self->getAppData().setShiftV(value);
-    self->executeCommand(self->shiftCommand);
+    self->executeCommand(self->shiftVCommand);
 }
 
 void GuiApp::onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
@@ -248,6 +248,7 @@ void GuiApp::createCommands() {
     this->rotateYCommand = new RotateYCommand(this);
     this->rotateZCommand = new RotateZCommand(this);
     this->shiftCommand = new ShiftCommand(this);
+    this->shiftVCommand = new ShiftVCommand(this);
     this->zoomCommand = new ZoomCommand(this);
     this->lineSwitchCommand = new LineSwitchCommand(this);
     this->projSwitchCommand = new ProjSwitchCommand(this);

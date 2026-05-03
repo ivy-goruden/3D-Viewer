@@ -55,6 +55,12 @@ class ShiftCommand : public Command {
     void execute() override;
 };
 
+class ShiftVCommand : public Command {
+  public:
+    ShiftVCommand(GuiApp* app) : Command(app) {};
+    void execute() override;
+};
+
 class ZoomCommand : public Command {
   public:
     ZoomCommand(GuiApp* app) : Command(app) {};

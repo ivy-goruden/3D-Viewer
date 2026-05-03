@@ -43,6 +43,12 @@ void ShiftCommand::execute() {
     canvas->redraw();
 }
 
+void ShiftVCommand::execute() {
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setPosY(app->getAppData().getShiftV());
+    canvas->redraw();
+}
+
 void ZoomCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
     canvas->setZoom(double(app->getAppData().getZoom())/100);
