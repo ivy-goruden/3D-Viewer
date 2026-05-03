@@ -14,58 +14,63 @@ void SaveCommand::execute() {
 }
 
 void ResetCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs(0, 0, 0);
-    (*canvas)->redraw();
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->rotateAbs(0, 0, 0);
+    canvas->redraw();
 }
 
 void RotateXCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs(app->getAppData().getAngleX(), (*canvas)->getAngleY(), (*canvas)->getAngleZ());
-    (*canvas)->redraw();
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->rotateAbs(app->getAppData().getAngleX(), canvas->getAngleY(), canvas->getAngleZ());
+    canvas->redraw();
 }
 
 void RotateYCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs((*canvas)->getAngleX(), app->getAppData().getAngleY(), (*canvas)->getAngleZ());
-    (*canvas)->redraw();
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->rotateAbs(canvas->getAngleX(), app->getAppData().getAngleY(), canvas->getAngleZ());
+    canvas->redraw();
 }
 
 void RotateZCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->rotateAbs((*canvas)->getAngleX(), (*canvas)->getAngleY(), app->getAppData().getAngleZ());
-    (*canvas)->redraw();
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->rotateAbs(canvas->getAngleX(), canvas->getAngleY(), app->getAppData().getAngleZ());
+    canvas->redraw();   
 }
 
 void ShiftCommand::execute() {
-    g_print("%s: %d\n", "shiftSpinnerValueVhanged", app->getAppData().getShift());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setPosX(app->getAppData().getShift());
+    canvas->redraw();
 }
 
 void ZoomCommand::execute() {
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(app->window, "canvas"));
-    (*canvas)->setScale(app->getAppData().getZoom());
-    (*canvas)->redraw();    
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setZoom(double(app->getAppData().getZoom())/100);
+    canvas->redraw();
 }
 
 void LineSwitchCommand::execute() {
-    g_print("%d\n", app->getAppData().getLineSwitch());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setLineType(app->getAppData().getLineSwitch());
+    canvas->redraw();
 }
 
-void ProjSwitchCommand::execute() {
-    g_print("%d\n", app->getAppData().getProjSwitch());
+void ProjSwitchCommand::execute(){
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->toggleProjection();
+    canvas->redraw();
 }
 
 void FillSwitchCommand::execute() {
-    g_print("%d\n", app->getAppData().getFillSwitch());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->togglePolyFill();
+    canvas->redraw();
 }
 
 void VertModeCommand::execute() {
-    g_print("%d\n", app->getAppData().getVertMode());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setVertType(app->getAppData().getVertMode());
+    canvas->redraw();
 }
 
 void ColorCommand::execute() {
@@ -91,5 +96,8 @@ void BgColorCommand::execute() {
 }
 
 void WeightCommand::execute() {
-    g_print("%s: %d\n", "weightSpinnerValueVhanged", app->getAppData().getWeight());
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setLineWidth(app->getAppData().getWeight()*0.01);
+    canvas->redraw();
 }
+

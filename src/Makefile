@@ -6,6 +6,7 @@ OLD = $(shell find ./ -name "*.o")
 TESTS := $(shell find tests/ -name "*.cpp")
 TESTS_OBJS := $(TESTS:.cpp=.o)
 SOURCE := callbacks/callbacks.cpp config/config.cpp simple_canvas.cpp controller/controller.cpp main.cpp
+GUI_SOURCE := $(shell find gui/ -name "*.cpp")
 GTEST_LIBS = -lgtest -lgtest_main -pthread
 
 %.o: %.c
@@ -24,7 +25,7 @@ dvi:
 
 dist:
  
-tests:$(TESTS_OBJS) 3Dtransformer.a
+tests: $(TESTS_OBJS) 3Dtransformer.a
 	g++ $(TESTS_OBJS) -L. -l3Dtransformer -o tests.out $(GTEST_LIBS)
 	./tests.out
 
@@ -38,9 +39,7 @@ gtk01run: gtk01
 	./gtk01.app
 
 gtk02: 3Dtransformer.a
-	g++ $(CXXFLAGS) gtk02.cpp gui/gui_app.cpp gui/open_dialog.cpp \
-	gui/color_dialog.cpp gui/command.cpp simple_canvas.cpp controller/controller.cpp \
-	-L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
+	g++ $(CXXFLAGS) gtk02.cpp $(GUI_SOURCE) controller/controller.cpp -L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
 
 gtk02run: gtk02
 	./gtk02.app
@@ -52,6 +51,6 @@ loaderrun: loader
 	./loader.app
 
 valgrind:
-# 	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
-#   --suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp --suppressions=my.supp --leak-check=full --show-leak-kinds=definite,indirect --gen-suppressions=all --track-origins=yes -s ./gtk02.app
-	valgrind --leak-check=full ./gtk02.app 2>&1 | grep -E "definitely.*gtk02.app|lost.*gtk02.app" || true
+	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
+  --suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp --suppressions=my.supp --leak-check=full --show-leak-kinds=definite,indirect --track-origins=yes -s ./gtk02.app
+# 	valgrind --leak-check=full ./gtk02.app 2>&1 | grep -E "definitely.*gtk02.app|lost.*gtk02.app" || true

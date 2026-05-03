@@ -2,7 +2,6 @@
 
 #include <gtk/gtk.h>
 #include <string>
-#include "rgb.hpp"
 #include "app_data.hpp"
 
 void ColorDialog::setOnColorSelectedCallback(ColorSelectedCallback callback) {

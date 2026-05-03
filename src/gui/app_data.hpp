@@ -3,8 +3,8 @@
 
 #include <format>
 #include <string>
-#include "rgb.hpp"
-#include "../simple_canvas.hpp"
+#include "gui_globals.h"
+#include "simple_canvas.hpp"
 
 class GuiApp;
 
@@ -26,12 +26,12 @@ struct AppData {
     int weight;
   public:
     AppData() {
-      angleX = 0;
-      angleY = 0;
+      angleX = 135;
+      angleY = 90;
       angleZ = 0;
       shift = 0;
       shiftV = 0;
-      zoom = 0;
+      zoom = 10;
       lineSwitch = false;
       projSwitch = false;
       fillSwitch = false;

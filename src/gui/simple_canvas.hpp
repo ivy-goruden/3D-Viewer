@@ -2,17 +2,11 @@
 #define SIMPLE_CANVAS_HPP
 
 #include <vector>
-#include "include/main.h"
+#include "../include/main.h"
 #include <gtk/gtk.h>
 #include <cmath>
-#include "controller/controller.hpp"
-
-struct Color {
-    double r,g,b;
-};
-
-enum Shape{None, Circle, Rect};
-enum Stroke{Solid, Dotted};
+#include "../controller/controller.hpp"
+#include "gui_globals.h"
 
 class SimpleCanvas {
 public:
@@ -35,6 +29,7 @@ public:
     // Элементы управления
     void loadFigure(const char* filename);
     void setScale(double);
+    void setZoom(double);
     void setPosX(double);
     void setPosY(double);
     void toggleProjection();
@@ -43,10 +38,16 @@ public:
     void rotateZ(double);
     void rotateAbs(double x, double y, double z);
     void togglePolyFill();
-
+    void setVertType(int type);
+    void setLineType(int type);
+    void setBgColor(Rgb color);
+    void setVertColor(Rgb color);
+    void setLineWidth(double width);
     double getAngleX();
     double getAngleY();
     double getAngleZ();
+    int getEdgesNum();
+    int getVerticesNum();
 
 private:
     GtkWidget* drawing_area;
@@ -63,10 +64,10 @@ private:
     double lineWidth_;
     double vertWidth_;
 
-    Color dotColor_;
-    Color lineColor_;
-    Color polyColor_;
-    Color bgColor_;
+    Rgb dotColor_;
+    Rgb lineColor_;
+    Rgb polyColor_;
+    Rgb bgColor_;
 
     bool fillPoly_;
     Shape vertType_;

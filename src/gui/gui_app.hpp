@@ -2,12 +2,12 @@
 #define GUI_APP
 
 #include <gtk/gtk.h>
-#include "rgb.hpp"
+#include "gui_globals.h"
 #include "app_data.hpp"
 #include "open_dialog.hpp"
 #include "color_dialog.hpp"
 #include "command.hpp"
-#include "../simple_canvas.hpp"
+#include "simple_canvas.hpp"
 
 class GuiApp {
   private:
@@ -57,6 +57,9 @@ class GuiApp {
     GObject* statusLabel;
     OpenDialog* openDialog;
     ColorDialog* colorDialog;
+    GObject* status_vert;
+    GObject* status_file;
+    GObject* status_edges;
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -67,7 +70,7 @@ class GuiApp {
     void updateStatusBar();
     AppData& getAppData();
     const AppData& getAppData() const;
-    void emitStatusUpdate();
+    SimpleCanvas* getCanvas();
 
   private:
     Command* openCommand;

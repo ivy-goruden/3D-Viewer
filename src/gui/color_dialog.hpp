@@ -4,8 +4,8 @@
 #include <gtk/gtk.h>
 #include <string>
 #include <functional>
-#include "rgb.hpp"
 #include "app_data.hpp"
+#include "gui_globals.h"
 
 class ColorDialog {
   public:

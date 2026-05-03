@@ -156,6 +156,9 @@ void GuiApp::activate(GtkApplication* app) {
     noneModeCheck = gtk_builder_get_object(builder, "vert_mode_none");
     rectModeCheck = gtk_builder_get_object(builder, "vert_mode_rect");
     circModeCheck = gtk_builder_get_object(builder, "vert_mode_circ");
+    status_vert = gtk_builder_get_object(builder, "status_vert");
+    status_file = gtk_builder_get_object(builder, "status_file");
+    status_edges = gtk_builder_get_object(builder, "status_edges");
     g_object_set_data(G_OBJECT(noneModeCheck), "mode", GINT_TO_POINTER(None));
     g_object_set_data(G_OBJECT(rectModeCheck), "mode", GINT_TO_POINTER(Rect));
     g_object_set_data(G_OBJECT(circModeCheck), "mode", GINT_TO_POINTER(Circle));
@@ -200,35 +203,33 @@ void GuiApp::activate(GtkApplication* app) {
         [](gpointer data) {
             delete static_cast<std::shared_ptr<SimpleCanvas>*>(data);
         });
+
+    gtk_label_set_text(GTK_LABEL(status_vert), "Вершины: 0");
+    gtk_label_set_text(GTK_LABEL(status_edges), "Рёбра: 0");
+    gtk_label_set_text(GTK_LABEL(status_file), "Файл: не выбран");
 }
 
 void GuiApp::colorSelected(double red, double green, double blue, double alpha) {
-    g_print("Выбран цвет: r=%.2f g=%.2f b=%.2f a=%.2f\n", red, green, blue, alpha);
-    getAppData().setColor(Rgb{red, green, blue, alpha});
-    updateStatusBar();
+    Rgb color = Rgb{red, green, blue, alpha};
+    getAppData().setColor(color);
+    getCanvas()->setVertColor(color);
+    getCanvas()->redraw();
 }
 
 void GuiApp::bgcolorSelected(double red, double green, double blue, double alpha) {
-    g_print("Выбран цвет фона: r=%.2f g=%.2f b=%.2f a=%.2f\n", red, green, blue, alpha);
-    getAppData().setBgColor(Rgb{red, green, blue, alpha});
-    updateStatusBar();
+    Rgb color = Rgb{red, green, blue, alpha};
+    getAppData().setBgColor(color);
+    getCanvas()->setBgColor(color);
+    getCanvas()->redraw();
 }
 
 void GuiApp::openFileSelected(const std::string& path) {
     g_print("%s\n", path.c_str());
     getAppData().setPath(path);
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
-        g_object_get_data(window, "canvas"));
-    if (canvas) {
-        (*canvas)->loadFigure(path.c_str());
-        (*canvas)->redraw();
-    }
+    auto* canvas =  getCanvas();
+    canvas->loadFigure(path.c_str());
+    canvas->redraw();
     updateStatusBar();
-}
-
-void GuiApp::updateStatusBar() {
-    g_print("%s\n", getAppData().toString().c_str());
-    gtk_label_set_text(GTK_LABEL(statusLabel), getAppData().toString().c_str());
 }
 
 AppData& GuiApp::getAppData() {
@@ -261,4 +262,23 @@ void GuiApp::executeCommand(Command *cmd) {
     if (cmd) {
         cmd->execute();
     }
+}
+
+SimpleCanvas* GuiApp::getCanvas(){
+    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+    g_object_get_data(window, "canvas"));
+    return canvas ? canvas->get() : nullptr;
+}
+
+void GuiApp::updateStatusBar(){
+    SimpleCanvas* canvas = getCanvas();
+    if (!canvas) return;
+
+    std::string vert_text = "Вершины: " + std::to_string(canvas->getVerticesNum());
+    std::string edges_text = "Грани: " + std::to_string(canvas->getEdgesNum());
+    std::string file_text = "Файл: " + getAppData().getPath();
+
+    gtk_label_set_text(GTK_LABEL(status_vert), vert_text.c_str());
+    gtk_label_set_text(GTK_LABEL(status_edges), edges_text.c_str());
+    gtk_label_set_text(GTK_LABEL(status_file), file_text.c_str());
 }
