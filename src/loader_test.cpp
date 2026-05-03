@@ -1,7 +1,7 @@
 #include "./include/obj_parser/obj_loader.hpp"
 
 int main() {
-    char fn[256] = "./assets/trumpet.obj";
+    char fn[256] = "./assets/teapot.obj";
     s21::ObjLoader loader = s21::ObjLoader();
     loader.loadObjFile(fn);
 

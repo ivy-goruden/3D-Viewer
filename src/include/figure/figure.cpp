@@ -28,12 +28,32 @@ namespace s21{
         Unique(l);
         edges_ = std::move(l);
         polygons_ = Poly_t();
-        for (FaceObj_t face: loader.faces){
-            std::vector<int> poly;
-            for (FaceElementObj_t el: face){
-                poly.push_back(el.vi-1);
+        // for (FaceObj_t face: loader.faces){
+        //     std::vector<int> poly;
+        //     for (FaceElementObj_t el: face){
+        //         poly.push_back(el.vi-1);
+        //     }
+        //     polygons_.push_back(poly);
+        // }
+        if (loader.groups.size() > 0) {
+            printf("group size %ld\n", loader.groups.at(0).size());
+            for (s21::GroupElement_t e : loader.groups.at(0)) {
+                if (e.kind == FACE) {
+                    std::vector<int> poly;
+                    for (s21::FaceElementObj_t el : loader.faces.at(e.index)){
+                        poly.push_back(el.vi-1);
+                    }
+                    polygons_.push_back(poly);
+                }
             }
-            polygons_.push_back(poly);
+        } else {
+            for (s21::FaceObj_t f : loader.faces) {
+                std::vector<int> poly;
+                for (FaceElementObj_t el: f) {
+                    poly.push_back(el.vi-1);
+                }
+                polygons_.push_back(poly);
+            }
         }
     }
 
