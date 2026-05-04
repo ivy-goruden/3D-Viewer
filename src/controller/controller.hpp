@@ -12,7 +12,7 @@ namespace s21{
             double camera_;
             double scale_;
 
-            Vert_t getFigureProjection(const matrix_t original);
+            Vert_t getFigureProjection(const matrix_t original, double minz);
         public:
             Controller();
             Vert_t loadFigure(const char* filename);

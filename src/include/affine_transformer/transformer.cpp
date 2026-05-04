@@ -1,5 +1,6 @@
 #include "transformer.hpp"
 #include <cmath>
+
 namespace s21{
 
     Transformer::Transformer(){}
@@ -13,12 +14,17 @@ namespace s21{
         return projection;
     }
 
-    Vert_t Transformer::getPerspectiveProjection(matrix_t m, double camera, double scale){
+    Vert_t Transformer::getPerspectiveProjection(matrix_t m, double camera, 
+            double scale, double minz) {
+        printf("minz:%f\n", minz);
         //returns a list of vertices in new position
-        Vert_t projection;
-        for(int i =0; i < m.size(); i++){
-            double z = m[i][2] + camera;
-            if (z<= 0) continue; 
+        Vert_t projection;        
+        for (int i = 0; i < m.size(); i++) {
+            double z = m[i][2] + camera - minz;
+            if (z <= 0) {
+                printf("z:%f\n", z);
+                continue;
+            }
             Point coord = Point{m[i][0]/z*scale,m[i][1]/z*scale};
             projection.push_back(coord);
         }

@@ -27,9 +27,11 @@ namespace s21{
     void Controller::setAngleX(int angle){
         angleX_ = angle;
     }
+
     void Controller::setAngleY(int angle){
         angleY_ = angle;
     }
+
     void Controller::setAngleZ(int angle){
         angleZ_ = angle;
     }
@@ -39,7 +41,7 @@ namespace s21{
         loader.loadObjFile(filename);
         s21::Figure *figure  = new s21::Figure(loader);
         figure_ = figure;
-        Vert_t projection_ = getFigureProjection(figure_->getMatrix());
+        Vert_t projection_ = getFigureProjection(figure_->getMatrix(), figure->getMinz());
         return projection_;
     }
 
@@ -47,18 +49,16 @@ namespace s21{
         Vert_t projection_ = Vert_t();
         if (figure_ != nullptr){
             matrix_t rotate = s21::Transformer::Rotate(angleX_,angleY_,angleZ_, figure_->getMatrix());
-            projection_ = getFigureProjection(rotate);
-            
+            projection_ = getFigureProjection(rotate, figure_->getMinz(rotate));
         }
         return projection_;
-
     }
 
-    Vert_t Controller::getFigureProjection(const matrix_t original){
+    Vert_t Controller::getFigureProjection(const matrix_t original, double minz) {
         if (parallel_projection_){
             return s21::Transformer::getParallelProjection(original, scale_);
         }
-        return s21::Transformer::getPerspectiveProjection(original, camera_, scale_);
+        return s21::Transformer::getPerspectiveProjection(original, camera_, scale_, minz);
     }
 
     void Controller::toggleProjection(){

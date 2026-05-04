@@ -2,6 +2,7 @@
 namespace s21{
     Figure::Figure(matrix_t m, Poly_t p, Edge_t n): matrix_(m), polygons_(p), edges_(n){
         projectionVertices_ = Vert_t();
+        minz = 0;
     }
     Figure::Figure(ObjLoader loader){
         projectionVertices_ = Vert_t();
@@ -11,6 +12,11 @@ namespace s21{
             m.push_back({v.x, v.y, v.z, 1.0});
         }
         matrix_ = std::move(m);
+        
+        minz = 0;
+        for (int i = 0; i < matrix_.size(); i++) {
+            if (matrix_[i][2] < 0 && minz > matrix_[i][2]) minz = matrix_[i][2];
+        }
 
         Edge_t l = Edge_t();
         for (const auto& line : loader.lines) {
@@ -70,7 +76,21 @@ namespace s21{
     Vert_t Figure::getProjection(){
         return projectionVertices_;
     }
-    Poly_t Figure::getPolygons(){
+
+    double Figure::getMinz() {
+        return minz;
+    }
+
+    double Figure::getMinz(matrix_t& m) {
+        double mz = 0;
+        for (int i = 0; i < m.size(); i++) {
+            if (m[i][2] < 0 && mz > m[i][2]) mz = m[i][2];
+        }
+        return mz;
+    }
+
+    Poly_t Figure::getPolygons()
+    {
         return polygons_;
     }
     matrix_t Figure::getMatrix(){

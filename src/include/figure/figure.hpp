@@ -14,9 +14,8 @@ class Figure{
         Edge_t edges_;                  //pairs of iterators of the connected vertices
         matrix_t matrix_;               //matrix of original figure for transformation
         Vert_t projectionVertices_;    //transformed projection of original figure
-
+        double minz;
         void Unique(Edge_t&);
-
     
     public:
         Figure(matrix_t, Poly_t, Edge_t);
@@ -27,6 +26,8 @@ class Figure{
         int getVerticesNum();
         int getNodesNum();
         Vert_t getProjection();
+        double getMinz();
+        double getMinz(matrix_t& m);
 };
 
 }
