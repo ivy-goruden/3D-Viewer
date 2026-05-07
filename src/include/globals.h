@@ -13,6 +13,7 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
 namespace s21{
 
 struct Point {
@@ -77,4 +78,5 @@ struct Bounds {
 #define Y2_d 90
 #define Z2_d 0
 }
+
 #endif

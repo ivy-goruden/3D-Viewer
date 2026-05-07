@@ -72,7 +72,13 @@ void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
     cairo_fill(cr);
 }
 
-void SimpleCanvas::drawVert(cairo_t* cr){
+void SimpleCanvas::drawGrid(cairo_t* cr) {
+    for (const auto& point : gridProjection_) {
+        cairo_arc(cr, point.x, point.y, 4, 0, 2 * M_PI);
+    }
+}
+
+void SimpleCanvas::drawVert(cairo_t* cr) {
     for (const auto& point : projection_) {
         draw_dot(cr, point.x, point.y);
     }
@@ -104,6 +110,7 @@ void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, 
 
 void SimpleCanvas::loadFigure(const char* filename) {
     projection_ = c_->loadFigure(filename);
+    gridProjection_ = c_->gridProjection();
 }
 
 void SimpleCanvas::redraw(){
@@ -117,10 +124,10 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
     cairo_translate(cr, width/2+xStart_, height/2+yStart_);
     cairo_scale(cr, scale_, scale_);
 
+    drawGrid(cr);
     drawFaces(cr);
     drawEdges(cr);
     drawVert(cr);
-
 }
 
 void SimpleCanvas::setScale(double scale){
@@ -145,16 +152,19 @@ void SimpleCanvas::rotateAbs(double x, double y, double z){
 void SimpleCanvas::rotateX(double x){
     c_->setAngleX(x);
     projection_ = c_->getFigure();
+    gridProjection_ = c_->gridProjection();
 }
 
 void SimpleCanvas::rotateY(double y){
     c_->setAngleY(y);
     projection_ = c_->getFigure();
+    gridProjection_ = c_->gridProjection();
 }
 
 void SimpleCanvas::rotateZ(double z){
     c_->setAngleY(z);
     projection_ = c_->getFigure();
+    gridProjection_ = c_->gridProjection();
 }
 
 void SimpleCanvas::toggleProjection(){
@@ -222,6 +232,7 @@ double SimpleCanvas::getAngleZ() {
 int SimpleCanvas::getEdgesNum(){
     return c_->getEdgesNum();
 }
+
 int SimpleCanvas::getVerticesNum(){
     return c_->getVerticesNum();
 }

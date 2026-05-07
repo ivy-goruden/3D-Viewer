@@ -36,6 +36,20 @@ namespace s21{
         angleZ_ = angle;
     }
 
+    Vert_t Controller::gridProjection() {
+        if (grid_ == nullptr) {
+            grid_ = new Grid();
+        }
+        Vert_t projection_ = Vert_t();
+        if (figure_ != nullptr) {
+            Bounds b = figure_->getBounds();
+            grid_->createGrid(b, std::abs(b.minx - b.maxx));        
+            matrix_t rotate = s21::Transformer::Rotate(angleX_, angleY_, angleZ_, grid_->getMatrix());
+            Vert_t projection_ = getFigureProjection(grid_->getMatrix(), figure_->getMinz());
+        }
+        return projection_;
+    }
+
     Vert_t Controller::loadFigure(const char* filename){
         s21::ObjLoader loader = s21::ObjLoader();
         loader.loadObjFile(filename);

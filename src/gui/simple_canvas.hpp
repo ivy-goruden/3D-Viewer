@@ -7,6 +7,7 @@
 #include <cmath>
 #include "../controller/controller.hpp"
 #include "gui_globals.h"
+#include "../include/grid.hpp"
 
 class SimpleCanvas {
 public:
@@ -22,6 +23,7 @@ public:
     void draw_dot(cairo_t* cr, double x, double y);
 
     // Отрисовка фигуры
+    void drawGrid(cairo_t* cr);
     void drawVert(cairo_t* cr);
     void drawEdges(cairo_t* cr);
     void drawFaces(cairo_t* cr);
@@ -72,6 +74,8 @@ private:
     bool fillPoly_;
     Shape vertType_;
     Stroke lineType_;
+
+    s21::Vert_t gridProjection_;
 };
 
 #endif // SIMPLE_CANVAS_HPP
