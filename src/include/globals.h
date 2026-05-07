@@ -55,6 +55,15 @@ typedef struct{
 
 } ProjectionData_t; // figure data for drawing
 
+struct Bounds {
+    double minx;
+    double maxx;
+    double miny;
+    double maxy;
+    double minz;
+    double maxz;
+};
+
 //ANGLES
 //angles are counted from Y up-looking axis
 

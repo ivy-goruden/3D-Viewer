@@ -1,9 +1,12 @@
 #include "figure.hpp"
+
 namespace s21{
+
     Figure::Figure(matrix_t m, Poly_t p, Edge_t n): matrix_(m), polygons_(p), edges_(n){
         projectionVertices_ = Vert_t();
-        minz = 0;
+        bounds = {0, 0, 0, 0, 0, 0};
     }
+
     Figure::Figure(ObjLoader loader){
         projectionVertices_ = Vert_t();
 
@@ -13,9 +16,18 @@ namespace s21{
         }
         matrix_ = std::move(m);
         
-        minz = 0;
+        bounds = {
+            matrix_[0][0], matrix_[0][0],
+            matrix_[0][1], matrix_[0][1],
+            matrix_[0][2], matrix_[0][2]
+        };
         for (int i = 0; i < matrix_.size(); i++) {
-            if (matrix_[i][2] < 0 && minz > matrix_[i][2]) minz = matrix_[i][2];
+            if (bounds.maxx < matrix_[i][0]) bounds.maxx = matrix_[i][0];
+            if (bounds.minx > matrix_[i][0]) bounds.minx = matrix_[i][0];
+            if (bounds.maxy < matrix_[i][1]) bounds.maxy = matrix_[i][1];
+            if (bounds.miny > matrix_[i][1]) bounds.miny = matrix_[i][1];
+            if (bounds.maxz < matrix_[i][2]) bounds.maxz = matrix_[i][2];
+            if (bounds.minz > matrix_[i][2]) bounds.minz = matrix_[i][2];
         }
 
         Edge_t l = Edge_t();
@@ -78,32 +90,38 @@ namespace s21{
     }
 
     double Figure::getMinz() {
-        return minz;
+        return bounds.minz;
     }
 
     double Figure::getMinz(matrix_t& m) {
-        double mz = 0;
+        double mz = m[0][2];
         for (int i = 0; i < m.size(); i++) {
-            if (m[i][2] < 0 && mz > m[i][2]) mz = m[i][2];
+            if (mz > m[i][2]) mz = m[i][2];
         }
         return mz;
     }
 
-    Poly_t Figure::getPolygons()
-    {
+    Poly_t Figure::getPolygons() {
         return polygons_;
     }
-    matrix_t Figure::getMatrix(){
+
+    matrix_t Figure::getMatrix() {
         return matrix_;
     }
-    int Figure::getVerticesNum(){
-        return matrix_.size();
+
+    int Figure::getVerticesNum() {
+        return matrix_.size();        
     }
-    Edge_t Figure::getEdges(){
+
+    Edge_t Figure::getEdges() {
         return edges_;
     }
 
-    int Figure::getNodesNum(){
+    int Figure::getNodesNum() {
         return edges_.size();
+    }
+
+    Bounds Figure::getBounds() {
+        return bounds;
     }
 }

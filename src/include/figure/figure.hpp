@@ -13,8 +13,9 @@ class Figure{
         Poly_t polygons_;               //list of iterators for the vertices connected in polys
         Edge_t edges_;                  //pairs of iterators of the connected vertices
         matrix_t matrix_;               //matrix of original figure for transformation
-        Vert_t projectionVertices_;    //transformed projection of original figure
+        Vert_t projectionVertices_;     //transformed projection of original figure
         double minz;
+        Bounds bounds;
         void Unique(Edge_t&);
     
     public:
@@ -28,6 +29,7 @@ class Figure{
         Vert_t getProjection();
         double getMinz();
         double getMinz(matrix_t& m);
+        Bounds getBounds();
 };
 
 }

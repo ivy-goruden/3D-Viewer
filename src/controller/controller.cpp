@@ -9,7 +9,7 @@ namespace s21{
         angleX_ = X2_d;
         angleY_ = Y2_d;
         angleZ_ = Z2_d;
-        camera_ = 3;
+        camera_ = 100;
     }
 
     double Controller::getAngleX() {

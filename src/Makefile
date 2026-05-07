@@ -19,7 +19,7 @@ install:
 uninstall:
 
 clean:
-	rm -rf *.a $(OLD) game.out
+	rm -rf *.a $(OLD) game.out *.app
 
 dvi:
 

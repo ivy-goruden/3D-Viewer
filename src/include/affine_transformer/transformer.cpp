@@ -18,6 +18,7 @@ namespace s21{
             double scale, double minz) {
         printf("minz:%f\n", minz);
         //returns a list of vertices in new position
+        minz = minz < 0 ? minz : 0;
         Vert_t projection;        
         for (int i = 0; i < m.size(); i++) {
             double z = m[i][2] + camera - minz;
