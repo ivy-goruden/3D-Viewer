@@ -20,12 +20,6 @@ namespace s21 {
         fillGrid(x1, x2, y1, y2, z1, z2, step);
     }
 
-    void Grid::createGrid(s21::Figure& figure, double step) {
-        m = matrix_t();
-        Bounds b = figure.getBounds();
-        fillGrid(b.minx, b.maxx, b.miny, b.maxy, b.minz, b.maxz, step);
-    }
-
     void Grid::fillGrid(double x1, double x2, double y1, double y2, double z1, double z2, double step) {
         double dx = x2 - x1;
         double dy = y2 - y1;
@@ -35,15 +29,17 @@ namespace s21 {
         double z = z1 - dz;
         x2 += dx;
         y2 += dy;
-        z2 += dz;    
+        z2 += dz;
         while (x < x2) {
             while (y < y2) {
                 while (z < z2) {
                     m.push_back({x, y, z, 1});
                     z += step;
                 }
+                z = z1 - dz;
                 y += step;
             }
+            y = y1 - dy;
             x += step;
         }
     }

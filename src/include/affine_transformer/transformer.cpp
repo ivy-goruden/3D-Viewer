@@ -1,9 +1,9 @@
 #include "transformer.hpp"
+#include "matrix.hpp"
 #include <cmath>
 
 namespace s21{
 
-    Transformer::Transformer(){}
     Vert_t Transformer::getParallelProjection(matrix_t m, double scale){
         //returns a list of vertices in new position
         Vert_t projection;
@@ -16,14 +16,12 @@ namespace s21{
 
     Vert_t Transformer::getPerspectiveProjection(matrix_t m, double camera, 
             double scale, double minz) {
-        printf("minz:%f\n", minz);
         //returns a list of vertices in new position
         minz = minz < 0 ? minz : 0;
         Vert_t projection;        
         for (int i = 0; i < m.size(); i++) {
             double z = m[i][2] + camera - minz;
             if (z <= 0) {
-                printf("z:%f\n", z);
                 continue;
             }
             Point coord = Point{m[i][0]/z*scale,m[i][1]/z*scale};
@@ -54,34 +52,10 @@ namespace s21{
             {0,0,1,0},
             {0,0,0,1}
         };
-        matrix_t result =  multiplyMatrix(&original, &x_rotate);
-        result =  multiplyMatrix(&result, &y_rotate);
-        result =  multiplyMatrix(&result, &z_rotate);
+        matrix_t result =  Matrix::multiplyMatrix(&original, &x_rotate);
+        result =  Matrix::multiplyMatrix(&result, &y_rotate);
+        result =  Matrix::multiplyMatrix(&result, &z_rotate);
         return result;
-
-    }
-
-    matrix_t Transformer::multiplyMatrix(const matrix_t *f, const matrix_t *s){
-        int rows = f->size();
-        int cols = s[0].size();
-        int inner = s->size();
-        matrix_t nMatrix = createMatrix(rows, cols);
-        for (int row = 0; row<rows;row++){
-            for (int col = 0; col < cols; col++){
-                double val = 0;
-                for (int x = 0; x<inner;x++){
-                    val += ((*f)[row][x])*((*s)[x][col]);
-                }
-                nMatrix[row][col] = val;
-            }
-
-        }
-        return nMatrix;
-    }
-
-    matrix_t Transformer::createMatrix(int rows, int cols){
-        std::vector<std::vector<double>> matrix(rows, std::vector<double>(cols, 0));
-        return matrix;
     }
 
 }
