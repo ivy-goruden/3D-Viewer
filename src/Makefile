@@ -39,7 +39,7 @@ gtk01run: gtk01
 	./gtk01.app
 
 gtk02: 3Dtransformer.a
-	g++ $(CXXFLAGS) gtk02.cpp $(GUI_SOURCE) include/grid.cpp controller/controller.cpp -L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
+	g++ $(CXXFLAGS) gtk02.cpp $(GUI_SOURCE) include/projection/projection.cpp include/grid.cpp controller/controller.cpp -L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
 
 gtk02run: gtk02
 	./gtk02.app

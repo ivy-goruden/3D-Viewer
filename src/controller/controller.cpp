@@ -1,6 +1,7 @@
 #include "controller.hpp"
 #include "../include/obj_parser/obj_loader.hpp"
 #include "../include/affine_transformer/transformer.hpp"
+#include "../include/projection/projection.hpp"
 #include <cmath>
 
 namespace s21{
@@ -43,9 +44,10 @@ namespace s21{
         Vert_t projection_ = Vert_t();
         if (figure_ != nullptr) {
             Bounds b = figure_->getBounds();
-            grid_->createGrid(b, std::abs(b.minx - b.maxx));        
-            matrix_t rotate = s21::Transformer::Rotate(angleX_, angleY_, angleZ_, grid_->getMatrix());
-            Vert_t projection_ = getFigureProjection(grid_->getMatrix(), figure_->getMinz());
+            grid_->createGrid(b, std::abs(b.minx - b.maxx) / 100);
+            matrix_t m = grid_->getMatrix();
+            PerspProjection proj(1, 3, 3, 1920, 780);
+            Vert_t projection_ = proj.calculate(m);
         }
         return projection_;
     }

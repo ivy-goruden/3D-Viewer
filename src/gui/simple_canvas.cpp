@@ -73,8 +73,10 @@ void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
 }
 
 void SimpleCanvas::drawGrid(cairo_t* cr) {
+    cairo_set_source_rgb(cr, dotColor_.red, dotColor_.green, dotColor_.blue);
     for (const auto& point : gridProjection_) {
         cairo_arc(cr, point.x, point.y, 4, 0, 2 * M_PI);
+        cairo_fill(cr);
     }
 }
 

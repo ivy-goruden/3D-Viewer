@@ -6,15 +6,19 @@
 namespace s21 {
 
     class Projection {
-      private:
-        /* data */
+      protected:
+        double distance;
+        double view_w;
+        double view_h;
+        int screen_w;
+        int screen_h;
       public:
-        Projection() {};
-        ~Projection() {};
-        virtual Vert_t calculate() = 0;
+        Projection(double d, double vw, double vh, int sw, int sh) : distance(d), view_w(vw), view_h(vh), screen_w(sw), screen_h(sh) {};
+        virtual ~Projection() = default;
+        virtual Vert_t calculate(matrix_t& matrix) = 0;
     };
 
-    class OrtoProjection : Projection {
+    class OrtoProjection : public Projection {
       private:
         const matrix_t matrix = {
             {1,0,0,0},
@@ -23,9 +27,17 @@ namespace s21 {
             {0,0,0,1}
         };
       public:
-        OrtoProjection();
-        ~OrtoProjection();
-        Vert_t calculate();
+        OrtoProjection(double d, double vw, double vh, int sw, int sh) : Projection(d, vw, vh, sw, sh) {};
+        ~OrtoProjection() override = default;
+        Vert_t calculate(matrix_t& matrix) override;
+    };
+    
+    class PerspProjection : public Projection {
+      private:
+      public:
+        PerspProjection(double d, double vw, double vh, int sw, int sh) : Projection(d, vw, vh, sw, sh) {};
+        ~PerspProjection() override = default;
+        Vert_t calculate(matrix_t& matrix) override;
     };
     
 }
