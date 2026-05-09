@@ -51,7 +51,7 @@ public:
     int getEdgesNum();
     int getVerticesNum();
 
-private:
+public:
     GtkWidget* drawing_area;
     // Статические колбэки GTK
     static void on_draw_static(GtkDrawingArea* area, cairo_t* cr,

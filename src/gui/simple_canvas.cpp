@@ -1,4 +1,13 @@
 #include "simple_canvas.hpp"
+#include <iostream>
+#include <format>
+
+void drawSomething(cairo_t* cr, SimpleCanvas& cv) {
+    cairo_set_source_rgb(cr, 0, 0, 0);
+    cairo_set_line_width(cr, cv.lineWidth_ * 10);
+    cairo_arc(cr, 0, 0, 100, 0, 2 * M_PI);
+    cairo_stroke(cr);
+}
 
 // Реализация методов класса SimpleCanvas для GTK4
 
@@ -8,7 +17,7 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(drawing_area),
                                    on_draw_static,
                                    this, nullptr);
-    scale_ = 10;
+    scale_ = 1;
     xStart_ = 0;
     yStart_ = 0;
     widget_ = drawing_area;
@@ -22,6 +31,8 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     vertWidth_ = 0.1;
     vertType_ = None;
     lineType_ = Solid;
+
+    gridProjection_ = c_->gridProjection();
 }
 
 SimpleCanvas::~SimpleCanvas() {
@@ -73,9 +84,12 @@ void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
 }
 
 void SimpleCanvas::drawGrid(cairo_t* cr) {
-    cairo_set_source_rgb(cr, dotColor_.red, dotColor_.green, dotColor_.blue);
+    std::cout << "[SimpleCanvas::drawGrid]\n";
+    cairo_set_source_rgb(cr, 0, 0, 0);
     for (const auto& point : gridProjection_) {
-        cairo_arc(cr, point.x, point.y, 4, 0, 2 * M_PI);
+        // std::cout << std::format("x{},y{}\n", point.x, point.y);
+        cairo_arc(cr, point.x, point.y, 2, 0, 2 * M_PI);
+        cairo_set_line_width(cr, lineWidth_ * 1);
         cairo_fill(cr);
     }
 }
@@ -111,8 +125,7 @@ void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, 
 }
 
 void SimpleCanvas::loadFigure(const char* filename) {
-    projection_ = c_->loadFigure(filename);
-    gridProjection_ = c_->gridProjection();
+    projection_ = c_->loadFigure(filename);    
 }
 
 void SimpleCanvas::redraw(){
@@ -123,13 +136,16 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
     cairo_set_source_rgb(cr, bgColor_.red, bgColor_.green, bgColor_.blue);
     cairo_paint(cr);
     cairo_set_line_width(cr, lineWidth_);
-    cairo_translate(cr, width/2+xStart_, height/2+yStart_);
+    cairo_translate(cr, width / 2 + xStart_, height / 2 + yStart_);
     cairo_scale(cr, scale_, scale_);
 
     drawGrid(cr);
-    drawFaces(cr);
-    drawEdges(cr);
-    drawVert(cr);
+    // drawFaces(cr);
+    // drawEdges(cr);
+    // drawVert(cr);
+
+    drawSomething(cr, *this);
+    std::cout << "[SimpleCanvas::onDraw] " << std::format("w{},h{},xc{},yc{},s{},lw{}\n", width, height, width/2+xStart_, height/2+yStart_, scale_, lineWidth_);
 }
 
 void SimpleCanvas::setScale(double scale){
@@ -149,6 +165,7 @@ void SimpleCanvas::rotateAbs(double x, double y, double z){
     c_->setAngleY(y);
     c_->setAngleZ(z);
     projection_ = c_->getFigure();
+    gridProjection_ = c_->gridProjection();
 }
 
 void SimpleCanvas::rotateX(double x){
@@ -214,7 +231,7 @@ void SimpleCanvas::setLineWidth(double width){
     lineWidth_ = width;
 }
 
-void SimpleCanvas::setZoom(double zoom){
+void SimpleCanvas::setZoom(double zoom) {
     c_->setScale(zoom);
     projection_ = c_->getFigure();
 }

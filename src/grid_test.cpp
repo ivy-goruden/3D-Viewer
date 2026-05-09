@@ -6,7 +6,7 @@
 
 int main() {
     s21::Grid grid = s21::Grid();
-    grid.createGrid(0, 1, 0, 1, 0, 1, 0.1);
+    grid.createGrid(0, 1920, 0, 780, 0, 2000, 100);
     s21::matrix_t m = grid.getMatrix();
 
     // for (auto &&i : m) {
@@ -16,10 +16,10 @@ int main() {
     //     std::cout << std::endl;
     // }
     
-    s21::PerspProjection proj(1, 3, 3, 1920, 780);
+    s21::PerspProjection proj(-1000, 1920, 780, 1920, 780);
     s21::Vert_t points = proj.calculate(m);
     for (auto &&i : points) {
-        std::cout << round(i.x)  << " " << i.y << std::endl;
+        std::cout << round(i.x)  << " " << i.y << "; ";
     }
 
     return 0;

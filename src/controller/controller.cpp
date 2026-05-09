@@ -3,6 +3,7 @@
 #include "../include/affine_transformer/transformer.hpp"
 #include "../include/projection/projection.hpp"
 #include <cmath>
+#include <iostream>
 
 namespace s21{
 
@@ -41,14 +42,11 @@ namespace s21{
         if (grid_ == nullptr) {
             grid_ = new Grid();
         }
-        Vert_t projection_ = Vert_t();
-        if (figure_ != nullptr) {
-            Bounds b = figure_->getBounds();
-            grid_->createGrid(b, std::abs(b.minx - b.maxx) / 100);
-            matrix_t m = grid_->getMatrix();
-            PerspProjection proj(1, 3, 3, 1920, 780);
-            Vert_t projection_ = proj.calculate(m);
-        }
+        grid_->createGrid(0, 100, 0, 100, 0, 100, 100);
+        matrix_t m = grid_->getMatrix();
+        m = s21::Transformer::Rotate(angleX_, angleY_, angleZ_, m);
+        PerspProjection proj(-10, 1000, 1000, 1000, 1000);
+        Vert_t projection_ = proj.calculate(m);
         return projection_;
     }
 
