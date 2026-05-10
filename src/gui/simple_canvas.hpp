@@ -23,6 +23,7 @@ public:
     void draw_dot(cairo_t* cr, double x, double y);
 
     // Отрисовка фигуры
+    void drawAxes(cairo_t* cr);
     void drawGrid(cairo_t* cr);
     void drawVert(cairo_t* cr);
     void drawEdges(cairo_t* cr);
@@ -73,9 +74,14 @@ public:
 
     bool fillPoly_;
     Shape vertType_;
-    Stroke lineType_;
+    Stroke lineType_;    
 
     s21::Vert_t gridProjection_;
+    int window_w = 1920;
+    int window_h = 1080;
+public:
+    s21::Point toScreenPoint(s21::Point canvasPoint);
+    s21::Point toCanvasPoint(s21::Point screenPoint);
 };
 
 #endif // SIMPLE_CANVAS_HPP

@@ -2,7 +2,6 @@
 #define GRID_HPP
 
 #include "globals.h"
-#include "figure/figure.hpp"
 
 namespace s21 {
 

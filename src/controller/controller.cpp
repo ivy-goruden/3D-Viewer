@@ -42,10 +42,10 @@ namespace s21{
         if (grid_ == nullptr) {
             grid_ = new Grid();
         }
-        grid_->createGrid(0, 100, 0, 100, 0, 100, 100);
+        grid_->createGrid(0, 1000, 0, 1000, 0, 1000, 100);
         matrix_t m = grid_->getMatrix();
         m = s21::Transformer::Rotate(angleX_, angleY_, angleZ_, m);
-        PerspProjection proj(-10, 1000, 1000, 1000, 1000);
+        PerspProjection proj(100, 1920, 1080, 1920, 1080);
         Vert_t projection_ = proj.calculate(m);
         return projection_;
     }

@@ -23,3 +23,4 @@ s21::Vert_t s21::PerspProjection::calculate(s21::matrix_t& matrix) {
     }
     return points;
 }
+
