@@ -45,8 +45,12 @@ namespace s21{
         grid_->createGrid(0, 1000, 0, 1000, 0, 1000, 100);
         matrix_t m = grid_->getMatrix();
         m = s21::Transformer::Rotate(angleX_, angleY_, angleZ_, m);
-        PerspProjection proj(100, 1920, 1080, 1920, 1080);
-        Vert_t projection_ = proj.calculate(m);
+        s21::SimplePerspective proj(2, 1920, 1080);
+        Vert_t projection_;
+        for (const auto& point3d : m) {
+            s21::Point p = proj.project({point3d[0], point3d[1], point3d[2]});
+            projection_.push_back(p);
+        }
         return projection_;
     }
 

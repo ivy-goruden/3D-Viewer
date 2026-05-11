@@ -1,6 +1,7 @@
 #ifndef PROJECTION_H
 #define PROJECTION_H
 
+#include <cmath>
 #include "../globals.h"
 
 namespace s21 {
@@ -51,10 +52,11 @@ namespace s21 {
             : distance(d), screenW(w), screenH(h) {}
         
         Point project(const Point3d& point) {
-            if (point.z <= 0) return {-1, -1};            
-            double scale = distance / point.z;
-            int x = (int)(point.x * scale + screenW / 2);
-            int y = (int)(screenH / 2 - point.y * scale);            
+            if (point.z < 0) return {-100000, -100000};            
+            double z = point.z == 0 ? 1 : point.z;
+            double scale = distance / z;
+            int x = (int)(point.x * scale);
+            int y = (int)(-1 * point.y * scale);            
             return {x, y};
         }
 
@@ -63,111 +65,134 @@ namespace s21 {
         }    
     };
 
-    // class PerspectiveProjection {
-    //   private:
-    //     // Параметры камеры
-    //     Point3d eye;      // положение камеры
-    //     Point3d center;   // куда смотрим
-    //     Point3d up;       // вектор вверх
+    class PerspectiveProjection {
+      private:
+        // Параметры камеры
+        Point3d eye;      // положение камеры
+        Point3d center;   // куда смотрим
+        Point3d up;       // вектор вверх
         
-    //     // Параметры проекции
-    //     double fov;       // угол обзора в градусах
-    //     double aspect;    // ширина/высота экрана
-    //     double nearPlane; // ближняя плоскость
-    //     double farPlane;  // дальняя плоскость
+        // Параметры проекции
+        double fov;       // угол обзора в градусах
+        double aspect;    // ширина/высота экрана
+        double nearPlane; // ближняя плоскость
+        double farPlane;  // дальняя плоскость
         
-    //     int screenWidth;
-    //     int screenHeight;
+        int screenWidth;
+        int screenHeight;
         
-    //     // Матрица вида (View Matrix)
-    //     double viewMatrix[4][4];
+        // Матрица вида (View Matrix)
+        double viewMatrix[4][4];
         
-    //     // Матрица перспективной проекции (Projection Matrix)
-    //     double projMatrix[4][4];
+        // Матрица перспективной проекции (Projection Matrix)
+        double projMatrix[4][4];
         
-    //   public:
-    //     PerspectiveProjection(Point3d cameraPos, Point3d lookAt, Point3d upVector,
-    //                         double fovDeg, double aspectRatio, 
-    //                         double nearP, double farP,
-    //                         int sw, int sh) {
-    //         eye = cameraPos;
-    //         center = lookAt;
-    //         up = upVector;
-    //         fov = fovDeg;
-    //         aspect = aspectRatio;
-    //         nearPlane = nearP;
-    //         farPlane = farP;
-    //         screenWidth = sw;
-    //         screenHeight = sh;
+      public:
+        PerspectiveProjection(Point3d cameraPos, Point3d lookAt, Point3d upVector,
+                            double fovDeg, double aspectRatio, 
+                            double nearP, double farP,
+                            int sw, int sh) {
+            eye = cameraPos;
+            center = lookAt;
+            up = upVector;
+            fov = fovDeg;
+            aspect = aspectRatio;
+            nearPlane = nearP;
+            farPlane = farP;
+            screenWidth = sw;
+            screenHeight = sh;
             
-    //         calculateViewMatrix();
-    //         calculateProjectionMatrix();
-    //     }
+            calculateViewMatrix();
+            calculateProjectionMatrix();
+        }
         
-    //     // Проекция точки 3D -> 2D (экранные координаты)
-    //     Point project(const Point3d& point) {
-    //         // 1. Переводим точку в пространство камеры
-    //         double cameraSpace[4] = {point.x, point.y, point.z, 1.0};
-    //         multiplyMatrixVector(viewMatrix, cameraSpace);
+        // Проекция точки 3D -> 2D (экранные координаты)
+        Point project(const Point3d& point) {
+            // 1. Переводим в пространство камеры
+            double cameraSpace[4] = {point.x, point.y, point.z, 1.0};
+            double viewResult[4];
+            multiplyMatrixVector(viewMatrix, cameraSpace, viewResult);
             
-    //         // 2. Применяем перспективную проекцию
-    //         double clipSpace[4];
-    //         multiplyMatrixVector(projMatrix, cameraSpace, clipSpace);
+            // 2. Применяем проекцию
+            double clipSpace[4];
+            multiplyMatrixVector(projMatrix, viewResult, clipSpace);
             
-    //         // 3. Перспективное деление (преобразование в NDC - Normalized Device Coordinates)
-    //         if (clipSpace[3] == 0) return {-1, -1};
+            // 3. Перспективное деление
+            if (clipSpace[3] == 0) return {-1, -1};
             
-    //         double ndcX = clipSpace[0] / clipSpace[3];
-    //         double ndcY = clipSpace[1] / clipSpace[3];
+            double ndcX = clipSpace[0] / clipSpace[3];
+            double ndcY = clipSpace[1] / clipSpace[3];
             
-    //         // 4. Преобразование в экранные координаты
-    //         int screenX = (int)((ndcX + 1.0) * 0.5 * screenWidth);
-    //         int screenY = (int)((1.0 - (ndcY + 1.0) * 0.5) * screenHeight); // Y перевернут
+            // 4. В экранные координаты
+            int screenX = static_cast<int>(ndcX * screenWidth / 2);
+            int screenY = static_cast<int>(-1.0 * ndcY * screenHeight / 2);
             
-    //         return {screenX, screenY};
-    //     }
+            return {screenX, screenY};
+        }
         
-    //     // Проекция отрезка
-    //     std::pair<Point, Point> projectSegment(const Point3d& p1, const Point3d& p2) {
-    //         return {project(p1), project(p2)};
-    //     }
+        // Проекция отрезка
+        std::pair<Point, Point> projectSegment(const Point3d& p1, const Point3d& p2) {
+            return {project(p1), project(p2)};
+        }
         
-    // private:
-    //     void calculateViewMatrix() {
-    //         // Вычисляем векторы камеры
-    //         Point3d forward = normalize({
-    //             center.x - eye.x,
-    //             center.y - eye.y,
-    //             center.z - eye.z
-    //         });
+    private:
+        double dot(const Point3d& a, const Point3d& b) {
+            return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
+
+        Point3d cross(const Point3d& a, const Point3d& b) {
+            return {
+                a.y * b.z - a.z * b.y,
+                a.z * b.x - a.x * b.z,
+                a.x * b.y - a.y * b.x
+            };
+        }
+
+        double length(const Point3d& v) {
+            return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+        }
+
+        Point3d normalize(const Point3d& v) {
+            double len = length(v);
+            if (len == 0) return {0, 0, 0};
+            return {v.x / len, v.y / len, v.z / len};
+        }
+
+        void calculateViewMatrix() {
+            // Вычисляем векторы камеры
+            Point3d forward = normalize({
+                center.x - eye.x,
+                center.y - eye.y,
+                center.z - eye.z
+            });
             
-    //         Point3d right = normalize(cross(forward, up));
-    //         Point3d trueUp = normalize(cross(right, forward));
+            Point3d right = normalize(cross(forward, up));
+            Point3d trueUp = normalize(cross(right, forward));
             
-    //         // Матрица вида (LookAt матрица)
-    //         viewMatrix[0][0] = right.x; viewMatrix[0][1] = right.y; viewMatrix[0][2] = right.z; viewMatrix[0][3] = -dot(right, eye);
-    //         viewMatrix[1][0] = trueUp.x; viewMatrix[1][1] = trueUp.y; viewMatrix[1][2] = trueUp.z; viewMatrix[1][3] = -dot(trueUp, eye);
-    //         viewMatrix[2][0] = -forward.x; viewMatrix[2][1] = -forward.y; viewMatrix[2][2] = -forward.z; viewMatrix[2][3] = dot(forward, eye);
-    //         viewMatrix[3][0] = 0; viewMatrix[3][1] = 0; viewMatrix[3][2] = 0; viewMatrix[3][3] = 1;
-    //     }
+            // Матрица вида (LookAt матрица)
+            viewMatrix[0][0] = right.x; viewMatrix[0][1] = right.y; viewMatrix[0][2] = right.z; viewMatrix[0][3] = -dot(right, eye);
+            viewMatrix[1][0] = trueUp.x; viewMatrix[1][1] = trueUp.y; viewMatrix[1][2] = trueUp.z; viewMatrix[1][3] = -dot(trueUp, eye);
+            viewMatrix[2][0] = -forward.x; viewMatrix[2][1] = -forward.y; viewMatrix[2][2] = -forward.z; viewMatrix[2][3] = dot(forward, eye);
+            viewMatrix[3][0] = 0; viewMatrix[3][1] = 0; viewMatrix[3][2] = 0; viewMatrix[3][3] = 1;
+        }
         
-    //     void calculateProjectionMatrix() {
-    //         double f = 1.0 / tan(fov * 0.5 * M_PI / 180.0);
-    //         double rangeInv = 1.0 / (nearPlane - farPlane);
+        void calculateProjectionMatrix() {
+            double f = 1.0 / tan(fov * 0.5 * M_PI / 180.0);
+            double rangeInv = 1.0 / (nearPlane - farPlane);
             
-    //         projMatrix[0][0] = f / aspect; projMatrix[0][1] = 0; projMatrix[0][2] = 0; projMatrix[0][3] = 0;
-    //         projMatrix[1][0] = 0; projMatrix[1][1] = f; projMatrix[1][2] = 0; projMatrix[1][3] = 0;
-    //         projMatrix[2][0] = 0; projMatrix[2][1] = 0; projMatrix[2][2] = (farPlane + nearPlane) * rangeInv; projMatrix[2][3] = 2 * farPlane * nearPlane * rangeInv;
-    //         projMatrix[3][0] = 0; projMatrix[3][1] = 0; projMatrix[3][2] = -1; projMatrix[3][3] = 0;
-    //     }
+            projMatrix[0][0] = f / aspect; projMatrix[0][1] = 0; projMatrix[0][2] = 0; projMatrix[0][3] = 0;
+            projMatrix[1][0] = 0; projMatrix[1][1] = f; projMatrix[1][2] = 0; projMatrix[1][3] = 0;
+            projMatrix[2][0] = 0; projMatrix[2][1] = 0; projMatrix[2][2] = (farPlane + nearPlane) * rangeInv; projMatrix[2][3] = 2 * farPlane * nearPlane * rangeInv;
+            projMatrix[3][0] = 0; projMatrix[3][1] = 0; projMatrix[3][2] = -1; projMatrix[3][3] = 0;
+        }
         
-    //     void multiplyMatrixVector(const double matrix[4][4], const double vec[4], double result[4]) {
-    //         for (int i = 0; i < 4; i++) {
-    //             result[i] = matrix[i][0] * vec[0] + matrix[i][1] * vec[1] + 
-    //                         matrix[i][2] * vec[2] + matrix[i][3] * vec[3];
-    //         }
-    //     }
-    // };
+        void multiplyMatrixVector(const double matrix[4][4], const double vec[4], double result[4]) {
+            for (int i = 0; i < 4; i++) {
+                result[i] = matrix[i][0] * vec[0] + matrix[i][1] * vec[1] + 
+                            matrix[i][2] * vec[2] + matrix[i][3] * vec[3];
+            }
+        }
+    };
 
 }
 

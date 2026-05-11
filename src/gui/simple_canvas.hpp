@@ -82,6 +82,7 @@ public:
 public:
     s21::Point toScreenPoint(s21::Point canvasPoint);
     s21::Point toCanvasPoint(s21::Point screenPoint);
+    void renderSegment(cairo_t* cr, const s21::Point3d& p1, const s21::Point3d& p2);
 };
 
 #endif // SIMPLE_CANVAS_HPP

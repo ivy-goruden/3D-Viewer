@@ -31,15 +31,11 @@ namespace s21 {
         y2 += dy;
         z2 += dz;
         while (x < x2) {
-            while (y < y2) {
-                while (z < z2) {
-                    m.push_back({x, y, z, 1});
-                    z += step;
-                }
-                z = z1 - dz;
-                y += step;
+            while (z < z2) {
+                m.push_back({x, 0, z, 1});
+                z += step;
             }
-            y = y1 - dy;
+            z = z1 - dz;
             x += step;
         }
     }
