@@ -50,6 +50,12 @@ loader:
 loaderrun: loader
 	./loader.app
 
+proj:
+	g++ $(CXXFLAGS) projection/main.cpp projection/gui.cpp -o projection/projection.app $(GTKFLAGS) -lm
+
+projrun: proj
+	projection/projection.app
+
 valgrind:
 	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
   --suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp --suppressions=my.supp --leak-check=full --show-leak-kinds=definite,indirect --track-origins=yes -s ./gtk02.app
