@@ -28,6 +28,7 @@ void DrawSomething(cairo_t* cr, GuiApp* gui) {
 
 s21::Point GuiApp::viewportToCanvas(double x, double y) {
     return toScreenPoint(s21::Point{x * Cw / Vw, y * Ch / Vh});
+    // return s21::Point{x * Cw / Vw, y * Ch / Vh};
 }
 
 s21::Point GuiApp::projectVertex(s21::Point3d v) {
@@ -50,6 +51,13 @@ s21::Point GuiApp::toCanvasPoint(s21::Point screenPoint) {
 }
 
 GuiApp::GuiApp() {
+    // Инициализируем данные
+    drag_data = g_new0(DragData, 1);
+    drag_data->app = this;
+    drag_data->offset_x = 0;
+    drag_data->offset_y = 0;
+    drag_data->is_dragging = FALSE;
+
     d = 1;
     Cw = 1;
     Ch = 1;
@@ -69,6 +77,7 @@ GuiApp::GuiApp() {
 }
 
 GuiApp::~GuiApp() {
+    g_free(drag_data);
     g_object_unref(app);
 }
 
@@ -202,11 +211,40 @@ void GuiApp::activate(GtkApplication* app) {
     gtk_window_present(GTK_WINDOW(window));
 
     gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(paper), on_draw_static, this, nullptr);
+
+    GtkEventController *motion_controller = gtk_event_controller_motion_new();
+    g_signal_connect(motion_controller, "motion", G_CALLBACK(on_motion), NULL);
+    gtk_widget_add_controller(GTK_WIDGET(paper), motion_controller);
+
+    // Создаём жест для перетаскивания
+    GtkGesture *drag_gesture = gtk_gesture_drag_new();
+    // Подключаем сигналы
+    g_signal_connect(drag_gesture, "drag-begin", G_CALLBACK(on_drag_begin), drag_data);
+    g_signal_connect(drag_gesture, "drag-update", G_CALLBACK(on_drag_update), drag_data);
+    g_signal_connect(drag_gesture, "drag-end", G_CALLBACK(on_drag_end), drag_data);
+    // Добавляем контроллер на виджет
+    gtk_widget_add_controller(GTK_WIDGET(paper), GTK_EVENT_CONTROLLER(drag_gesture));
+}
+
+void GuiApp::on_motion(GtkEventControllerMotion *controller, gdouble x, gdouble y, gpointer user_data) {
+    GdkModifierType state;
+    GdkDevice *device = gtk_event_controller_get_current_event_device(GTK_EVENT_CONTROLLER(controller));
+    g_print("Moving with left button pressed at (%.1f, %.1f)\n", x, y);
 }
 
 void GuiApp::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer user_data) {
     GuiApp* self = static_cast<GuiApp*>(user_data);
     self->onDraw(cr, width, height);
+}
+
+void GuiApp::onDragUpdate() {
+    int dx = floor(1.0 * Vw / d / drag_data->offset_x);
+    int dy = floor(1.0 * Vh / d / drag_data->offset_y);
+    g_print("Shift: %.2d (%.2dx%.2d) (%.2d, %.2d)\n", d, Vw, Vh, dx, dy);
+    g_print("Dragging: offset (%.1f, %.1f), new position (%.1f, %.1f)\n",
+        drag_data->offset_x, drag_data->offset_y,
+        drag_data->drag_start_x + drag_data->offset_x,
+        drag_data->drag_start_y + drag_data->offset_y);
 }
 
 void GuiApp::onDraw(cairo_t* cr, int width, int height) {
@@ -225,4 +263,33 @@ void GuiApp::onDraw(cairo_t* cr, int width, int height) {
 
 void GuiApp::redraw() {
     gtk_widget_queue_draw(GTK_WIDGET(paper));
+}
+
+void GuiApp::on_drag_begin(GtkGestureDrag *gesture, double start_x, double start_y, gpointer user_data) {
+    DragData *data = (DragData*)user_data;
+    data->is_dragging = TRUE;
+    data->drag_start_x = start_x;
+    data->drag_start_y = start_y;
+    data->offset_x = 0;
+    data->offset_y = 0;
+    g_print("Drag started at (%.1f, %.1f)\n", start_x, start_y);
+}
+
+void GuiApp::on_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data) {
+    DragData *data = (DragData*)user_data;
+    
+    if (!data->is_dragging) return;
+    
+    // Вычисляем новую позицию
+    data->offset_x = offset_x;
+    data->offset_y = offset_y;    
+    // Перерисовываем виджет
+    GuiApp *self = static_cast<GuiApp*>(data->app);
+    self->onDragUpdate();
+}
+
+void GuiApp::on_drag_end(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data) {
+    DragData *data = (DragData*)user_data;
+    data->is_dragging = FALSE;
+    g_print("Drag ended. Final offset (%.1f, %.1f)\n", offset_x, offset_y);
 }

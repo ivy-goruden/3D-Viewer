@@ -5,6 +5,18 @@
 #include <string>
 #include "../include/globals.h"
 
+class GuiApp;
+
+struct DragData {
+    GuiApp* app;
+    GtkWidget* drawing_area;
+    double drag_start_x;
+    double drag_start_y;
+    double offset_x;
+    double offset_y;
+    gboolean is_dragging;
+};
+
 class GuiApp {
   private:
     static void onColorButtonClick(GtkButton* btn, gpointer user_data);
@@ -24,7 +36,6 @@ class GuiApp {
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
     static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
-    static void onStatusUpdate();
 
   public:
     std::string ui_file;
@@ -53,6 +64,7 @@ class GuiApp {
     GObject* status_vert;
     GObject* status_file;
     GObject* status_edges;
+    DragData *drag_data;
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -60,9 +72,18 @@ class GuiApp {
     void onDraw(cairo_t* cr, int width, int height);
     void redraw();
     static void on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer user_data);
+    static void on_motion(GtkEventControllerMotion *controller, gdouble x, gdouble y, gpointer user_data);
+    static void on_drag_begin(GtkGestureDrag *gesture, double start_x, double start_y, gpointer user_data);
+    static void on_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data);
+    static void on_drag_end(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data);
+    void onDragUpdate();
+
+    // static void on_realize(GtkWidget *widget, gpointer user_data);
+    // static gboolean on_motion_notify(GtkWidget *widget,GdkEvent *event,gpointer user_data);
 
   public:
     int d, Cw, Ch, Vw, Vh;
+    double x, y;
     double ratio;
     std::vector<s21::Point3d> shape;
     s21::Point viewportToCanvas(double x, double y);
