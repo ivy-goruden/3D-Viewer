@@ -77,6 +77,7 @@ class GuiApp {
     static void on_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data);
     static void on_drag_end(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data);
     void onDragUpdate();
+    void onDragEnd();
 
     // static void on_realize(GtkWidget *widget, gpointer user_data);
     // static gboolean on_motion_notify(GtkWidget *widget,GdkEvent *event,gpointer user_data);
@@ -86,6 +87,7 @@ class GuiApp {
     double x, y;
     double ratio;
     std::vector<s21::Point3d> shape;
+    std::vector<s21::Point3d> shape_clone;
     s21::Point viewportToCanvas(double x, double y);
     s21::Point projectVertex(s21::Point3d v);
     void drawLine(cairo_t* cr, s21::Point p1, s21::Point p2);

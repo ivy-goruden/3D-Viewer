@@ -10,28 +10,28 @@ void DrawSomething(cairo_t* cr, GuiApp* gui) {
     cairo_arc(cr, 0, 0, 100, 0, 2 * M_PI);
     cairo_stroke(cr);
 
-    gui->drawLine(cr, gui->projectVertex(gui->shape[0]), gui->projectVertex(gui->shape[1]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[1]), gui->projectVertex(gui->shape[2]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[2]), gui->projectVertex(gui->shape[3]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[3]), gui->projectVertex(gui->shape[0]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[0]), gui->projectVertex(gui->shape_clone[1]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[1]), gui->projectVertex(gui->shape_clone[2]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[2]), gui->projectVertex(gui->shape_clone[3]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[3]), gui->projectVertex(gui->shape_clone[0]));
 
-    gui->drawLine(cr, gui->projectVertex(gui->shape[4]), gui->projectVertex(gui->shape[5]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[5]), gui->projectVertex(gui->shape[6]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[6]), gui->projectVertex(gui->shape[7]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[7]), gui->projectVertex(gui->shape[4]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[4]), gui->projectVertex(gui->shape_clone[5]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[5]), gui->projectVertex(gui->shape_clone[6]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[6]), gui->projectVertex(gui->shape_clone[7]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[7]), gui->projectVertex(gui->shape_clone[4]));
 
-    gui->drawLine(cr, gui->projectVertex(gui->shape[0]), gui->projectVertex(gui->shape[4]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[1]), gui->projectVertex(gui->shape[5]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[2]), gui->projectVertex(gui->shape[6]));
-    gui->drawLine(cr, gui->projectVertex(gui->shape[3]), gui->projectVertex(gui->shape[7]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[0]), gui->projectVertex(gui->shape_clone[4]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[1]), gui->projectVertex(gui->shape_clone[5]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[2]), gui->projectVertex(gui->shape_clone[6]));
+    gui->drawLine(cr, gui->projectVertex(gui->shape_clone[3]), gui->projectVertex(gui->shape_clone[7]));
 }
 
 s21::Point GuiApp::viewportToCanvas(double x, double y) {
     return toScreenPoint(s21::Point{x * Cw / Vw, y * Ch / Vh});
-    // return s21::Point{x * Cw / Vw, y * Ch / Vh};
 }
 
 s21::Point GuiApp::projectVertex(s21::Point3d v) {
+    // return viewportToCanvas(v.x, v.y);
     return viewportToCanvas(v.x * d / v.z, v.y * d / v.z);
 }
 
@@ -72,6 +72,7 @@ GuiApp::GuiApp() {
     shape.push_back({ 1,  1,  2});
     shape.push_back({ 1, -1,  2});
     shape.push_back({-1, -1,  2});
+    shape_clone = shape;
 
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
@@ -238,8 +239,15 @@ void GuiApp::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int he
 }
 
 void GuiApp::onDragUpdate() {
-    int dx = floor(1.0 * Vw / d / drag_data->offset_x);
-    int dy = floor(1.0 * Vh / d / drag_data->offset_y);
+    double dx = 1.0 * drag_data->offset_x * Vw / Cw / d;
+    double dy = 1.0 * drag_data->offset_y * Vh / Ch / d;
+    for (int i = 0; i < shape.size(); i++) {
+        shape_clone[i].x = shape[i].x + 1.0 * dx / 2;
+        shape_clone[i].y = shape[i].y - 1.0 * dy / 2;
+        g_print("%.2f ", 1.0 * dy * shape[i].z);
+    }
+    g_print("\n");
+    redraw();
     g_print("Shift: %.2d (%.2dx%.2d) (%.2d, %.2d)\n", d, Vw, Vh, dx, dy);
     g_print("Dragging: offset (%.1f, %.1f), new position (%.1f, %.1f)\n",
         drag_data->offset_x, drag_data->offset_y,
@@ -247,11 +255,16 @@ void GuiApp::onDragUpdate() {
         drag_data->drag_start_y + drag_data->offset_y);
 }
 
+void GuiApp::onDragEnd() {
+    shape = shape_clone;
+    redraw();
+}
+
 void GuiApp::onDraw(cairo_t* cr, int width, int height) {
     Cw = width;
     Ch = height;
-    Vw = Cw;
-    Vh = Ch;
+    Vw = Cw/20;
+    Vh = Ch/20;
     cairo_set_source_rgb(cr, 0, 0, 0);
     cairo_paint(cr);
     cairo_set_line_width(cr, 10);
@@ -282,7 +295,8 @@ void GuiApp::on_drag_update(GtkGestureDrag *gesture, double offset_x, double off
     
     // Вычисляем новую позицию
     data->offset_x = offset_x;
-    data->offset_y = offset_y;    
+    data->offset_y = offset_y;
+    
     // Перерисовываем виджет
     GuiApp *self = static_cast<GuiApp*>(data->app);
     self->onDragUpdate();
@@ -292,4 +306,8 @@ void GuiApp::on_drag_end(GtkGestureDrag *gesture, double offset_x, double offset
     DragData *data = (DragData*)user_data;
     data->is_dragging = FALSE;
     g_print("Drag ended. Final offset (%.1f, %.1f)\n", offset_x, offset_y);
+
+    // Перерисовываем виджет
+    GuiApp *self = static_cast<GuiApp*>(data->app);
+    self->onDragEnd();
 }
