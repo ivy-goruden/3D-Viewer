@@ -1,11 +1,20 @@
 #ifndef GUI
 #define GUI
 
+#include <time.h>
 #include <gtk/gtk.h>
 #include <string>
 #include "../include/globals.h"
 
 class GuiApp;
+
+struct KeyData {
+    GuiApp* app;
+    GtkWidget* drawing_area;
+    gboolean is_ctrl;
+    gboolean is_alt;
+    struct timespec press_time;
+};
 
 struct DragData {
     GuiApp* app;
@@ -65,6 +74,7 @@ class GuiApp {
     GObject* status_file;
     GObject* status_edges;
     DragData *drag_data;
+    KeyData *key_data;
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -76,11 +86,13 @@ class GuiApp {
     static void on_drag_begin(GtkGestureDrag *gesture, double start_x, double start_y, gpointer user_data);
     static void on_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data);
     static void on_drag_end(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data);
+    static gboolean on_scroll(GtkEventControllerScroll *controller, gdouble dx, gdouble dy, gpointer user_data);
+    static gboolean on_key_pressed(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data);
+    static gboolean on_key_released(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data);
+
     void onDragUpdate();
     void onDragEnd();
-
-    // static void on_realize(GtkWidget *widget, gpointer user_data);
-    // static gboolean on_motion_notify(GtkWidget *widget,GdkEvent *event,gpointer user_data);
+    void onScroll(double dx, double dy);
 
   public:
     int d, Cw, Ch, Vw, Vh;

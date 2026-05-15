@@ -1,4 +1,5 @@
 #include "gui.hpp"
+#include <time.h>
 #include <gtk/gtk.h>
 #include <iostream>
 #include <filesystem>
@@ -51,12 +52,16 @@ s21::Point GuiApp::toCanvasPoint(s21::Point screenPoint) {
 }
 
 GuiApp::GuiApp() {
-    // Инициализируем данные
+    key_data = g_new0(KeyData, 1);
+    key_data->app = this;
+    key_data->is_alt = false;
+    key_data->is_ctrl = false;
+
     drag_data = g_new0(DragData, 1);
     drag_data->app = this;
     drag_data->offset_x = 0;
     drag_data->offset_y = 0;
-    drag_data->is_dragging = FALSE;
+    drag_data->is_dragging = false;
 
     d = 1;
     Cw = 1;
@@ -78,6 +83,7 @@ GuiApp::GuiApp() {
 }
 
 GuiApp::~GuiApp() {
+    g_free(key_data);
     g_free(drag_data);
     g_object_unref(app);
 }
@@ -214,8 +220,16 @@ void GuiApp::activate(GtkApplication* app) {
     gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(paper), on_draw_static, this, nullptr);
 
     GtkEventController *motion_controller = gtk_event_controller_motion_new();
-    g_signal_connect(motion_controller, "motion", G_CALLBACK(on_motion), NULL);
+    g_signal_connect(motion_controller, "motion", G_CALLBACK(on_motion), this);
     gtk_widget_add_controller(GTK_WIDGET(paper), motion_controller);
+
+    // Создаем контроллер клавиатуры
+    GtkEventController *key_controller = gtk_event_controller_key_new();
+    // Подключаем сигналы
+    g_signal_connect(key_controller, "key-pressed", G_CALLBACK(on_key_pressed), key_data);
+    g_signal_connect(key_controller, "key-released", G_CALLBACK(on_key_released), key_data);
+    // Добавляем контроллер на виджет
+    gtk_widget_add_controller(GTK_WIDGET(window), key_controller);
 
     // Создаём жест для перетаскивания
     GtkGesture *drag_gesture = gtk_gesture_drag_new();
@@ -225,6 +239,16 @@ void GuiApp::activate(GtkApplication* app) {
     g_signal_connect(drag_gesture, "drag-end", G_CALLBACK(on_drag_end), drag_data);
     // Добавляем контроллер на виджет
     gtk_widget_add_controller(GTK_WIDGET(paper), GTK_EVENT_CONTROLLER(drag_gesture));
+
+    // Создаем контроллер прокрутки
+    // GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES — отслеживаем обе оси
+    GtkEventController *scroll_controller = GTK_EVENT_CONTROLLER(gtk_event_controller_scroll_new(
+        GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES));
+    // Подключаем сигнал "scroll" к нашему обработчику
+    g_signal_connect(scroll_controller, "scroll", G_CALLBACK(on_scroll), this);
+    // Добавляем контроллер к виджету
+    gtk_widget_add_controller(GTK_WIDGET(paper), scroll_controller);
+
 }
 
 void GuiApp::on_motion(GtkEventControllerMotion *controller, gdouble x, gdouble y, gpointer user_data) {
@@ -260,6 +284,13 @@ void GuiApp::onDragEnd() {
     redraw();
 }
 
+void GuiApp::onScroll(double dx, double dy) {
+    if (key_data->is_ctrl) {
+        d += dy;
+        redraw();
+    }
+}
+
 void GuiApp::onDraw(cairo_t* cr, int width, int height) {
     Cw = width;
     Ch = height;
@@ -290,7 +321,7 @@ void GuiApp::on_drag_begin(GtkGestureDrag *gesture, double start_x, double start
 
 void GuiApp::on_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data) {
     DragData *data = (DragData*)user_data;
-    
+
     if (!data->is_dragging) return;
     
     // Вычисляем новую позицию
@@ -310,4 +341,61 @@ void GuiApp::on_drag_end(GtkGestureDrag *gesture, double offset_x, double offset
     // Перерисовываем виджет
     GuiApp *self = static_cast<GuiApp*>(data->app);
     self->onDragEnd();
+}
+
+gboolean GuiApp::on_scroll(GtkEventControllerScroll *controller, gdouble dx, gdouble dy, gpointer user_data) {
+    if (dy > 0) {
+        g_print("Scroll Down: %.0f\n", dy);
+    } else if (dy < 0) {
+        g_print("Scroll Up: %.0f\n", -dy);
+    }    
+    if (dx != 0) {
+        g_print("Horizontal Scroll: %.0f\n", dx);
+    }
+    
+    // Перерисовываем виджет
+    GuiApp* self = static_cast<GuiApp*>(user_data);
+    self->onScroll(dx, dy);
+    
+    return GDK_EVENT_STOP;
+}
+
+gboolean GuiApp::on_key_pressed(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {    
+    KeyData *data = (KeyData*)user_data;
+
+    g_print("state %d GDK_CONTROL_MASK %d\n", state, GDK_CONTROL_MASK);
+
+    // Проверка Ctrl
+    if (keyval == GDK_KEY_Control_L || keyval == GDK_KEY_Control_R) {
+        g_print("Комбинация Ctrl нажата\n");
+        data->is_ctrl = true;
+        return GDK_EVENT_STOP;
+    }    
+    // Проверка Alt
+    if (keyval == GDK_KEY_Alt_L || keyval == GDK_KEY_Alt_R) {
+        g_print("Комбинация Alt нажата\n");
+        data->is_alt = true;
+        return GDK_EVENT_STOP;
+    }
+    
+    return GDK_EVENT_PROPAGATE;
+}
+
+gboolean GuiApp::on_key_released(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
+    KeyData *data = (KeyData*)user_data;
+
+    // Проверка Ctrl
+    if (keyval == GDK_KEY_Control_L || keyval == GDK_KEY_Control_R) {
+        g_print("Комбинация Ctrl отжата\n");
+        data->is_ctrl = false;
+        return GDK_EVENT_STOP;
+    }    
+    // Проверка Alt
+    if (keyval == GDK_KEY_Alt_L || keyval == GDK_KEY_Alt_R) {
+        g_print("Комбинация Alt отжата\n");
+        data->is_alt = false;
+        return GDK_EVENT_STOP;
+    }
+
+    return GDK_EVENT_PROPAGATE;
 }
