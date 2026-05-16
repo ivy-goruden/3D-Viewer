@@ -55,8 +55,8 @@ namespace s21 {
             if (point.z < 0) return {-100000, -100000};            
             double z = point.z == 0 ? 1 : point.z;
             double scale = distance / z;
-            int x = (int)(point.x * scale);
-            int y = (int)(-1 * point.y * scale);            
+            double x = (point.x * scale);
+            double y = (-1 * point.y * scale);            
             return {x, y};
         }
 

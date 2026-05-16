@@ -6,6 +6,7 @@
 #include <format>
 
 #include "../include/globals.h"
+#include "../include/affine_transformer/matrix.hpp"
 #include "../include/affine_transformer/transformer.hpp"
 
 void DrawSomething(cairo_t* cr, GuiApp* gui) {
@@ -276,7 +277,7 @@ void GuiApp::onDragUpdate() {
             if (shape.size() == (i + 1)) g_print("\n");
         }
 
-        s21::Bounds bounds = s21::Transformer::getBounds(m);
+        s21::Bounds bounds = s21::Matrix::getBounds(m);
         double cx = (bounds.minx + bounds.maxx) / 2;
         double cy = (bounds.miny + bounds.maxy) / 2;
         double cz = (bounds.minz + bounds.maxz) / 2;

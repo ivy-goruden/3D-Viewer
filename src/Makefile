@@ -9,6 +9,8 @@ SOURCE := callbacks/callbacks.cpp config/config.cpp simple_canvas.cpp controller
 GUI_SOURCE := $(shell find gui/ -name "*.cpp")
 GTEST_LIBS = -lgtest -lgtest_main -pthread
 
+.PHONY: clean
+
 %.o: %.c
 	g++ $(CXXFLAGS) -c $< -o $@
 
@@ -19,7 +21,7 @@ install:
 uninstall:
 
 clean:
-	rm -rf *.a $(OLD) game.out *.app
+	find . -type f \( -name '*.app' -o -name '*.out' -o -name '*.so' -o -name '*.a' -o -name '*.o' \) -exec rm -f {} +
 
 dvi:
 

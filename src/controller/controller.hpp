@@ -6,7 +6,6 @@ namespace s21{
 
     class Controller{
         protected:
-            Grid *grid_ = nullptr;
             Figure *figure_ = nullptr;
             bool parallel_projection_ = false;
             double angleX_;
@@ -18,10 +17,8 @@ namespace s21{
             Vert_t getFigureProjection(const matrix_t original, double minz);
         public:
             Controller();
-            Vert_t gridProjection();
             Vert_t loadFigure(const char* filename);
-            Vert_t getFigure();
-            
+            Vert_t getFigure();            
             void toggleProjection();
             Edge_t getEdges();
             Poly_t getPolygons();

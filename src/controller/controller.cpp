@@ -11,7 +11,7 @@ namespace s21{
         angleX_ = X2_d;
         angleY_ = Y2_d;
         angleZ_ = Z2_d;
-        camera_ = 100;
+        camera_ = 10;
     }
 
     double Controller::getAngleX() {
@@ -36,22 +36,6 @@ namespace s21{
 
     void Controller::setAngleZ(int angle){
         angleZ_ = angle;
-    }
-
-    Vert_t Controller::gridProjection() {
-        if (grid_ == nullptr) {
-            grid_ = new Grid();
-        }
-        grid_->createGrid(0, 1000, 0, 1000, 0, 1000, 100);
-        matrix_t m = grid_->getMatrix();
-        m = s21::Transformer::Rotate(angleX_, angleY_, angleZ_, m);
-        s21::SimplePerspective proj(2, 1920, 1080);
-        Vert_t projection_;
-        for (const auto& point3d : m) {
-            s21::Point p = proj.project({point3d[0], point3d[1], point3d[2]});
-            projection_.push_back(p);
-        }
-        return projection_;
     }
 
     Vert_t Controller::loadFigure(const char* filename){

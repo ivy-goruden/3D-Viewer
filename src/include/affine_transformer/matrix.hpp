@@ -7,7 +7,7 @@ namespace s21 {
         Matrix() {};
         ~Matrix() {};
 
-        static matrix_t multiplyMatrix(const matrix_t *f, const matrix_t *s){
+        static matrix_t multiplyMatrix(const matrix_t *f, const matrix_t *s) {
             int rows = f->size();
             int cols = s[0].size();
             int inner = s->size();
@@ -24,11 +24,27 @@ namespace s21 {
             return nMatrix;
         }
 
-        static matrix_t createMatrix(int rows, int cols){
+        static matrix_t createMatrix(int rows, int cols) {
             std::vector<std::vector<double>> matrix(rows, std::vector<double>(cols, 0));
             return matrix;
         }
 
+        static Bounds getBounds(matrix_t& matrix_) {
+            Bounds bounds = {
+                matrix_[0][0], matrix_[0][0],
+                matrix_[0][1], matrix_[0][1],
+                matrix_[0][2], matrix_[0][2]
+            };
+            for (int i = 0; i < matrix_.size(); i++) {
+                if (bounds.maxx < matrix_[i][0]) bounds.maxx = matrix_[i][0];
+                if (bounds.minx > matrix_[i][0]) bounds.minx = matrix_[i][0];
+                if (bounds.maxy < matrix_[i][1]) bounds.maxy = matrix_[i][1];
+                if (bounds.miny > matrix_[i][1]) bounds.miny = matrix_[i][1];
+                if (bounds.maxz < matrix_[i][2]) bounds.maxz = matrix_[i][2];
+                if (bounds.minz > matrix_[i][2]) bounds.minz = matrix_[i][2];
+            }
+            return bounds;
+        }
     };
 
 }
