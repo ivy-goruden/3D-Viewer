@@ -5,6 +5,9 @@
 #include <filesystem>
 #include <format>
 
+#include "../include/globals.h"
+#include "../include/affine_transformer/transformer.hpp"
+
 void DrawSomething(cairo_t* cr, GuiApp* gui) {
     cairo_set_source_rgb(cr, 1, 1, 1);
     cairo_set_line_width(cr, 1);
@@ -73,10 +76,10 @@ GuiApp::GuiApp() {
     shape.push_back({ 1,  1,  1});
     shape.push_back({ 1, -1,  1});
     shape.push_back({-1, -1,  1});
-    shape.push_back({-1,  1,  2});
-    shape.push_back({ 1,  1,  2});
-    shape.push_back({ 1, -1,  2});
-    shape.push_back({-1, -1,  2});
+    shape.push_back({-1,  1,  3});
+    shape.push_back({ 1,  1,  3});
+    shape.push_back({ 1, -1,  3});
+    shape.push_back({-1, -1,  3});
     shape_clone = shape;
 
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
@@ -263,11 +266,45 @@ void GuiApp::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int he
 }
 
 void GuiApp::onDragUpdate() {
+    if (key_data->is_ctrl) {
+        s21::matrix_t m;
+        for (int i = 0; i < shape.size(); i++) {
+            m.push_back({shape[i].x, shape[i].y, shape[i].z, 1});
+        }
+        for (int i = 0; i < shape.size(); i++) {
+            g_print("orig %.2f %.2f %.2f;\n", m[i][0], m[i][1], m[i][2]);
+            if (shape.size() == (i + 1)) g_print("\n");
+        }
+
+        s21::Bounds bounds = s21::Transformer::getBounds(m);
+        double cx = (bounds.minx + bounds.maxx) / 2;
+        double cy = (bounds.miny + bounds.maxy) / 2;
+        double cz = (bounds.minz + bounds.maxz) / 2;
+        g_print("bounds %.1f, %.1f, %.1f\n", cx, cy, cz);
+
+        int angleX = floor(1.5 * 90 / Cw * drag_data->offset_y);
+        int angleY = floor(1.5 * 90 / Cw * drag_data->offset_x);
+        // g_print("%d, %.1f, %f\n", Cw, drag_data->offset_x, angleY);
+
+        m = s21::Transformer::Translate(-cx, -cy, -cz, m);
+        m = s21::Transformer::Rotate(-angleX, -angleY, 0, m);
+        m = s21::Transformer::Translate(cx, cy, cz, m);
+
+        for (int i = 0; i < shape.size(); i++) {
+            shape_clone[i].x = m[i][0];
+            shape_clone[i].y = m[i][1];
+            shape_clone[i].z = m[i][2];
+        }        
+
+        redraw();
+        return;
+    }
+
     double dx = 1.0 * drag_data->offset_x * Vw / Cw / d;
     double dy = 1.0 * drag_data->offset_y * Vh / Ch / d;
     for (int i = 0; i < shape.size(); i++) {
-        shape_clone[i].x = shape[i].x + 1.0 * dx / 2;
-        shape_clone[i].y = shape[i].y - 1.0 * dy / 2;
+        shape_clone[i].x = shape[i].x + 1.0 * dx * shape[i].z;
+        shape_clone[i].y = shape[i].y - 1.0 * dy * shape[i].z;
         g_print("%.2f ", 1.0 * dy * shape[i].z);
     }
     g_print("\n");
@@ -285,10 +322,8 @@ void GuiApp::onDragEnd() {
 }
 
 void GuiApp::onScroll(double dx, double dy) {
-    if (key_data->is_ctrl) {
-        d += dy;
-        redraw();
-    }
+    d += dy;
+    redraw();
 }
 
 void GuiApp::onDraw(cairo_t* cr, int width, int height) {

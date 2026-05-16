@@ -30,7 +30,7 @@ namespace s21{
         return projection;
     }
 
-    matrix_t Transformer::Rotate(int angleX_deg, int angleY_deg, int angleZ_deg, const matrix_t& original){
+    matrix_t Transformer::Rotate(int angleX_deg, int angleY_deg, int angleZ_deg, const matrix_t& original) {
         double angleX = angleX_deg * M_PI / 180.0;
         double angleY = angleY_deg * M_PI / 180.0;
         double angleZ = angleZ_deg * M_PI / 180.0;
@@ -58,4 +58,34 @@ namespace s21{
         return result;
     }
 
+    matrix_t Transformer::Translate(double cx, double cy, double cz, const matrix_t& original) {
+        const matrix_t translate = {
+            {1, 0, 0, cx},
+            {0, 1, 0, cy},
+            {0, 0, 1, cz},
+            {0, 0, 0, 1}
+        };
+        matrix_t result;
+        for (int i = 0; i < original.size(); i++) {
+            result.push_back({original[i][0] + cx, original[i][1] + cy, original[i][2] + cz});
+        }
+        return result;
+    }
+
+    Bounds Transformer::getBounds(matrix_t& matrix_) {
+        Bounds bounds = {
+            matrix_[0][0], matrix_[0][0],
+            matrix_[0][1], matrix_[0][1],
+            matrix_[0][2], matrix_[0][2]
+        };
+        for (int i = 0; i < matrix_.size(); i++) {
+            if (bounds.maxx < matrix_[i][0]) bounds.maxx = matrix_[i][0];
+            if (bounds.minx > matrix_[i][0]) bounds.minx = matrix_[i][0];
+            if (bounds.maxy < matrix_[i][1]) bounds.maxy = matrix_[i][1];
+            if (bounds.miny > matrix_[i][1]) bounds.miny = matrix_[i][1];
+            if (bounds.maxz < matrix_[i][2]) bounds.maxz = matrix_[i][2];
+            if (bounds.minz > matrix_[i][2]) bounds.minz = matrix_[i][2];
+        }
+        return bounds;
+    }
 }

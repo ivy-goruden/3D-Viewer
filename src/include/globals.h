@@ -62,12 +62,9 @@ namespace s21 {
     } ProjectionData_t; // figure data for drawing
 
     struct Bounds {
-        double minx;
-        double maxx;
-        double miny;
-        double maxy;
-        double minz;
-        double maxz;
+        double minx, maxx;
+        double miny, maxy;
+        double minz, maxz;
     };
 
     //ANGLES
