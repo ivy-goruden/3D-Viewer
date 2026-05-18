@@ -1,4 +1,7 @@
 #include "../globals.h"
+#include <format>
+#include <string>
+#include <iostream>
 
 namespace s21 {
 
@@ -12,10 +15,10 @@ namespace s21 {
             int cols = s[0].size();
             int inner = s->size();
             matrix_t nMatrix = createMatrix(rows, cols);
-            for (int row = 0; row<rows;row++){
-                for (int col = 0; col < cols; col++){
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < cols; col++) {
                     double val = 0;
-                    for (int x = 0; x<inner;x++){
+                    for (int x = 0; x < inner; x++) {
                         val += ((*f)[row][x])*((*s)[x][col]);
                     }
                     nMatrix[row][col] = val;

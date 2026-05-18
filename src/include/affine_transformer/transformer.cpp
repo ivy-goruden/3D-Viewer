@@ -1,6 +1,9 @@
 #include "transformer.hpp"
 #include "matrix.hpp"
 #include <cmath>
+#include <format>
+#include <string>
+#include <iostream>
 
 namespace s21{
 
@@ -52,24 +55,30 @@ namespace s21{
             {0,0,1,0},
             {0,0,0,1}
         };
-        matrix_t result =  Matrix::multiplyMatrix(&original, &x_rotate);
-        result =  Matrix::multiplyMatrix(&result, &y_rotate);
-        result =  Matrix::multiplyMatrix(&result, &z_rotate);
+        matrix_t result = Matrix::multiplyMatrix(&original, &x_rotate);
+        result = Matrix::multiplyMatrix(&result, &y_rotate);
+        result = Matrix::multiplyMatrix(&result, &z_rotate);
         return result;
     }
 
-    matrix_t Transformer::Translate(double cx, double cy, double cz, const matrix_t& original) {
+    matrix_t Transformer::Translate(double tx, double ty, double tz, const matrix_t& original) {
         const matrix_t translate = {
-            {1, 0, 0, cx},
-            {0, 1, 0, cy},
-            {0, 0, 1, cz},
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {tx, ty, tz, 1}
+        };
+        return Matrix::multiplyMatrix(&original, &translate);
+    }
+
+    matrix_t Transformer::Scale(double sx, double sy, double sz, const matrix_t& original) {
+        const matrix_t sc = {
+            {sx, 0, 0, 0},
+            {0, sy, 0, 0},
+            {0, 0, sz, 0},
             {0, 0, 0, 1}
         };
-        matrix_t result;
-        for (int i = 0; i < original.size(); i++) {
-            result.push_back({original[i][0] + cx, original[i][1] + cy, original[i][2] + cz});
-        }
-        return result;
+        return Matrix::multiplyMatrix(&original, &sc);
     }
 
 }

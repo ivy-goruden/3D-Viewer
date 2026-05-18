@@ -53,7 +53,7 @@ loaderrun: loader
 	./loader.app
 
 proj:
-	g++ $(CXXFLAGS) projection/main.cpp projection/gui.cpp include/affine_transformer/transformer.cpp -o projection/projection.app $(GTKFLAGS) -lm -lrt
+	g++ $(CXXFLAGS) projection/main.cpp projection/gui.cpp include/affine_transformer/transformer.cpp include/grid.cpp -o projection/projection.app $(GTKFLAGS) -lm -lrt
 
 projrun: proj
 	projection/projection.app
