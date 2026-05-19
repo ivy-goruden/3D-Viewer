@@ -11,24 +11,7 @@
 #include "../include/grid.hpp"
 
 void DrawSomething(cairo_t* cr, GuiApp* gui) {
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[0]), gui->projectVertex(gui->shape_clone[1]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[1]), gui->projectVertex(gui->shape_clone[2]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[2]), gui->projectVertex(gui->shape_clone[3]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[3]), gui->projectVertex(gui->shape_clone[0]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[4]), gui->projectVertex(gui->shape_clone[5]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[5]), gui->projectVertex(gui->shape_clone[6]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[6]), gui->projectVertex(gui->shape_clone[7]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[7]), gui->projectVertex(gui->shape_clone[4]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[0]), gui->projectVertex(gui->shape_clone[4]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[1]), gui->projectVertex(gui->shape_clone[5]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[2]), gui->projectVertex(gui->shape_clone[6]));
-    // gui->drawLine(cr, gui->projectVertex(gui->shape_clone[3]), gui->projectVertex(gui->shape_clone[7]));
-
-    for (int i = 0; i < gui->shape_clone.size() - 1; i++) {
-        if (gui->shape_clone[i].z > 0) {
-            gui->drawDot(cr, gui->projectVertex(gui->shape_clone[i]));
-        }
-    }
+    gui->drawObject(cr, gui->shapeVert, gui->shapeFace, gui->tr);
 }
 
 s21::Point GuiApp::viewportToCanvas(double x, double y) {
@@ -41,18 +24,52 @@ s21::Point GuiApp::projectVertex(s21::Point3d v) {
 }
 
 void GuiApp::drawDot(cairo_t* cr, s21::Point p) {
-    cairo_set_line_width(cr, 10);
+    cairo_set_line_width(cr, 1);
     cairo_set_source_rgb(cr, 1, 1, 1);
     cairo_arc(cr, p.x, p.y, 3, 0, 2 * M_PI);
     cairo_stroke(cr);
 }
 
 void GuiApp::drawLine(cairo_t* cr, s21::Point p1, s21::Point p2) {
-    cairo_set_line_width(cr, 10);
+    cairo_set_line_width(cr, 1);
     cairo_set_source_rgb(cr, 1, 1, 1);
     cairo_move_to(cr, p1.x, p1.y);
     cairo_line_to(cr, p2.x, p2.y);
     cairo_stroke(cr);
+}
+
+void GuiApp::drawFace(cairo_t* cr, std::vector<int> face, s21::Vert_t& projected) {
+    cairo_set_source_rgb(cr, 1, 1, 1);
+    cairo_move_to(cr, projected[face[0]].x, projected[face[0]].y);
+    for (size_t i = 1; i < face.size(); i++) {
+        cairo_line_to(cr, projected[face[i]].x, projected[face[i]].y);
+    }
+    cairo_close_path(cr);
+    cairo_stroke(cr);
+}
+
+void GuiApp::drawObject(cairo_t *cr, s21::matrix_t &verts, s21::Poly_t &faces, s21::Transform tr) {
+    s21::matrix_t vt = applyTransform(verts, tr);
+
+    s21::Vert_t projected;
+    for (size_t i = 0; i < vt.size(); i++) {
+        projected.push_back(projectVertex(vectorToPoint3d(vt[i])));
+    }
+    for (size_t i = 0; i < faces.size(); i++) {
+        drawFace(cr, faces[i], projected);
+    }    
+}
+
+s21::Point3d GuiApp::vectorToPoint3d(std::vector<double> v) {
+    return {v[0], v[1], v[2]};
+}
+
+s21::matrix_t GuiApp::applyTransform(s21::matrix_t &verts, s21::Transform tr) {
+    s21::matrix_t transformed;
+    transformed = s21::Transformer::Scale(tr.scale, tr.scale, tr.scale, verts);
+    transformed = s21::Transformer::Rotate(tr.rotation_x, tr.rotation_y, tr.rotation_z, transformed);
+    transformed = s21::Transformer::Translate(tr.trans_x, tr.trans_y, tr.trans_z, transformed);
+    return transformed;
 }
 
 s21::Point GuiApp::toScreenPoint(s21::Point canvasPoint) {
@@ -81,15 +98,33 @@ GuiApp::GuiApp() {
     Vw = 1;
     Vh = 1;
 
-    shape.push_back({ 1,  1,  1});
-    shape.push_back({-1,  1,  1});
-    shape.push_back({-1, -1,  1});
-    shape.push_back({ 1, -1,  1});
-    shape.push_back({ 1,  1, -1});
-    shape.push_back({-1,  1, -1});
-    shape.push_back({-1, -1, -1});
-    shape.push_back({ 1, -1, -1});
-    shape_clone = shape;
+    s21::Transform tr = {
+        1,
+        0, 0, 0,
+        -1.5, 0, 7
+    };
+
+    shapeVert.push_back({ 1,  1,  1,  1});
+    shapeVert.push_back({-1,  1,  1,  1});
+    shapeVert.push_back({-1, -1,  1,  1});
+    shapeVert.push_back({ 1, -1,  1,  1});
+    shapeVert.push_back({ 1,  1, -1,  1});
+    shapeVert.push_back({-1,  1, -1,  1});
+    shapeVert.push_back({-1, -1, -1,  1});
+    shapeVert.push_back({ 1, -1, -1,  1});
+
+    shapeFace.push_back({ 0, 1, 2 });
+    shapeFace.push_back({ 0, 2, 3 });
+    shapeFace.push_back({ 4, 0, 3 });
+    shapeFace.push_back({ 4, 3, 7 });
+    shapeFace.push_back({ 5, 4, 7 });
+    shapeFace.push_back({ 5, 7, 6 });
+    shapeFace.push_back({ 1, 5, 6 });
+    shapeFace.push_back({ 1, 6, 2 });
+    shapeFace.push_back({ 4, 5, 1 });
+    shapeFace.push_back({ 4, 1, 0 });
+    shapeFace.push_back({ 2, 6, 7 });
+    shapeFace.push_back({ 2, 7, 3 });
 
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
@@ -277,33 +312,33 @@ void GuiApp::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int he
 void GuiApp::onDragUpdate() {
     if (!key_data->is_ctrl) {
         s21::matrix_t m;
-        for (int i = 0; i < shape.size(); i++) {
-            m.push_back({shape[i].x, shape[i].y, shape[i].z, 1});
-        }
-        for (int i = 0; i < shape.size(); i++) {
-            g_print("orig %.2f %.2f %.2f;\n", m[i][0], m[i][1], m[i][2]);
-            if (shape.size() == (i + 1)) g_print("\n");
-        }
+        // for (int i = 0; i < shape.size(); i++) {
+        //     m.push_back({shape[i].x, shape[i].y, shape[i].z, 1});
+        // }
+        // for (int i = 0; i < shape.size(); i++) {
+        //     g_print("orig %.2f %.2f %.2f;\n", m[i][0], m[i][1], m[i][2]);
+        //     if (shape.size() == (i + 1)) g_print("\n");
+        // }
 
-        s21::Bounds bounds = s21::Matrix::getBounds(m);
-        double cx = (bounds.minx + bounds.maxx) / 2;
-        double cy = (bounds.miny + bounds.maxy) / 2;
-        double cz = (bounds.minz + bounds.maxz) / 2;
-        g_print("bounds %.1f, %.1f, %.1f\n", cx, cy, cz);
+        // s21::Bounds bounds = s21::Matrix::getBounds(m);
+        // double cx = (bounds.minx + bounds.maxx) / 2;
+        // double cy = (bounds.miny + bounds.maxy) / 2;
+        // double cz = (bounds.minz + bounds.maxz) / 2;
+        // g_print("bounds %.1f, %.1f, %.1f\n", cx, cy, cz);
 
-        int angleX = floor(1.5 * 90 / Cw * drag_data->offset_y);
-        int angleY = floor(1.5 * 90 / Cw * drag_data->offset_x);
-        // g_print("%d, %.1f, %f\n", Cw, drag_data->offset_x, angleY);
+        // int angleX = floor(1.5 * 90 / Cw * drag_data->offset_y);
+        // int angleY = floor(1.5 * 90 / Cw * drag_data->offset_x);
+        // // g_print("%d, %.1f, %f\n", Cw, drag_data->offset_x, angleY);
 
-        m = s21::Transformer::Translate(-cx, -cy, -cz, m);
-        m = s21::Transformer::Rotate(-angleX, -angleY, 0, m);
-        m = s21::Transformer::Translate(cx, cy, cz, m);
+        // m = s21::Transformer::Translate(-cx, -cy, -cz, m);
+        // m = s21::Transformer::Rotate(-angleX, -angleY, 0, m);
+        // m = s21::Transformer::Translate(cx, cy, cz, m);
 
-        for (int i = 0; i < shape.size(); i++) {
-            shape_clone[i].x = m[i][0];
-            shape_clone[i].y = m[i][1];
-            shape_clone[i].z = m[i][2];
-        }        
+        // for (int i = 0; i < shape.size(); i++) {
+        //     shape_clone[i].x = m[i][0];
+        //     shape_clone[i].y = m[i][1];
+        //     shape_clone[i].z = m[i][2];
+        // }        
 
         redraw();
         return;
@@ -311,12 +346,12 @@ void GuiApp::onDragUpdate() {
 
     double dx = 1.0 * drag_data->offset_x * Vw / Cw / d;
     double dy = 1.0 * drag_data->offset_y * Vh / Ch / d;
-    for (int i = 0; i < shape.size(); i++) {
-        shape_clone[i].x = shape[i].x + 1.0 * dx / 4;
-        shape_clone[i].y = shape[i].y - 1.0 * dy / 4;
-        g_print("%.2f ", 1.0 * dy * shape[i].z);
-    }
-    g_print("\n");
+    // for (int i = 0; i < shape.size(); i++) {
+    //     shape_clone[i].x = shape[i].x + 1.0 * dx / 4;
+    //     shape_clone[i].y = shape[i].y - 1.0 * dy / 4;
+    //     g_print("%.2f ", 1.0 * dy * shape[i].z);
+    // }
+    // g_print("\n");
     redraw();
     g_print("Shift: %.2d (%.2dx%.2d) (%.2d, %.2d)\n", d, Vw, Vh, dx, dy);
     g_print("Dragging: offset (%.1f, %.1f), new position (%.1f, %.1f)\n",
@@ -326,7 +361,6 @@ void GuiApp::onDragUpdate() {
 }
 
 void GuiApp::onDragEnd() {
-    shape = shape_clone;
     redraw();
 }
 
@@ -342,7 +376,7 @@ void GuiApp::onDraw(cairo_t* cr, int width, int height) {
     Vh = Ch/20;
     cairo_set_source_rgb(cr, 0, 0, 0);
     cairo_paint(cr);
-    cairo_set_line_width(cr, 10);
+    cairo_set_line_width(cr, 1);
     cairo_translate(cr, 0, 0);
     cairo_scale(cr, 1, 1);
     DrawSomething(cr, this);

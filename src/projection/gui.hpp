@@ -98,14 +98,20 @@ class GuiApp {
     int d, Cw, Ch, Vw, Vh;
     double x, y;
     double ratio;
-    std::vector<s21::Point3d> shape;
-    std::vector<s21::Point3d> shape_clone;
+    s21::Transform tr;
+    s21::matrix_t shapeVert;
+    s21::Poly_t shapeFace;    
     s21::Point viewportToCanvas(double x, double y);
     s21::Point projectVertex(s21::Point3d v);
     void drawLine(cairo_t* cr, s21::Point p1, s21::Point p2);
     void drawDot(cairo_t* cr, s21::Point p);
+    void drawObject(cairo_t* cr, s21::matrix_t& verts, s21::Poly_t& faces, s21::Transform tr);
+    void drawFace(cairo_t* cr, std::vector<int> face, s21::Vert_t& projected);
     s21::Point toScreenPoint(s21::Point canvasPoint);
     s21::Point toCanvasPoint(s21::Point screenPoint);
+    s21::Point3d vectorToPoint3d(std::vector<double> v);
+    s21::matrix_t applyTransform(s21::matrix_t& verts, s21::Transform tr);
+
 };
 
 #endif

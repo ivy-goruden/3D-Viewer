@@ -26,6 +26,12 @@ namespace s21 {
         Point3d(double x = 0, double y = 0, double z = 0) : x(x), y(y), z(z) {}
     };
 
+    struct Transform {
+        double scale;
+        int rotation_x, rotation_y, rotation_z;
+        double trans_x, trans_y, trans_z;
+    };
+
     struct Seg_t {
         int start, end;
         bool operator==(const Seg_t& other) const {
