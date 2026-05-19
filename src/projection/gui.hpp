@@ -90,6 +90,7 @@ class GuiApp {
     static gboolean on_key_pressed(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data);
     static gboolean on_key_released(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data);
 
+    void onDragBegin();
     void onDragUpdate();
     void onDragEnd();
     void onScroll(double dx, double dy);
@@ -99,6 +100,7 @@ class GuiApp {
     double x, y;
     double ratio;
     s21::Transform tr;
+    s21::Transform tr_copy;
     s21::matrix_t shapeVert;
     s21::Poly_t shapeFace;    
     s21::Point viewportToCanvas(double x, double y);

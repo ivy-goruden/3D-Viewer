@@ -6,6 +6,8 @@
 #include <list>
 #include <memory>
 #include <cstdio>
+#include <format>
+
 #define MOVE_SCOPE 0.1
 #define SCALING_FACTOR 0.1
 #define ROTATE_SCOPE 10
@@ -30,6 +32,7 @@ namespace s21 {
         double scale;
         int rotation_x, rotation_y, rotation_z;
         double trans_x, trans_y, trans_z;
+        std::string toString() { return std::format("sc {} rx {} ry {} rz {} tx {} ty {} tz {}", scale, rotation_x, rotation_y, rotation_z, trans_x, trans_y, trans_z); }
     };
 
     struct Seg_t {

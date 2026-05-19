@@ -6,11 +6,14 @@
 #include <format>
 
 #include "../include/globals.h"
+#include "../include/obj_parser/obj_loader.hpp"
+#include "../include/figure/figure.hpp"
 #include "../include/affine_transformer/matrix.hpp"
 #include "../include/affine_transformer/transformer.hpp"
 #include "../include/grid.hpp"
 
 void DrawSomething(cairo_t* cr, GuiApp* gui) {
+    std::cout << gui->tr.toString() << std::endl;
     gui->drawObject(cr, gui->shapeVert, gui->shapeFace, gui->tr);
 }
 
@@ -50,6 +53,7 @@ void GuiApp::drawFace(cairo_t* cr, std::vector<int> face, s21::Vert_t& projected
 
 void GuiApp::drawObject(cairo_t *cr, s21::matrix_t &verts, s21::Poly_t &faces, s21::Transform tr) {
     s21::matrix_t vt = applyTransform(verts, tr);
+    std::cout << tr.toString() << std::endl;
 
     s21::Vert_t projected;
     for (size_t i = 0; i < vt.size(); i++) {
@@ -92,16 +96,16 @@ GuiApp::GuiApp() {
     drag_data->offset_y = 0;
     drag_data->is_dragging = false;
 
-    d = 1;
+    d = 10;
     Cw = 1;
     Ch = 1;
     Vw = 1;
     Vh = 1;
 
-    s21::Transform tr = {
+    tr = {
         1,
         0, 0, 0,
-        -1.5, 0, 7
+        0, 0, 7
     };
 
     shapeVert.push_back({ 1,  1,  1,  1});
@@ -125,6 +129,15 @@ GuiApp::GuiApp() {
     shapeFace.push_back({ 4, 1, 0 });
     shapeFace.push_back({ 2, 6, 7 });
     shapeFace.push_back({ 2, 7, 3 });
+
+    s21::ObjLoader loader = s21::ObjLoader();
+    loader.loadObjFile("assets/diamond.obj");
+    s21::Figure* figure  = new s21::Figure(loader);
+    shapeVert = figure->getMatrix();
+    shapeFace = figure->getPolygons();
+    s21::Bounds b = s21::Matrix::getBounds(shapeVert);
+    shapeVert = s21::Transformer::Translate(-(b.maxx - b.minx)/2, -(b.maxy - b.miny)/2, -(b.maxz - b.minz)/2, shapeVert);
+    tr.trans_z = std::abs(b.maxz - b.minz) + 10;
 
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
@@ -309,63 +322,50 @@ void GuiApp::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int he
     self->onDraw(cr, width, height);
 }
 
+void GuiApp::onDragBegin() {
+    tr_copy = tr;
+    redraw();
+}
+
 void GuiApp::onDragUpdate() {
     if (!key_data->is_ctrl) {
-        s21::matrix_t m;
-        // for (int i = 0; i < shape.size(); i++) {
-        //     m.push_back({shape[i].x, shape[i].y, shape[i].z, 1});
-        // }
-        // for (int i = 0; i < shape.size(); i++) {
-        //     g_print("orig %.2f %.2f %.2f;\n", m[i][0], m[i][1], m[i][2]);
-        //     if (shape.size() == (i + 1)) g_print("\n");
-        // }
-
-        // s21::Bounds bounds = s21::Matrix::getBounds(m);
-        // double cx = (bounds.minx + bounds.maxx) / 2;
-        // double cy = (bounds.miny + bounds.maxy) / 2;
-        // double cz = (bounds.minz + bounds.maxz) / 2;
-        // g_print("bounds %.1f, %.1f, %.1f\n", cx, cy, cz);
-
-        // int angleX = floor(1.5 * 90 / Cw * drag_data->offset_y);
-        // int angleY = floor(1.5 * 90 / Cw * drag_data->offset_x);
-        // // g_print("%d, %.1f, %f\n", Cw, drag_data->offset_x, angleY);
-
-        // m = s21::Transformer::Translate(-cx, -cy, -cz, m);
-        // m = s21::Transformer::Rotate(-angleX, -angleY, 0, m);
-        // m = s21::Transformer::Translate(cx, cy, cz, m);
-
-        // for (int i = 0; i < shape.size(); i++) {
-        //     shape_clone[i].x = m[i][0];
-        //     shape_clone[i].y = m[i][1];
-        //     shape_clone[i].z = m[i][2];
-        // }        
-
-        redraw();
-        return;
+        int angleX = floor(1.5 * 90 / Cw * drag_data->offset_y);
+        int angleY = floor(1.5 * 90 / Cw * drag_data->offset_x);
+        tr.rotation_x = tr_copy.rotation_x + angleX;
+        tr.rotation_y = tr_copy.rotation_y + angleY;
+        g_print("%d, %f, %f\n", Cw, angleX, angleY);
+    } else {
+        double dx = 1.0 * drag_data->offset_x * Vw / Cw / d;
+        double dy = 1.0 * drag_data->offset_y * Vh / Ch / d;
+        tr.trans_x = tr_copy.trans_x + dx;
+        tr.trans_y = tr_copy.trans_y - dy;
+        g_print("Shift: %d (%.2dx%.2d) (%.2f, %.2f)\n", d, Vw, Vh, dx, dy);
+        g_print("Dragging: offset (%.1f, %.1f), new position (%.1f, %.1f)\n",
+            drag_data->offset_x, drag_data->offset_y,
+            drag_data->drag_start_x + drag_data->offset_x,
+            drag_data->drag_start_y + drag_data->offset_y);
     }
-
-    double dx = 1.0 * drag_data->offset_x * Vw / Cw / d;
-    double dy = 1.0 * drag_data->offset_y * Vh / Ch / d;
-    // for (int i = 0; i < shape.size(); i++) {
-    //     shape_clone[i].x = shape[i].x + 1.0 * dx / 4;
-    //     shape_clone[i].y = shape[i].y - 1.0 * dy / 4;
-    //     g_print("%.2f ", 1.0 * dy * shape[i].z);
-    // }
-    // g_print("\n");
     redraw();
-    g_print("Shift: %.2d (%.2dx%.2d) (%.2d, %.2d)\n", d, Vw, Vh, dx, dy);
-    g_print("Dragging: offset (%.1f, %.1f), new position (%.1f, %.1f)\n",
-        drag_data->offset_x, drag_data->offset_y,
-        drag_data->drag_start_x + drag_data->offset_x,
-        drag_data->drag_start_y + drag_data->offset_y);
 }
 
 void GuiApp::onDragEnd() {
+    if (!key_data->is_ctrl) {
+        int angleX = floor(1.5 * 90 / Cw * drag_data->offset_y);
+        int angleY = floor(1.5 * 90 / Cw * drag_data->offset_x);
+        tr.rotation_x = tr_copy.rotation_x + angleX;
+        tr.rotation_y = tr_copy.rotation_y + angleY;
+    } else {
+        double dx = 1.0 * drag_data->offset_x * Vw / Cw / d;
+        double dy = 1.0 * drag_data->offset_y * Vh / Ch / d;
+        tr.trans_x = tr_copy.trans_x + dx;
+        tr.trans_y = tr_copy.trans_y - dy;
+    }
     redraw();
 }
 
 void GuiApp::onScroll(double dx, double dy) {
-    d += dy;
+    d = d - dy;
+    d = d > 0 ? d : 1;
     redraw();
 }
 
@@ -395,6 +395,10 @@ void GuiApp::on_drag_begin(GtkGestureDrag *gesture, double start_x, double start
     data->offset_x = 0;
     data->offset_y = 0;
     g_print("Drag started at (%.1f, %.1f)\n", start_x, start_y);
+
+    // Перерисовываем виджет
+    GuiApp *self = static_cast<GuiApp*>(data->app);
+    self->onDragBegin();
 }
 
 void GuiApp::on_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data) {
