@@ -17,6 +17,7 @@ struct AppData {
     int shift;
     int shiftV;
     int zoom;
+    int scale;
     bool lineSwitch;
     bool projSwitch;
     bool fillSwitch;
@@ -32,6 +33,7 @@ struct AppData {
       shift = 0;
       shiftV = 0;
       zoom = 10;
+      scale = 10;
       lineSwitch = false;
       projSwitch = false;
       fillSwitch = false;
@@ -60,6 +62,9 @@ struct AppData {
     }
     int getZoom() const {
         return zoom;
+    }
+    int getScale() const {
+        return scale;
     }
     bool getLineSwitch() const {
         return lineSwitch;
@@ -102,6 +107,9 @@ struct AppData {
     }
     void setZoom(int val) {
         zoom = val;
+    }
+    void setScale(int val) {
+        scale = val;
     }
     void setLineSwitch(bool val) {
         lineSwitch = val;

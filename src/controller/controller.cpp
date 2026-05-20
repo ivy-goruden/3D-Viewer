@@ -2,6 +2,7 @@
 #include "../include/obj_parser/obj_loader.hpp"
 #include "../include/affine_transformer/transformer.hpp"
 #include "../include/projection/projection.hpp"
+#include "../include/affine_transformer/matrix.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -38,12 +39,29 @@ namespace s21{
         angleZ_ = angle;
     }
 
+    void Controller::setCamera(int camera){
+        camera_ = camera;
+    }
+
+    void Controller::shiftX(int shiftx){
+        shiftx_ = shiftx;
+    }
+
+   void Controller::shiftY(int shifty){
+        shifty_ = shifty;
+    }
+
     Vert_t Controller::loadFigure(const char* filename){
         s21::ObjLoader loader = s21::ObjLoader();
         loader.loadObjFile(filename);
         s21::Figure *figure  = new s21::Figure(loader);
         figure_ = figure;
-        Vert_t projection_ = getFigureProjection(figure_->getMatrix(), figure->getMinz());
+
+        s21::matrix_t shapeVert = figure_->getMatrix();
+        s21::Bounds b = s21::Matrix::getBounds(shapeVert);
+        matrix_t fig = s21::Transformer::Translate(-(b.maxx + b.minx)/2, -(b.maxy + b.miny)/2, 1, shapeVert);
+
+        Vert_t projection_ = getFigureProjection(fig, figure->getMinz(fig));
         return projection_;
     }
 
@@ -51,7 +69,8 @@ namespace s21{
         Vert_t projection_ = Vert_t();
         if (figure_ != nullptr){
             matrix_t rotate = s21::Transformer::Rotate(angleX_,angleY_,angleZ_, figure_->getMatrix());
-            projection_ = getFigureProjection(rotate, figure_->getMinz(rotate));
+            matrix_t translate = s21::Transformer::Translate(shiftx_, shifty_, 0, rotate);
+            projection_ = getFigureProjection(translate, figure_->getMinz(translate));
         }
         return projection_;
     }

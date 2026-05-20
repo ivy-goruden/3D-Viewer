@@ -24,6 +24,7 @@ class GuiApp {
     static void onShiftSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onShiftVSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onScaleSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onLineSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
@@ -44,6 +45,7 @@ class GuiApp {
     GObject* shiftSpinnerButton;
     GObject* shiftVSpinnerButton;
     GObject* zoomSpinnerButton;
+    GObject* scaleSpinnerButton;
     GObject* paper;
     GObject* lineSwitch;
     GObject* projSwitch;
@@ -82,6 +84,7 @@ class GuiApp {
     Command* shiftCommand;
     Command* shiftVCommand;
     Command* zoomCommand;
+    Command* scaleCommand;
     Command* lineSwitchCommand;
     Command* projSwitchCommand;
     Command* fillSwitchCommand;

@@ -30,9 +30,10 @@ public:
     // Элементы управления
     void loadFigure(const char* filename);
     void setScale(double);
+    void setCamera(int);
     void setZoom(double);
-    void setPosX(double);
-    void setPosY(double);
+    void shiftX(int);
+    void shiftY(int);
     void toggleProjection();
     void rotateX(double);
     void rotateY(double);
@@ -57,6 +58,8 @@ public:
                                int width, int height, gpointer user_data);
     static void on_window_destroy(GtkWidget* widget, gpointer data);
     double scale_;
+    int width_;
+    int height_;
     double xStart_;
     double yStart_;
     s21::Vert_t projection_;
@@ -72,7 +75,9 @@ public:
 
     bool fillPoly_;
     Shape vertType_;
-    Stroke lineType_;    
+    Stroke lineType_;   
+    int Cwidth_;
+    int Cheight_; 
 };
 
 #endif // SIMPLE_CANVAS_HPP

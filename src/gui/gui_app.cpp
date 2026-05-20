@@ -72,6 +72,13 @@ void GuiApp::onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     self->executeCommand(self->zoomCommand);
 }
 
+void GuiApp::onScaleSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
+    GuiApp *self = static_cast<GuiApp*>(user_data);
+    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->scaleSpinnerButton));
+    self->getAppData().setScale(value);
+    self->executeCommand(self->scaleCommand);
+}
+
 void GuiApp::onLineSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     bool active = gtk_switch_get_active(GTK_SWITCH(self->lineSwitch));
@@ -149,6 +156,7 @@ void GuiApp::activate(GtkApplication* app) {
     shiftSpinnerButton = gtk_builder_get_object(builder, "shift_spinner");
     shiftVSpinnerButton = gtk_builder_get_object(builder, "shift_v_spinner");
     zoomSpinnerButton = gtk_builder_get_object(builder, "zoom_spinner");
+    scaleSpinnerButton = gtk_builder_get_object(builder, "scale_spinner");
     paper = gtk_builder_get_object(builder, "paper");
     lineSwitch = gtk_builder_get_object(builder, "line_switch");
     projSwitch = gtk_builder_get_object(builder, "proj_switch");
@@ -177,6 +185,7 @@ void GuiApp::activate(GtkApplication* app) {
     g_signal_connect(shiftSpinnerButton, "value_changed", G_CALLBACK(onShiftSpinnerValueChanged), this);
     g_signal_connect(shiftVSpinnerButton, "value_changed", G_CALLBACK(onShiftVSpinnerValueChanged), this);
     g_signal_connect(zoomSpinnerButton, "value_changed", G_CALLBACK(onZoomSpinnerValueChanged), this);
+    g_signal_connect(scaleSpinnerButton, "value_changed", G_CALLBACK(onScaleSpinnerValueChanged), this);
     g_signal_connect(lineSwitch, "notify::active", G_CALLBACK(onLineSwitchActivate), this);
     g_signal_connect(projSwitch, "notify::active", G_CALLBACK(onProjSwitchActivate), this);
     g_signal_connect(fillSwitch, "notify::active", G_CALLBACK(onFillSwitchActivate), this);
@@ -250,6 +259,7 @@ void GuiApp::createCommands() {
     this->shiftCommand = new ShiftCommand(this);
     this->shiftVCommand = new ShiftVCommand(this);
     this->zoomCommand = new ZoomCommand(this);
+    this->scaleCommand = new ScaleCommand(this);
     this->lineSwitchCommand = new LineSwitchCommand(this);
     this->projSwitchCommand = new ProjSwitchCommand(this);
     this->fillSwitchCommand = new FillSwitchCommand(this);

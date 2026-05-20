@@ -22,10 +22,14 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     polyColor_ = Rgb(0,0,1,1);
     bgColor_ = Rgb(1,1,1,1);
     fillPoly_ = false;
-    lineWidth_ = 0.01;
-    vertWidth_ = 0.1;
+    lineWidth_ = 0.1;
+    vertWidth_ = 1;
     vertType_ = None;
     lineType_ = Solid;
+    width_ = 1;
+    height_ = 1;
+    Cwidth_ = 1;
+    Cheight_ = 1;
 }
 
 SimpleCanvas::~SimpleCanvas() {
@@ -66,9 +70,9 @@ void SimpleCanvas::draw_polygon(cairo_t* cr, const std::vector<s21::Point>& poin
 void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
     switch(vertType_){
         case Circle:
-            cairo_arc(cr, x, y, lineWidth_*2, 0, 2 * M_PI);
+            cairo_arc(cr, x, y, vertWidth_*2, 0, 2 * M_PI);
         case Rect:
-            double d = lineWidth_*2*std::sqrt(2)/2;
+            double d = vertWidth_*2*std::sqrt(2)/2;
             cairo_rectangle (cr, x-d, y-d, 2*d, 2*d);
     }
     cairo_set_source_rgb(cr, dotColor_.red, dotColor_.green, dotColor_.blue);
@@ -117,23 +121,23 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
     cairo_set_source_rgb(cr, bgColor_.red, bgColor_.green, bgColor_.blue);
     cairo_paint(cr);
     cairo_set_line_width(cr, lineWidth_);
-    cairo_translate(cr, width / 2 + xStart_, height / 2 + yStart_);
-    cairo_scale(cr, scale_, scale_);
+    // cairo_translate(cr, width / 2 + xStart_, height / 2 + yStart_);
+    cairo_scale(cr, Cwidth_, Cheight_);
     drawFaces(cr);
     drawEdges(cr);
     drawVert(cr);
 }
 
-void SimpleCanvas::setScale(double scale){
-    scale_ = scale;
+void SimpleCanvas::shiftX(int x){
+    c_->shiftX(x+(width_/2));
+
+    projection_ = c_->getFigure();
 }
 
-void SimpleCanvas::setPosX(double x){
-    xStart_ = x;
-}
+void SimpleCanvas::shiftY(int y){
+    c_->shiftY(y+(height_/2));
 
-void SimpleCanvas::setPosY(double y){
-    yStart_ = y;
+    projection_ = c_->getFigure();
 }
 
 void SimpleCanvas::rotateAbs(double x, double y, double z){
@@ -203,8 +207,14 @@ void SimpleCanvas::setLineWidth(double width){
     lineWidth_ = width;
 }
 
-void SimpleCanvas::setZoom(double zoom) {
-    c_->setScale(zoom);
+//расстояние до камеры
+void SimpleCanvas::setCamera(int camera) {
+    c_->setCamera(camera);
+    projection_ = c_->getFigure();
+}
+
+void SimpleCanvas::setScale(double scale){
+    c_->setScale(scale/10);
     projection_ = c_->getFigure();
 }
 

@@ -267,6 +267,7 @@ void GuiApp::activate(GtkApplication* app) {
     shiftSpinnerButton = gtk_builder_get_object(builder, "shift_spinner");
     shiftVSpinnerButton = gtk_builder_get_object(builder, "shift_v_spinner");
     zoomSpinnerButton = gtk_builder_get_object(builder, "zoom_spinner");
+    zoomSpinnerButton = gtk_builder_get_object(builder, "_spinner");
     weightSpinnerButton = gtk_builder_get_object(builder, "weight_spinner");
     paper = gtk_builder_get_object(builder, "paper");
     status_vert = gtk_builder_get_object(builder, "status_vert");

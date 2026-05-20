@@ -39,19 +39,25 @@ void RotateZCommand::execute() {
 
 void ShiftCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setPosX(app->getAppData().getShift());
+    canvas->shiftX(app->getAppData().getShift());
     canvas->redraw();
 }
 
 void ShiftVCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setPosY(app->getAppData().getShiftV());
+    canvas->shiftY(app->getAppData().getShiftV());
     canvas->redraw();
 }
 
 void ZoomCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setZoom(double(app->getAppData().getZoom())/100);
+    canvas->setCamera(app->getAppData().getZoom());
+    canvas->redraw();
+}
+
+void ScaleCommand::execute() {
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setScale(app->getAppData().getScale());
     canvas->redraw();
 }
 

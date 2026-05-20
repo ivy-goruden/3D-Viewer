@@ -67,6 +67,12 @@ class ZoomCommand : public Command {
     void execute() override;
 };
 
+class ScaleCommand : public Command{
+  public:
+    ScaleCommand(GuiApp *app) : Command(app) {};
+    void execute() override;
+};
+
 class LineSwitchCommand : public Command {
   public:
     LineSwitchCommand(GuiApp* app) : Command(app) {};
