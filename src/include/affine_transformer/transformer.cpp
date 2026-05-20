@@ -23,7 +23,7 @@ namespace s21{
         minz = minz < 0 ? minz : 0;
         Vert_t projection;        
         for (int i = 0; i < m.size(); i++) {
-            double z = m[i][2] + camera - minz;
+            double z = m[i][2] + camera;
             if (z <= 0) {
                 continue;
             }

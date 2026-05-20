@@ -29,7 +29,7 @@ s21::Point GuiApp::viewportToCanvas(double x, double y) {
 
 s21::Point GuiApp::projectVertex(s21::Point3d v) {
     // return viewportToCanvas(v.x, v.y);
-    return viewportToCanvas(v.x * d / v.z, v.y * d / v.z);
+    return viewportToCanvas(v.x * tr.scale / v.z, v.y * tr.scale / v.z);
 }
 
 void GuiApp::drawDot(cairo_t* cr, s21::Point p) {
@@ -74,14 +74,17 @@ s21::Point3d GuiApp::vectorToPoint3d(std::vector<double> v) {
 }
 
 s21::matrix_t GuiApp::applyTransform(s21::matrix_t &verts, s21::Transform tr) {
-    std::cout << tr.toString() << std::endl;
+    // std::cout << "applyTransform tr " << tr.toString() << std::endl;
 
     s21::matrix_t transformed;
     transformed = s21::Transformer::Scale(tr.scale, tr.scale, tr.scale, verts);
-    PrintMatrix(transformed);
-
     transformed = s21::Transformer::Rotate(tr.rotation_x, tr.rotation_y, tr.rotation_z, transformed);
-    transformed = s21::Transformer::Translate(tr.trans_x, tr.trans_y, tr.trans_z, transformed);
+
+    // PrintMatrix(transformed);
+    s21::Bounds b = s21::Matrix::getBounds(transformed);
+    // std::cout << "applyTransform scale b " << b.toString() << std::endl;
+    if (b.minz < 0) this->tr.trans_z = std::abs(b.minz) + 10;
+    transformed = s21::Transformer::Translate(tr.trans_x, tr.trans_y, this->tr.trans_z, transformed);
     return transformed;
 }
 
@@ -114,42 +117,46 @@ GuiApp::GuiApp() {
     tr = {
         1,
         0, 0, 0,
-        0, 0, 80
+        0, 0, 100
     };
 
-    // shapeVert.push_back({ 1,  1,  1,  1});
-    // shapeVert.push_back({-1,  1,  1,  1});
-    // shapeVert.push_back({-1, -1,  1,  1});
-    // shapeVert.push_back({ 1, -1,  1,  1});
-    // shapeVert.push_back({ 1,  1, -1,  1});
-    // shapeVert.push_back({-1,  1, -1,  1});
-    // shapeVert.push_back({-1, -1, -1,  1});
-    // shapeVert.push_back({ 1, -1, -1,  1});
+    shapeVert.push_back({ 1,  1,  1,  1});
+    shapeVert.push_back({-1,  1,  1,  1});
+    shapeVert.push_back({-1, -1,  1,  1});
+    shapeVert.push_back({ 1, -1,  1,  1});
+    shapeVert.push_back({ 1,  1, -1,  1});
+    shapeVert.push_back({-1,  1, -1,  1});
+    shapeVert.push_back({-1, -1, -1,  1});
+    shapeVert.push_back({ 1, -1, -1,  1});
 
-    // shapeFace.push_back({ 0, 1, 2 });
-    // shapeFace.push_back({ 0, 2, 3 });
-    // shapeFace.push_back({ 4, 0, 3 });
-    // shapeFace.push_back({ 4, 3, 7 });
-    // shapeFace.push_back({ 5, 4, 7 });
-    // shapeFace.push_back({ 5, 7, 6 });
-    // shapeFace.push_back({ 1, 5, 6 });
-    // shapeFace.push_back({ 1, 6, 2 });
-    // shapeFace.push_back({ 4, 5, 1 });
-    // shapeFace.push_back({ 4, 1, 0 });
-    // shapeFace.push_back({ 2, 6, 7 });
-    // shapeFace.push_back({ 2, 7, 3 });
+    shapeFace.push_back({ 0, 1, 2 });
+    shapeFace.push_back({ 0, 2, 3 });
+    shapeFace.push_back({ 4, 0, 3 });
+    shapeFace.push_back({ 4, 3, 7 });
+    shapeFace.push_back({ 5, 4, 7 });
+    shapeFace.push_back({ 5, 7, 6 });
+    shapeFace.push_back({ 1, 5, 6 });
+    shapeFace.push_back({ 1, 6, 2 });
+    shapeFace.push_back({ 4, 5, 1 });
+    shapeFace.push_back({ 4, 1, 0 });
+    shapeFace.push_back({ 2, 6, 7 });
+    shapeFace.push_back({ 2, 7, 3 });
 
     s21::ObjLoader loader = s21::ObjLoader();
-    loader.loadObjFile("assets/cube.obj");
+    // loader.loadObjFile("assets/cube.obj");
     // loader.loadObjFile("assets/diamond.obj");
     // loader.loadObjFile("assets/teapot.obj");
+    loader.loadObjFile("assets/beast.obj");
+    // loader.loadObjFile("assets/trumpet.obj");
     s21::Figure* figure  = new s21::Figure(loader);
     shapeVert = figure->getMatrix();
     shapeFace = figure->getPolygons();
-    s21::Bounds b = s21::Matrix::getBounds(shapeVert);
-    std::cout << b.toString() << std::endl;
 
+    s21::Bounds b = s21::Matrix::getBounds(shapeVert);
+    std::cout << b.toString() << std::endl;    
+    
     shapeVert = s21::Transformer::Translate(-(b.maxx + b.minx)/2, -(b.maxy + b.miny)/2, -(b.maxz + b.minz)/2, shapeVert);
+
     b = s21::Matrix::getBounds(shapeVert);
     std::cout << b.toString() << std::endl;
 
