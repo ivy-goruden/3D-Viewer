@@ -12,6 +12,16 @@
 #include "../include/affine_transformer/transformer.hpp"
 #include "../include/grid.hpp"
 
+#define TIME_BLOCK(code_block) do { \
+    struct timespec start, end; \
+    clock_gettime(CLOCK_MONOTONIC, &start); \
+    code_block \
+    clock_gettime(CLOCK_MONOTONIC, &end); \
+    double time_spent = (end.tv_sec - start.tv_sec) + \
+                        (end.tv_nsec - start.tv_nsec) / 1e9; \
+    printf("Время выполнения: %f секунд\n", time_spent); \
+} while(0)
+
 void PrintMatrix(s21::matrix_t& m) {
     for (size_t i = 0; i < m.size(); i++) {
         std::cout << std::format("{},{},{}", m[i][0],m[i][1],m[i][2]) << std::endl;
@@ -28,8 +38,8 @@ s21::Point GuiApp::viewportToCanvas(double x, double y) {
 }
 
 s21::Point GuiApp::projectVertex(s21::Point3d v) {
-    // return viewportToCanvas(v.x, v.y);
-    return viewportToCanvas(v.x * tr.scale / v.z, v.y * tr.scale / v.z);
+    return viewportToCanvas(v.x, v.y);
+    // return viewportToCanvas(v.x * tr.scale / v.z, v.y * tr.scale / v.z);
 }
 
 void GuiApp::drawDot(cairo_t* cr, s21::Point p) {
@@ -58,15 +68,18 @@ void GuiApp::drawFace(cairo_t* cr, std::vector<int> face, s21::Vert_t& projected
 }
 
 void GuiApp::drawObject(cairo_t *cr, s21::matrix_t &verts, s21::Poly_t &faces, s21::Transform tr) {
-    s21::matrix_t vt = applyTransform(verts, tr);
-
-    s21::Vert_t projected;
-    for (size_t i = 0; i < vt.size(); i++) {
-        projected.push_back(projectVertex(vectorToPoint3d(vt[i])));
-    }
-    for (size_t i = 0; i < faces.size(); i++) {
-        drawFace(cr, faces[i], projected);
-    }    
+    s21::matrix_t vt;
+    TIME_BLOCK({
+        vt = applyTransform(verts, tr);
+    
+        s21::Vert_t projected;
+        for (size_t i = 0; i < vt.size(); i++) {
+            projected.push_back(projectVertex(vectorToPoint3d(vt[i])));
+        }
+        for (size_t i = 0; i < faces.size(); i++) {
+            drawFace(cr, faces[i], projected);
+        }
+    });    
 }
 
 s21::Point3d GuiApp::vectorToPoint3d(std::vector<double> v) {
@@ -115,7 +128,7 @@ GuiApp::GuiApp() {
     Vh = 1;
 
     tr = {
-        1,
+        0.1,
         0, 0, 0,
         0, 0, 100
     };
@@ -145,9 +158,11 @@ GuiApp::GuiApp() {
     s21::ObjLoader loader = s21::ObjLoader();
     // loader.loadObjFile("assets/cube.obj");
     // loader.loadObjFile("assets/diamond.obj");
-    // loader.loadObjFile("assets/teapot.obj");
-    loader.loadObjFile("assets/beast.obj");
+    loader.loadObjFile("assets/teapot.obj");
+    // loader.loadObjFile("assets/beast.obj");
     // loader.loadObjFile("assets/trumpet.obj");
+    // loader.loadObjFile("assets/shuttle.obj");
+    // loader.loadObjFile("assets/Pottery Barn_Childrens Bedroom Nightstand N180226.obj");
     s21::Figure* figure  = new s21::Figure(loader);
     shapeVert = figure->getMatrix();
     shapeFace = figure->getPolygons();
