@@ -12,6 +12,12 @@
 #include "../include/affine_transformer/transformer.hpp"
 #include "../include/grid.hpp"
 
+void PrintMatrix(s21::matrix_t& m) {
+    for (size_t i = 0; i < m.size(); i++) {
+        std::cout << std::format("{},{},{}", m[i][0],m[i][1],m[i][2]) << std::endl;
+    }
+}
+
 void DrawSomething(cairo_t* cr, GuiApp* gui) {
     std::cout << gui->tr.toString() << std::endl;
     gui->drawObject(cr, gui->shapeVert, gui->shapeFace, gui->tr);
@@ -53,7 +59,6 @@ void GuiApp::drawFace(cairo_t* cr, std::vector<int> face, s21::Vert_t& projected
 
 void GuiApp::drawObject(cairo_t *cr, s21::matrix_t &verts, s21::Poly_t &faces, s21::Transform tr) {
     s21::matrix_t vt = applyTransform(verts, tr);
-    std::cout << tr.toString() << std::endl;
 
     s21::Vert_t projected;
     for (size_t i = 0; i < vt.size(); i++) {
@@ -69,8 +74,12 @@ s21::Point3d GuiApp::vectorToPoint3d(std::vector<double> v) {
 }
 
 s21::matrix_t GuiApp::applyTransform(s21::matrix_t &verts, s21::Transform tr) {
+    std::cout << tr.toString() << std::endl;
+
     s21::matrix_t transformed;
     transformed = s21::Transformer::Scale(tr.scale, tr.scale, tr.scale, verts);
+    PrintMatrix(transformed);
+
     transformed = s21::Transformer::Rotate(tr.rotation_x, tr.rotation_y, tr.rotation_z, transformed);
     transformed = s21::Transformer::Translate(tr.trans_x, tr.trans_y, tr.trans_z, transformed);
     return transformed;
@@ -96,7 +105,7 @@ GuiApp::GuiApp() {
     drag_data->offset_y = 0;
     drag_data->is_dragging = false;
 
-    d = 10;
+    d = 1;
     Cw = 1;
     Ch = 1;
     Vw = 1;
@@ -105,39 +114,44 @@ GuiApp::GuiApp() {
     tr = {
         1,
         0, 0, 0,
-        0, 0, 7
+        0, 0, 80
     };
 
-    shapeVert.push_back({ 1,  1,  1,  1});
-    shapeVert.push_back({-1,  1,  1,  1});
-    shapeVert.push_back({-1, -1,  1,  1});
-    shapeVert.push_back({ 1, -1,  1,  1});
-    shapeVert.push_back({ 1,  1, -1,  1});
-    shapeVert.push_back({-1,  1, -1,  1});
-    shapeVert.push_back({-1, -1, -1,  1});
-    shapeVert.push_back({ 1, -1, -1,  1});
+    // shapeVert.push_back({ 1,  1,  1,  1});
+    // shapeVert.push_back({-1,  1,  1,  1});
+    // shapeVert.push_back({-1, -1,  1,  1});
+    // shapeVert.push_back({ 1, -1,  1,  1});
+    // shapeVert.push_back({ 1,  1, -1,  1});
+    // shapeVert.push_back({-1,  1, -1,  1});
+    // shapeVert.push_back({-1, -1, -1,  1});
+    // shapeVert.push_back({ 1, -1, -1,  1});
 
-    shapeFace.push_back({ 0, 1, 2 });
-    shapeFace.push_back({ 0, 2, 3 });
-    shapeFace.push_back({ 4, 0, 3 });
-    shapeFace.push_back({ 4, 3, 7 });
-    shapeFace.push_back({ 5, 4, 7 });
-    shapeFace.push_back({ 5, 7, 6 });
-    shapeFace.push_back({ 1, 5, 6 });
-    shapeFace.push_back({ 1, 6, 2 });
-    shapeFace.push_back({ 4, 5, 1 });
-    shapeFace.push_back({ 4, 1, 0 });
-    shapeFace.push_back({ 2, 6, 7 });
-    shapeFace.push_back({ 2, 7, 3 });
+    // shapeFace.push_back({ 0, 1, 2 });
+    // shapeFace.push_back({ 0, 2, 3 });
+    // shapeFace.push_back({ 4, 0, 3 });
+    // shapeFace.push_back({ 4, 3, 7 });
+    // shapeFace.push_back({ 5, 4, 7 });
+    // shapeFace.push_back({ 5, 7, 6 });
+    // shapeFace.push_back({ 1, 5, 6 });
+    // shapeFace.push_back({ 1, 6, 2 });
+    // shapeFace.push_back({ 4, 5, 1 });
+    // shapeFace.push_back({ 4, 1, 0 });
+    // shapeFace.push_back({ 2, 6, 7 });
+    // shapeFace.push_back({ 2, 7, 3 });
 
     s21::ObjLoader loader = s21::ObjLoader();
-    loader.loadObjFile("assets/diamond.obj");
+    loader.loadObjFile("assets/cube.obj");
+    // loader.loadObjFile("assets/diamond.obj");
+    // loader.loadObjFile("assets/teapot.obj");
     s21::Figure* figure  = new s21::Figure(loader);
     shapeVert = figure->getMatrix();
     shapeFace = figure->getPolygons();
     s21::Bounds b = s21::Matrix::getBounds(shapeVert);
-    shapeVert = s21::Transformer::Translate(-(b.maxx - b.minx)/2, -(b.maxy - b.miny)/2, -(b.maxz - b.minz)/2, shapeVert);
-    tr.trans_z = std::abs(b.maxz - b.minz) + 10;
+    std::cout << b.toString() << std::endl;
+
+    shapeVert = s21::Transformer::Translate(-(b.maxx + b.minx)/2, -(b.maxy + b.miny)/2, -(b.maxz + b.minz)/2, shapeVert);
+    b = s21::Matrix::getBounds(shapeVert);
+    std::cout << b.toString() << std::endl;
 
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
@@ -360,12 +374,17 @@ void GuiApp::onDragEnd() {
         tr.trans_x = tr_copy.trans_x + dx;
         tr.trans_y = tr_copy.trans_y - dy;
     }
+    shapeVert = s21::Transformer::Rotate(tr.rotation_x, tr.rotation_y, tr.rotation_z, shapeVert);
+    tr.rotation_x = 0;
+    tr.rotation_y = 0;
+    tr.rotation_z = 0;
     redraw();
 }
 
 void GuiApp::onScroll(double dx, double dy) {
-    d = d - dy;
-    d = d > 0 ? d : 1;
+    // d = d - dy;
+    // d = d > 0 ? d : 1;
+    tr.scale += dy;
     redraw();
 }
 

@@ -74,6 +74,7 @@ namespace s21 {
         double minx, maxx;
         double miny, maxy;
         double minz, maxz;
+        std::string toString() { return std::format("x{}:{} y{}:{} z{}:{}", minx, maxx, miny, maxy, minz, maxz); }
     };
 
     //ANGLES
