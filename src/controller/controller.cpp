@@ -43,6 +43,14 @@ namespace s21{
         camera_ = camera;
     }
 
+    double Controller::getScale(){
+        return scale_;
+    }
+    
+    int Controller::getZoom(){
+        return camera_;
+    }
+
     void Controller::shiftX(int shiftx){
         shiftx_ = shiftx;
     }
@@ -59,12 +67,13 @@ namespace s21{
 
         s21::matrix_t shapeVert = figure_->getMatrix();
         s21::Bounds b = s21::Matrix::getBounds(shapeVert);
-        matrix_t fig = s21::Transformer::Translate(-(b.maxx + b.minx)/2, -(b.maxy + b.miny)/2, 1, shapeVert);
+        matrix_t fig = s21::Transformer::Translate(-(b.maxx + b.minx)/2, -(b.maxy + b.miny)/2, -(b.maxz + b.minz)/2, shapeVert);
         figure->setMatrix(fig);
         int x = b.maxx - b.minx;
         int y = b.maxy - b.miny;
         int z = b.maxz - b.minz;
-        camera_ = std::sqrt(std::pow(x, 2) + std::pow(y, 2) + std::pow(z, 2))+10;
+        diagonal_ =  std::sqrt(std::pow(x, 2) + std::pow(y, 2) + std::pow(z, 2))+10;
+        camera_ = diagonal_;
         scale_ = camera_;
         Vert_t projection_ = getFigureProjection(fig, figure->getMinz(fig));
         return projection_;
@@ -97,6 +106,13 @@ namespace s21{
 
     void Controller::toggleProjection(){
         parallel_projection_ = !parallel_projection_;
+        if (parallel_projection_){
+            scale_ = 1/2;
+        }
+        else{
+            scale_ = diagonal_;
+        }
+
     }
 
     Edge_t Controller::getEdges(){

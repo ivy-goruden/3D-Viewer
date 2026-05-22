@@ -18,9 +18,8 @@ void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
 void GuiApp::onOpenButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->executeCommand(self->openCommand);
-        gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->ySpinnerButton),0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->xSpinnerButton),0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->zSpinnerButton),0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->zoomCommand),self->getAppData().getZoom());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->scaleCommand),self->getAppData().getScale());
 }
 
 void GuiApp::onSaveButtonClick(GtkButton* btn, gpointer user_data) {
@@ -34,6 +33,8 @@ void GuiApp::onResetButtonClick(GtkButton* btn, gpointer user_data) {
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->ySpinnerButton),0);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->xSpinnerButton),0);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->zSpinnerButton),0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->shiftSpinnerButton), 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->shiftVSpinnerButton), 0);
 }
 
 void GuiApp::onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
@@ -243,6 +244,14 @@ void GuiApp::openFileSelected(const std::string& path) {
     getAppData().setPath(path);
     auto* canvas =  getCanvas();
     canvas->loadFigure(path.c_str());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(scaleSpinnerButton), canvas->getScale());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(zoomSpinnerButton), canvas->getZoom());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(shiftSpinnerButton), 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(shiftVSpinnerButton), 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(ySpinnerButton),0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(xSpinnerButton),0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(zSpinnerButton),0);
+    executeCommand(resetCommand);
     canvas->redraw();
     updateStatusBar();
 }

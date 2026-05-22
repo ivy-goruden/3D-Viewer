@@ -48,6 +48,8 @@ public:
     double getAngleX();
     double getAngleY();
     double getAngleZ();
+    double getScale();
+    int getZoom();
     int getEdgesNum();
     int getVerticesNum();
 

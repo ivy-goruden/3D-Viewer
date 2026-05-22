@@ -15,6 +15,7 @@ namespace s21{
             double scale_;
             int shiftx_;
             int shifty_;
+            int diagonal_;
 
             Vert_t getFigureProjection(const matrix_t original, double minz);
         public:
@@ -34,6 +35,8 @@ namespace s21{
             void setAngleZ(int angle);
             void setScale(double scale);
             void setCamera(int camera);
+            double getScale();
+            int getZoom();
             int getEdgesNum();
             int getVerticesNum();
             Bounds getFigureBounds();

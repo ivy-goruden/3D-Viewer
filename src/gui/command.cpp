@@ -16,6 +16,8 @@ void SaveCommand::execute() {
 void ResetCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
     canvas->rotateAbs(0, 0, 0);
+    canvas->shiftX(0);
+    canvas->shiftY(0);
     canvas->redraw();
 }
 
@@ -109,7 +111,7 @@ void BgColorCommand::execute() {
 
 void WeightCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setLineWidth(app->getAppData().getWeight()*0.01);
+    canvas->setLineWidth(app->getAppData().getWeight());
     canvas->redraw();
 }
 

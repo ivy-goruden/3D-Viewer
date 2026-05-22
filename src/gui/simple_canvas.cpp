@@ -22,7 +22,7 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     polyColor_ = Rgb(0,0,1,1);
     bgColor_ = Rgb(1,1,1,1);
     fillPoly_ = false;
-    lineWidth_ = 0.1;
+    lineWidth_ = 1;
     vertWidth_ = 1;
     vertType_ = None;
     lineType_ = Solid;
@@ -38,13 +38,13 @@ void SimpleCanvas::draw_line(cairo_t* cr, double x1, double y1, double x2, doubl
     cairo_set_source_rgb(cr, lineColor_.red, lineColor_.green, lineColor_.blue);
     cairo_move_to(cr, x1, y1);
     cairo_line_to(cr, x2, y2);
-    if (lineType_ == Dotted){
+    if (lineType_ == Stroke(Dotted)){
         double dashes[] = {lineWidth_/canvas_scale_*2, lineWidth_/canvas_scale_};
         int num_dashes = 2;
         double offset = 0.0;
         cairo_set_dash(cr, dashes, num_dashes, offset);
+        g_print("HELLO");
     }
-
     cairo_stroke(cr);
 }
 
@@ -55,7 +55,7 @@ void SimpleCanvas::draw_polygon(cairo_t* cr, const std::vector<s21::Point>& poin
 
     cairo_move_to(cr, points[0].x, points[0].y);
     for (size_t i = 1; i < points.size(); ++i) {
-        cairo_line_to(cr, points[i].x, points[i].y);
+        draw_line(cr, points[0].x, points[0].y, points[i].x, points[i].y);
     }
     cairo_close_path(cr);
     if (fillPoly_){
@@ -120,7 +120,7 @@ void SimpleCanvas::redraw(){
 void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
     cairo_set_source_rgb(cr, bgColor_.red, bgColor_.green, bgColor_.blue);
     cairo_paint(cr);
-    cairo_set_line_width(cr, lineWidth_);
+    cairo_set_line_width(cr, lineWidth_/canvas_scale_*0.1);
     setCanvas(cr);
     drawFaces(cr);
     drawEdges(cr);
@@ -250,4 +250,11 @@ int SimpleCanvas::getEdgesNum(){
 
 int SimpleCanvas::getVerticesNum(){
     return c_->getVerticesNum();
+}
+
+double SimpleCanvas::getScale(){
+    return c_->getScale();
+}
+int SimpleCanvas::getZoom(){
+    return c_->getZoom();
 }
