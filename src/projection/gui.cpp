@@ -32,6 +32,10 @@ void PrintMatrix(s21::matrix_t& m) {
 void DrawSomething(cairo_t* cr, GuiApp* gui) {
     std::cout << gui->tr.toString() << std::endl;
     gui->drawObject(cr, gui->shapeVert, gui->shapeFace, gui->tr);
+
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(gui->xSpinnerButton), gui->tr.rotation_x);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(gui->ySpinnerButton), gui->tr.rotation_y);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(gui->zSpinnerButton), gui->tr.rotation_z);
 }
 
 s21::Point GuiApp::viewportToCanvas(double x, double y) {
@@ -174,11 +178,11 @@ GuiApp::GuiApp() {
     // loader.loadObjFile("assets/cube.obj");
     // loader.loadObjFile("assets/diamond.obj");
     // loader.loadObjFile("assets/Provance X_Table N140426.obj");
-    // loader.loadObjFile("assets/teapot.obj");
+    loader.loadObjFile("assets/teapot.obj");
     // loader.loadObjFile("assets/beast.obj");
     // loader.loadObjFile("assets/trumpet.obj");
     // loader.loadObjFile("assets/shuttle.obj");
-    loader.loadObjFile("assets/Pottery Barn_Childrens Bedroom Nightstand N180226.obj");
+    // loader.loadObjFile("assets/Pottery Barn_Childrens Bedroom Nightstand N180226.obj");
     s21::Figure* figure  = new s21::Figure(loader);
     shapeVert = figure->getMatrix();
     shapeFace = figure->getPolygons();
