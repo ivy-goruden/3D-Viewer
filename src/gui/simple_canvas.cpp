@@ -28,8 +28,6 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     lineType_ = Solid;
     width_ = 1;
     height_ = 1;
-    Cwidth_ = 1;
-    Cheight_ = 1;
 }
 
 SimpleCanvas::~SimpleCanvas() {
@@ -41,7 +39,7 @@ void SimpleCanvas::draw_line(cairo_t* cr, double x1, double y1, double x2, doubl
     cairo_move_to(cr, x1, y1);
     cairo_line_to(cr, x2, y2);
     if (lineType_ == Dotted){
-        double dashes[] = {lineWidth_*2, lineWidth_};
+        double dashes[] = {lineWidth_/canvas_scale_*2, lineWidth_/canvas_scale_};
         int num_dashes = 2;
         double offset = 0.0;
         cairo_set_dash(cr, dashes, num_dashes, offset);
@@ -70,9 +68,9 @@ void SimpleCanvas::draw_polygon(cairo_t* cr, const std::vector<s21::Point>& poin
 void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
     switch(vertType_){
         case Circle:
-            cairo_arc(cr, x, y, vertWidth_*2, 0, 2 * M_PI);
+            cairo_arc(cr, x, y, vertWidth_/canvas_scale_*2, 0, 2 * M_PI);
         case Rect:
-            double d = vertWidth_*2*std::sqrt(2)/2;
+            double d = vertWidth_/canvas_scale_*2*std::sqrt(2)/2;
             cairo_rectangle (cr, x-d, y-d, 2*d, 2*d);
     }
     cairo_set_source_rgb(cr, dotColor_.red, dotColor_.green, dotColor_.blue);
@@ -107,10 +105,12 @@ void SimpleCanvas::drawFaces(cairo_t* cr){
 void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer user_data) {
     SimpleCanvas* self = static_cast<SimpleCanvas*>(user_data);
     self->onDraw(cr, width, height);
+    self->width_ = width;
+    self->height_ = height;
 }
 
 void SimpleCanvas::loadFigure(const char* filename) {
-    projection_ = c_->loadFigure(filename);    
+    projection_ = c_->loadFigure(filename, width_, height_);    
 }
 
 void SimpleCanvas::redraw(){
@@ -121,21 +121,35 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
     cairo_set_source_rgb(cr, bgColor_.red, bgColor_.green, bgColor_.blue);
     cairo_paint(cr);
     cairo_set_line_width(cr, lineWidth_);
-    // cairo_translate(cr, width / 2 + xStart_, height / 2 + yStart_);
-    cairo_scale(cr, Cwidth_, Cheight_);
+    setCanvas(cr);
     drawFaces(cr);
     drawEdges(cr);
     drawVert(cr);
 }
 
+void SimpleCanvas::setCanvas(cairo_t* cr){
+    if (width_ <= 0 || height_ <= 0)
+        return;
+    g_print("Drawing area is %d x %d\n", width_, height_);
+    cairo_translate(cr, width_ / 2.0, height_ / 2.0);
+    s21::Bounds bounds = c_->getFigureBounds();
+    int fwidth = bounds.maxx-bounds.minx;
+    int fheight = bounds.maxy-bounds.miny;
+    if (fwidth <= 0 || fheight <= 0)
+        return;
+    this->canvas_scale_ = (double)width_/fwidth;
+    cairo_scale(cr, canvas_scale_, canvas_scale_);
+    g_print("Scale is %f x %f\n", (double)width_/fwidth, (double)height_/fheight);
+}
+
 void SimpleCanvas::shiftX(int x){
-    c_->shiftX(x+(width_/2));
+    c_->shiftX(x);
 
     projection_ = c_->getFigure();
 }
 
 void SimpleCanvas::shiftY(int y){
-    c_->shiftY(y+(height_/2));
+    c_->shiftY(y);
 
     projection_ = c_->getFigure();
 }

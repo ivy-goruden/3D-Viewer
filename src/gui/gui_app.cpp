@@ -18,6 +18,9 @@ void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
 void GuiApp::onOpenButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->executeCommand(self->openCommand);
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->ySpinnerButton),0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->xSpinnerButton),0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->zSpinnerButton),0);
 }
 
 void GuiApp::onSaveButtonClick(GtkButton* btn, gpointer user_data) {
@@ -28,6 +31,9 @@ void GuiApp::onSaveButtonClick(GtkButton* btn, gpointer user_data) {
 void GuiApp::onResetButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->executeCommand(self->resetCommand);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->ySpinnerButton),0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->xSpinnerButton),0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->zSpinnerButton),0);
 }
 
 void GuiApp::onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {

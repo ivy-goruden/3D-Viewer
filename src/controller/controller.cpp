@@ -51,7 +51,7 @@ namespace s21{
         shifty_ = shifty;
     }
 
-    Vert_t Controller::loadFigure(const char* filename){
+    Vert_t Controller::loadFigure(const char* filename, int canvasW, int canvasH){
         s21::ObjLoader loader = s21::ObjLoader();
         loader.loadObjFile(filename);
         s21::Figure *figure  = new s21::Figure(loader);
@@ -60,7 +60,12 @@ namespace s21{
         s21::matrix_t shapeVert = figure_->getMatrix();
         s21::Bounds b = s21::Matrix::getBounds(shapeVert);
         matrix_t fig = s21::Transformer::Translate(-(b.maxx + b.minx)/2, -(b.maxy + b.miny)/2, 1, shapeVert);
-
+        figure->setMatrix(fig);
+        int x = b.maxx - b.minx;
+        int y = b.maxy - b.miny;
+        int z = b.maxz - b.minz;
+        camera_ = std::sqrt(std::pow(x, 2) + std::pow(y, 2) + std::pow(z, 2))+10;
+        scale_ = camera_;
         Vert_t projection_ = getFigureProjection(fig, figure->getMinz(fig));
         return projection_;
     }
@@ -73,6 +78,14 @@ namespace s21{
             projection_ = getFigureProjection(translate, figure_->getMinz(translate));
         }
         return projection_;
+    }
+
+    Bounds Controller::getFigureBounds(){
+        Bounds bounds = Bounds{};
+        if (figure_ != nullptr){
+            bounds = figure_->getBounds();
+        }
+        return bounds;
     }
 
     Vert_t Controller::getFigureProjection(const matrix_t original, double minz) {

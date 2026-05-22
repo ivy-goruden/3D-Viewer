@@ -109,6 +109,10 @@ namespace s21{
         return matrix_;
     }
 
+    void Figure::setMatrix(matrix_t m){
+        matrix_ = m;
+    }
+
     int Figure::getVerticesNum() {
         return matrix_.size();        
     }

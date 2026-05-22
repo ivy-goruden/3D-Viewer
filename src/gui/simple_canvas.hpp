@@ -51,12 +51,13 @@ public:
     int getEdgesNum();
     int getVerticesNum();
 
-public:
+private:
     GtkWidget* drawing_area;
     // Статические колбэки GTK
     static void on_draw_static(GtkDrawingArea* area, cairo_t* cr,
                                int width, int height, gpointer user_data);
     static void on_window_destroy(GtkWidget* widget, gpointer data);
+    void setCanvas(cairo_t* cr);
     double scale_;
     int width_;
     int height_;
@@ -75,9 +76,8 @@ public:
 
     bool fillPoly_;
     Shape vertType_;
-    Stroke lineType_;   
-    int Cwidth_;
-    int Cheight_; 
+    Stroke lineType_;
+    double canvas_scale_;
 };
 
 #endif // SIMPLE_CANVAS_HPP

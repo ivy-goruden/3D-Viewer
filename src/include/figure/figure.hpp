@@ -24,6 +24,7 @@ class Figure{
         Poly_t getPolygons();
         Edge_t getEdges();
         matrix_t getMatrix();
+        void setMatrix(matrix_t);
         int getVerticesNum();
         int getNodesNum();
         Vert_t getProjection();

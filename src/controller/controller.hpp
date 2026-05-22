@@ -19,7 +19,7 @@ namespace s21{
             Vert_t getFigureProjection(const matrix_t original, double minz);
         public:
             Controller();
-            Vert_t loadFigure(const char* filename);
+            Vert_t loadFigure(const char* filename, int, int);
             Vert_t getFigure();            
             void toggleProjection();
             void shiftX(int);
@@ -36,6 +36,8 @@ namespace s21{
             void setCamera(int camera);
             int getEdgesNum();
             int getVerticesNum();
+            Bounds getFigureBounds();
+
 
     };
 }
