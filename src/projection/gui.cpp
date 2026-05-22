@@ -11,6 +11,7 @@
 #include "../include/affine_transformer/matrix.hpp"
 #include "../include/affine_transformer/transformer.hpp"
 #include "../include/grid.hpp"
+#include "../include/projection/projection.hpp"
 
 #define TIME_BLOCK(code_block) do { \
     struct timespec start, end; \
@@ -38,8 +39,22 @@ s21::Point GuiApp::viewportToCanvas(double x, double y) {
 }
 
 s21::Point GuiApp::projectVertex(s21::Point3d v) {
-    return viewportToCanvas(v.x, v.y);
-    // return viewportToCanvas(v.x * tr.scale / v.z, v.y * tr.scale / v.z);
+    // return viewportToCanvas(v.x, v.y);
+    // return viewportToCanvas(v.x * tr.scale /( v.z + 1000), v.y * tr.scale / (v.z + 1000));
+
+    // Настройка камеры
+    s21::Point3d cameraPos = {0, 0, 10};     // камера на оси Z
+    s21::Point3d lookAt = {0, 0, 0};          // смотрим в начало координат
+    s21::Point3d upVec = {0, 1, 0};           // Y вверх
+    
+    s21::PerspectiveProjection proj(
+        cameraPos, lookAt, upVec,
+        60.0,      // FOV 60 градусов
+        16.0/9.0,  // aspect ratio
+        0.1, 100.0,// near, far
+        1920, 1080 // разрешение экрана
+    );
+    return toScreenPoint(proj.project(v));
 }
 
 void GuiApp::drawDot(cairo_t* cr, s21::Point p) {
@@ -94,10 +109,10 @@ s21::matrix_t GuiApp::applyTransform(s21::matrix_t &verts, s21::Transform tr) {
     transformed = s21::Transformer::Rotate(tr.rotation_x, tr.rotation_y, tr.rotation_z, transformed);
 
     // PrintMatrix(transformed);
-    s21::Bounds b = s21::Matrix::getBounds(transformed);
+    // s21::Bounds b = s21::Matrix::getBounds(transformed);
     // std::cout << "applyTransform scale b " << b.toString() << std::endl;
-    if (b.minz < 0) this->tr.trans_z = std::abs(b.minz) + 10;
-    transformed = s21::Transformer::Translate(tr.trans_x, tr.trans_y, this->tr.trans_z, transformed);
+    // if (b.minz < 0) this->tr.trans_z = std::abs(b.minz) + 10;
+    transformed = s21::Transformer::Translate(tr.trans_x, tr.trans_y, tr.trans_z, transformed);
     return transformed;
 }
 
@@ -158,11 +173,12 @@ GuiApp::GuiApp() {
     s21::ObjLoader loader = s21::ObjLoader();
     // loader.loadObjFile("assets/cube.obj");
     // loader.loadObjFile("assets/diamond.obj");
-    loader.loadObjFile("assets/teapot.obj");
+    // loader.loadObjFile("assets/Provance X_Table N140426.obj");
+    // loader.loadObjFile("assets/teapot.obj");
     // loader.loadObjFile("assets/beast.obj");
     // loader.loadObjFile("assets/trumpet.obj");
     // loader.loadObjFile("assets/shuttle.obj");
-    // loader.loadObjFile("assets/Pottery Barn_Childrens Bedroom Nightstand N180226.obj");
+    loader.loadObjFile("assets/Pottery Barn_Childrens Bedroom Nightstand N180226.obj");
     s21::Figure* figure  = new s21::Figure(loader);
     shapeVert = figure->getMatrix();
     shapeFace = figure->getPolygons();
