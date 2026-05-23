@@ -2,15 +2,12 @@
 
 #include "gui_app.hpp"
 #include "app_data.hpp"
+#include <format>
 
 void OpenCommand::execute() {
     if (!app->openDialog->isActive()) {
         app->openDialog->open();    
     }
-}
-
-void SaveCommand::execute() {
-    //g_print("%s\n", "save command");
 }
 
 void ResetCommand::execute() {

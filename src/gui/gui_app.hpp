@@ -16,7 +16,6 @@ class GuiApp {
     static void onBgColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onActivate(GtkApplication *app, gpointer user_data);
     static void onOpenButtonClick(GtkButton* btn, gpointer user_data);
-    static void onSaveButtonClick(GtkButton* btn, gpointer user_data);
     static void onResetButtonClick(GtkButton* btn, gpointer user_data);
     static void onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
@@ -38,7 +37,6 @@ class GuiApp {
     GtkApplication *app;
     GObject* window;
     GObject* openButton;
-    GObject* saveButton;
     GObject* resetButton;
     GObject* xSpinnerButton;
     GObject* ySpinnerButton;
@@ -78,7 +76,6 @@ class GuiApp {
 
   private:
     Command* openCommand;
-    Command* saveCommand;
     Command* resetCommand;
     Command* rotateXCommand;
     Command* rotateYCommand;
