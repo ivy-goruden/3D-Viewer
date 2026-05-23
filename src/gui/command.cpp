@@ -2,6 +2,7 @@
 
 #include "gui_app.hpp"
 #include "app_data.hpp"
+#include <format>
 
 void OpenCommand::execute() {
     if (!app->openDialog->isActive()) {
@@ -9,13 +10,11 @@ void OpenCommand::execute() {
     }
 }
 
-void SaveCommand::execute() {
-    g_print("%s\n", "save command");
-}
-
 void ResetCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
     canvas->rotateAbs(0, 0, 0);
+    canvas->shiftX(0);
+    canvas->shiftY(0);
     canvas->redraw();
 }
 
@@ -39,19 +38,25 @@ void RotateZCommand::execute() {
 
 void ShiftCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setPosX(app->getAppData().getShift());
+    canvas->shiftX(app->getAppData().getShift());
     canvas->redraw();
 }
 
 void ShiftVCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setPosY(app->getAppData().getShiftV());
+    canvas->shiftY(app->getAppData().getShiftV());
     canvas->redraw();
 }
 
 void ZoomCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setZoom(double(app->getAppData().getZoom())/100);
+    canvas->setCamera(app->getAppData().getZoom());
+    canvas->redraw();
+}
+
+void ScaleCommand::execute() {
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setScale(app->getAppData().getScale());
     canvas->redraw();
 }
 
@@ -103,7 +108,13 @@ void BgColorCommand::execute() {
 
 void WeightCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setLineWidth(app->getAppData().getWeight()*0.01);
+    canvas->setLineWidth(app->getAppData().getWeight());
+    canvas->redraw();
+}
+
+void VertSizeCommand::execute() {
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setVertSize(app->getAppData().getVertSize());
     canvas->redraw();
 }
 

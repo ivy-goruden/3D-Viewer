@@ -23,11 +23,12 @@ namespace s21{
         minz = minz < 0 ? minz : 0;
         Vert_t projection;        
         for (int i = 0; i < m.size(); i++) {
-            double z = m[i][2] + camera;
-            if (z <= 0) {
+            double z = m[i][2]+camera;
+            if (z<=(-minz)) {
                 continue;
             }
-            Point coord = Point{m[i][0]/z*scale,m[i][1]/z*scale};
+            double factor = 1.0 / z;
+            Point coord = Point{m[i][0]*factor*scale,m[i][1]*factor*scale};
             projection.push_back(coord);
         }
         return projection;

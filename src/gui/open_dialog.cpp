@@ -5,26 +5,22 @@
 #include "app_data.hpp"
 
 OpenDialog::OpenDialog(GtkWindow* window_) {
+    window = window_;
+
     dialog = gtk_file_dialog_new();
     gtk_file_dialog_set_modal(dialog, true);
     gtk_file_dialog_set_title(dialog, "Выберите файл");
 
     filters = g_list_store_new(GTK_TYPE_FILE_FILTER);
     obj_filter = createObjFilter();
-    text_filter = createTextFilter();
     all_filter = createAllFilesFilter();
-    
     g_list_store_append(filters, obj_filter);
-    g_list_store_append(filters, text_filter);
-    g_list_store_append(filters, all_filter);
-
     gtk_file_dialog_set_filters(dialog, G_LIST_MODEL(filters));
     gtk_file_dialog_set_default_filter(dialog, obj_filter);
 }
 
 OpenDialog::~OpenDialog() {
     g_object_unref(obj_filter);
-    g_object_unref(text_filter);
     g_object_unref(all_filter);
     g_object_unref(filters);
     g_object_unref(dialog);
@@ -48,7 +44,7 @@ void OpenDialog::onOpenFileSelected(GObject *source, GAsyncResult *result, gpoin
     } else if (error) {
         self->active = false;
         if (!g_error_matches(error, GTK_DIALOG_ERROR, GTK_DIALOG_ERROR_CANCELLED)) {
-            g_printerr("Ошибка: %s\n", error->message);
+            g_printerr("open file error: %s\n", error->message);
         }
         g_error_free(error);
     }
@@ -58,17 +54,6 @@ GtkFileFilter* OpenDialog::createObjFilter() {
     GtkFileFilter *filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, "Графические объекты");
     gtk_file_filter_add_pattern(filter, "*.obj");
-    return filter;
-}
-
-GtkFileFilter* OpenDialog::createTextFilter() {
-    GtkFileFilter *filter = gtk_file_filter_new();
-    gtk_file_filter_set_name(filter, "Текстовые файлы");
-    gtk_file_filter_add_mime_type(filter, "text/plain");
-    gtk_file_filter_add_pattern(filter, "*.txt");
-    gtk_file_filter_add_pattern(filter, "*.md");
-    gtk_file_filter_add_pattern(filter, "*.c");
-    gtk_file_filter_add_pattern(filter, "*.h");
     return filter;
 }
 

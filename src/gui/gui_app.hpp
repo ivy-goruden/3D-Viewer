@@ -16,7 +16,6 @@ class GuiApp {
     static void onBgColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onActivate(GtkApplication *app, gpointer user_data);
     static void onOpenButtonClick(GtkButton* btn, gpointer user_data);
-    static void onSaveButtonClick(GtkButton* btn, gpointer user_data);
     static void onResetButtonClick(GtkButton* btn, gpointer user_data);
     static void onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
@@ -24,11 +23,13 @@ class GuiApp {
     static void onShiftSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onShiftVSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onScaleSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onLineSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
     static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onStatusUpdate();
 
   public:
@@ -36,7 +37,6 @@ class GuiApp {
     GtkApplication *app;
     GObject* window;
     GObject* openButton;
-    GObject* saveButton;
     GObject* resetButton;
     GObject* xSpinnerButton;
     GObject* ySpinnerButton;
@@ -44,6 +44,7 @@ class GuiApp {
     GObject* shiftSpinnerButton;
     GObject* shiftVSpinnerButton;
     GObject* zoomSpinnerButton;
+    GObject* scaleSpinnerButton;
     GObject* paper;
     GObject* lineSwitch;
     GObject* projSwitch;
@@ -60,6 +61,7 @@ class GuiApp {
     GObject* status_vert;
     GObject* status_file;
     GObject* status_edges;
+    GObject* vertSizeButton;
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -74,7 +76,6 @@ class GuiApp {
 
   private:
     Command* openCommand;
-    Command* saveCommand;
     Command* resetCommand;
     Command* rotateXCommand;
     Command* rotateYCommand;
@@ -82,6 +83,7 @@ class GuiApp {
     Command* shiftCommand;
     Command* shiftVCommand;
     Command* zoomCommand;
+    Command* scaleCommand;
     Command* lineSwitchCommand;
     Command* projSwitchCommand;
     Command* fillSwitchCommand;
@@ -89,6 +91,7 @@ class GuiApp {
     Command* colorCommand;
     Command* bgcolorCommand;
     Command* weightCommand;
+    Command* vertSizeCommand;
     void createCommands();
 
   public:

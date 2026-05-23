@@ -23,6 +23,7 @@ public:
     void draw_dot(cairo_t* cr, double x, double y);
 
     // Отрисовка фигуры
+    void setDash(cairo_t* cr);
     void drawVert(cairo_t* cr);
     void drawEdges(cairo_t* cr);
     void drawFaces(cairo_t* cr);
@@ -30,9 +31,10 @@ public:
     // Элементы управления
     void loadFigure(const char* filename);
     void setScale(double);
+    void setCamera(int);
     void setZoom(double);
-    void setPosX(double);
-    void setPosY(double);
+    void shiftX(int);
+    void shiftY(int);
     void toggleProjection();
     void rotateX(double);
     void rotateY(double);
@@ -44,19 +46,25 @@ public:
     void setBgColor(Rgb color);
     void setVertColor(Rgb color);
     void setLineWidth(double width);
+    void setVertSize(double size);
     double getAngleX();
     double getAngleY();
     double getAngleZ();
+    double getScale();
+    int getZoom();
     int getEdgesNum();
     int getVerticesNum();
 
-public:
+private:
     GtkWidget* drawing_area;
     // Статические колбэки GTK
     static void on_draw_static(GtkDrawingArea* area, cairo_t* cr,
                                int width, int height, gpointer user_data);
     static void on_window_destroy(GtkWidget* widget, gpointer data);
+    void setCanvas(cairo_t* cr);
     double scale_;
+    int width_;
+    int height_;
     double xStart_;
     double yStart_;
     s21::Vert_t projection_;
@@ -72,7 +80,8 @@ public:
 
     bool fillPoly_;
     Shape vertType_;
-    Stroke lineType_;    
+    Stroke lineType_;
+    double canvas_scale_;
 };
 
 #endif // SIMPLE_CANVAS_HPP
