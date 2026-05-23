@@ -10,7 +10,7 @@ void OpenCommand::execute() {
 }
 
 void SaveCommand::execute() {
-    g_print("%s\n", "save command");
+    //g_print("%s\n", "save command");
 }
 
 void ResetCommand::execute() {

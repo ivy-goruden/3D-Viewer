@@ -38,7 +38,7 @@ namespace s21 {
     struct Seg_t {
         int start, end;
         bool operator==(const Seg_t& other) const {
-            return (start == other.start && end == other.end);
+            return ((start == other.start && end == other.end) || (start == other.end && end == other.start));
         }
         bool operator<(const Seg_t& other) const {
             if (start != other.start) return start < other.start;

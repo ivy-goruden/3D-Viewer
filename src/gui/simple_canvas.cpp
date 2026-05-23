@@ -17,7 +17,7 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     widget_ = drawing_area;
     c_ = new s21::Controller();
     dotColor_ = Rgb(1,0,0,1);
-    lineColor_ = Rgb(0,1,0,1);
+    lineColor_ = Rgb(0,0,0,1);
     polyColor_ = Rgb(0,0,1,1);
     bgColor_ = Rgb(1,1,1,1);
     fillPoly_ = false;
@@ -133,7 +133,7 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
 void SimpleCanvas::setCanvas(cairo_t* cr){
     if (width_ <= 0 || height_ <= 0)
         return;
-    g_print("Drawing area is %d x %d\n", width_, height_);
+    //g_print("Drawing area is %d x %d\n", width_, height_);
     cairo_translate(cr, width_ / 2.0, height_ / 2.0);
     s21::Bounds bounds = c_->getFigureBounds();
     int fwidth = bounds.maxx-bounds.minx;
@@ -142,7 +142,7 @@ void SimpleCanvas::setCanvas(cairo_t* cr){
         return;
     this->canvas_scale_ = (double)width_/fwidth;
     cairo_scale(cr, canvas_scale_, canvas_scale_);
-    g_print("Scale is %f x %f\n", (double)width_/fwidth, (double)height_/fheight);
+    //g_print("Scale is %f x %f\n", (double)width_/fwidth, (double)height_/fheight);
 }
 
 void SimpleCanvas::shiftX(int x){
