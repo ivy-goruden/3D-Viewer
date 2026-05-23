@@ -33,39 +33,44 @@ SimpleCanvas::~SimpleCanvas() {
     // Деструктор (можно оставить пустым или освободить ресурсы)
 }
 
-void SimpleCanvas::draw_line(cairo_t* cr, double x1, double y1, double x2, double y2) {
-    cairo_set_source_rgb(cr, lineColor_.red, lineColor_.green, lineColor_.blue);
-    cairo_move_to(cr, x1, y1);
-    cairo_line_to(cr, x2, y2);
-    if (lineType_ == Stroke(Dotted)){
+void SimpleCanvas::setDash(cairo_t* cr) {
+    if (lineType_ == Stroke(Dotted)) {
         double dashes[] = {lineWidth_/canvas_scale_*2, lineWidth_/canvas_scale_};
         int num_dashes = 2;
         double offset = 0.0;
         cairo_set_dash(cr, dashes, num_dashes, offset);
-        g_print("HELLO");
     }
+}
+
+void SimpleCanvas::draw_line(cairo_t* cr, double x1, double y1, double x2, double y2) {
+    cairo_set_source_rgb(cr, lineColor_.red, lineColor_.green, lineColor_.blue);
+    cairo_move_to(cr, x1, y1);
+    cairo_line_to(cr, x2, y2);
+    setDash(cr);
     cairo_stroke(cr);
 }
 
 void SimpleCanvas::draw_polygon(cairo_t* cr, const std::vector<s21::Point>& points) {
     if (points.size() < 3) return;
 
-    cairo_set_source_rgb(cr, polyColor_.red, polyColor_.green, polyColor_.blue);
-
     cairo_move_to(cr, points[0].x, points[0].y);
     for (size_t i = 1; i < points.size(); ++i) {
-        draw_line(cr, points[0].x, points[0].y, points[i].x, points[i].y);
+        cairo_line_to(cr, points[i].x, points[i].y);
     }
     cairo_close_path(cr);
-    if (fillPoly_){
+
+    if (fillPoly_) {
+        cairo_set_source_rgba(cr, polyColor_.red, polyColor_.green, polyColor_.blue, 0.5);
         cairo_fill(cr);
-    }else{
+    } else {
+        setDash(cr);
+        cairo_set_source_rgb(cr, polyColor_.red, polyColor_.green, polyColor_.blue);
         cairo_stroke(cr);
     }
 }
 
 void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
-    switch(vertType_){
+    switch(vertType_) {
         case Circle:
             cairo_arc(cr, x, y, vertWidth_/canvas_scale_*2, 0, 2 * M_PI);
         case Rect:
@@ -84,15 +89,14 @@ void SimpleCanvas::drawVert(cairo_t* cr) {
 
 void SimpleCanvas::drawEdges(cairo_t* cr){
     s21::Edge_t edges = c_->getEdges();
-    for (s21::Seg_t s: edges){
+    for (s21::Seg_t s: edges) {
         draw_line(cr, projection_[s.start].x, projection_[s.start].y, projection_[s.end].x, projection_[s.end].y);
-
     }
 }
 
 void SimpleCanvas::drawFaces(cairo_t* cr){
     s21::Poly_t poly = c_->getPolygons();
-    for(auto dots: poly){
+    for(auto dots: poly) {
         std::vector<s21::Point> points;
         for(int n: dots){
             points.push_back(projection_[n]);
@@ -180,7 +184,7 @@ void SimpleCanvas::toggleProjection() {
     projection_ = c_->getFigure();
 }
 
-void SimpleCanvas::togglePolyFill() {
+void SimpleCanvas::togglePolyFill() {    
     fillPoly_ = !fillPoly_;
 }
 

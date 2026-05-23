@@ -23,6 +23,7 @@ public:
     void draw_dot(cairo_t* cr, double x, double y);
 
     // Отрисовка фигуры
+    void setDash(cairo_t* cr);
     void drawVert(cairo_t* cr);
     void drawEdges(cairo_t* cr);
     void drawFaces(cairo_t* cr);
