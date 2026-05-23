@@ -177,7 +177,7 @@ void GuiApp::activate(GtkApplication* app) {
     status_vert = gtk_builder_get_object(builder, "status_vert");
     status_file = gtk_builder_get_object(builder, "status_file");
     status_edges = gtk_builder_get_object(builder, "status_edges");
-    vertSizeButton = gtk_builder_get_object(builder, "vert_size_button");
+    vertSizeButton = gtk_builder_get_object(builder, "vert_size_spinner");
     g_object_set_data(G_OBJECT(noneModeCheck), "mode", GINT_TO_POINTER(None));
     g_object_set_data(G_OBJECT(rectModeCheck), "mode", GINT_TO_POINTER(Rect));
     g_object_set_data(G_OBJECT(circModeCheck), "mode", GINT_TO_POINTER(Circle));
@@ -256,7 +256,7 @@ void GuiApp::openFileSelected(const std::string& path) {
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(zSpinnerButton),0);
     executeCommand(resetCommand);
     updateStatusBar();
-    canvas->redraw();
+    getCanvas()->redraw();
 }
 
 AppData& GuiApp::getAppData() {
