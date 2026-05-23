@@ -98,6 +98,8 @@ void GuiApp::onProjSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer use
     bool active = gtk_switch_get_active(GTK_SWITCH(self->projSwitch));
     self->getAppData().setProjSwitch(active);
     self->executeCommand(self->projSwitchCommand);
+    auto* canvas = self->getCanvas();
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->scaleSpinnerButton), canvas->getScale());
 }
 
 void GuiApp::onFillSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {

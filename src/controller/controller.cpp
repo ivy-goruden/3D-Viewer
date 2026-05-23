@@ -65,7 +65,7 @@ namespace s21{
         figure_ = figure;
 
         s21::matrix_t shapeVert = figure_->getMatrix();
-        s21::Bounds b = s21::Matrix::getBounds(shapeVert);
+        s21::Bounds b = figure_->getBounds();
         matrix_t fig = s21::Transformer::Translate(-(b.maxx + b.minx)/2, -(b.maxy + b.miny)/2, -(b.maxz + b.minz)/2, shapeVert);
         figure->setMatrix(fig);
 
@@ -73,9 +73,9 @@ namespace s21{
         int y = b.maxy - b.miny;
         int z = b.maxz - b.minz;        
         diagonal_ =  std::sqrt(std::pow(x, 2) + std::pow(y, 2) + std::pow(z, 2))+10;
-
-        s21::Bounds bn = s21::Matrix::getBounds(fig);
-        Vert_t projection_ = getFigureProjection(fig, bn.minz);
+        //recount bounds
+        b = figure_->getBounds();
+        Vert_t projection_ = getFigureProjection(fig, b.minz);
 
         camera_ = diagonal_;
         scale_ = camera_;

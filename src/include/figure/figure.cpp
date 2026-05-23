@@ -86,7 +86,8 @@ namespace s21{
     }
 
     void Figure::setMatrix(matrix_t m){
-        matrix_ = m;
+        matrix_ = std::move(m);
+        bounds = Matrix::getBounds(matrix_);
     }
 
     int Figure::getVerticesNum() {
