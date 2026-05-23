@@ -1,7 +1,6 @@
 #include "controller.hpp"
 #include "../include/obj_parser/obj_loader.hpp"
 #include "../include/affine_transformer/transformer.hpp"
-#include "../include/projection/projection.hpp"
 #include "../include/affine_transformer/matrix.hpp"
 #include <cmath>
 #include <iostream>

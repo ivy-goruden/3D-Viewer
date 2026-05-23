@@ -2,7 +2,6 @@
 #include <iostream>
 #include <format>
 #include "../include/globals.h"
-#include "../include/projection/projection.hpp"
 #include "../include/axes.hpp"
 
 // Реализация методов класса SimpleCanvas для GTK4

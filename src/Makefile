@@ -20,13 +20,13 @@ install:
 
 uninstall:
 
-clean:
-	find . -type f \( -name '*.app' -o -name '*.out' -o -name '*.so' -o -name '*.a' -o -name '*.o' \) -exec rm -f {} +
-
 dvi:
 
 dist:
  
+clean:
+	find . -type f \( -name '*.app' -o -name '*.out' -o -name '*.so' -o -name '*.a' -o -name '*.o' \) -exec rm -f {} +
+
 tests: $(TESTS_OBJS) 3Dtransformer.a
 	g++ $(TESTS_OBJS) -L. -l3Dtransformer -o tests.out $(GTEST_LIBS)
 	./tests.out
@@ -34,23 +34,11 @@ tests: $(TESTS_OBJS) 3Dtransformer.a
 3Dtransformer.a: $(LIB_OBJS)
 	ar rcs lib3Dtransformer.a $^
 
-gtk01:
-	g++ $(CXXFLAGS) gtk01.cpp -o gtk01.app $(GTKFLAGS) -lm
-
-gtk01run: gtk01
-	./gtk01.app
-
 gtk02: 3Dtransformer.a
-	g++ $(CXXFLAGS) gtk02.cpp $(GUI_SOURCE) include/projection/projection.cpp include/grid.cpp include/axes.cpp controller/controller.cpp -L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
+	g++ $(CXXFLAGS) gtk02.cpp $(GUI_SOURCE) controller/controller.cpp -L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
 
 gtk02run: gtk02
 	./gtk02.app
-
-loader:
-	g++ $(CXXFLAGS) loader_test.cpp include/obj_parser/obj_loader.cpp -o loader.app $(GTKFLAGS) -lm
-
-loaderrun: loader
-	./loader.app
 
 proj:
 	g++ $(CXXFLAGS) projection/main.cpp include/figure/figure.cpp include/obj_parser/obj_loader.cpp projection/gui.cpp include/affine_transformer/transformer.cpp include/grid.cpp -o projection/projection.app $(GTKFLAGS) -lm -lrt
