@@ -4,7 +4,8 @@
 #include "../include/globals.h"
 #include "../include/axes.hpp"
 
-// Реализация методов класса SimpleCanvas для GTK4
+//singleton
+SimpleCanvas* simple_canvas_= nullptr;
 
 SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     // Устанавливаем функцию рисования (вместо сигнала "draw")
@@ -27,6 +28,14 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     lineType_ = Solid;
     width_ = 1;
     height_ = 1;
+}
+
+SimpleCanvas *SimpleCanvas::GetInstance(GtkWidget* drawing_area)
+{
+    if(simple_canvas_==nullptr){
+        simple_canvas_ = new SimpleCanvas(drawing_area);
+    }
+    return simple_canvas_;
 }
 
 SimpleCanvas::~SimpleCanvas() {

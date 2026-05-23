@@ -215,14 +215,21 @@ void GuiApp::activate(GtkApplication* app) {
 
     colorDialog = new ColorDialog(GTK_WINDOW(window));
 
-    auto canvas_shared = std::make_shared<SimpleCanvas>(GTK_WIDGET(paper));    
-    // Сохраняем shared_ptr в куче, чтобы передать в колбэки
-    auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas_shared);    
-    // Привязываем к окну, чтобы удалить shared_ptr при уничтожении окна
-    g_object_set_data_full(G_OBJECT(window), "canvas", canvas_ptr,
-        [](gpointer data) {
-            delete static_cast<std::shared_ptr<SimpleCanvas>*>(data);
-        });
+    // auto canvas_shared = std::make_shared<SimpleCanvas>(GTK_WIDGET(paper));    
+    // // Сохраняем shared_ptr в куче, чтобы передать в колбэки
+    // auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas_shared);    
+    // // Привязываем к окну, чтобы удалить shared_ptr при уничтожении окна
+    // g_object_set_data_full(G_OBJECT(window), "canvas", canvas_ptr,
+    //     [](gpointer data) {
+    //         delete static_cast<std::shared_ptr<SimpleCanvas>*>(data);
+    //     });
+
+    SimpleCanvas* canvas = SimpleCanvas::GetInstance(GTK_WIDGET(paper));
+    g_object_set_data_full(G_OBJECT(window), "canvas", canvas,
+    [](gpointer data) {
+        delete static_cast<SimpleCanvas*>(data);
+    });
+
 
     gtk_label_set_text(GTK_LABEL(status_vert), "Вершины: 0");
     gtk_label_set_text(GTK_LABEL(status_edges), "Рёбра: 0");
@@ -294,9 +301,9 @@ void GuiApp::executeCommand(Command *cmd) {
 }
 
 SimpleCanvas* GuiApp::getCanvas(){
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+    auto* canvas =  static_cast<SimpleCanvas*>(
     g_object_get_data(window, "canvas"));
-    return canvas ? canvas->get() : nullptr;
+    return canvas ? canvas : nullptr;
 }
 
 void GuiApp::updateStatusBar(){

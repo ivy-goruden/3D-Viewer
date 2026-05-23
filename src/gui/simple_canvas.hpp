@@ -11,8 +11,11 @@
 
 class SimpleCanvas {
 public:
+
+    SimpleCanvas(SimpleCanvas &other) = delete;
+    void operator=(const SimpleCanvas &) = delete;
     // Конструктор принимает GtkApplication
-    SimpleCanvas(GtkWidget* drawing_area);
+    static SimpleCanvas* GetInstance(GtkWidget* drawing_area);
     ~SimpleCanvas();
     void onDraw(cairo_t* cr, int width, int height);
     void redraw();
@@ -56,6 +59,7 @@ public:
     int getVerticesNum();
 
 private:
+    SimpleCanvas(GtkWidget* drawing_area);
     GtkWidget* drawing_area;
     // Статические колбэки GTK
     static void on_draw_static(GtkDrawingArea* area, cairo_t* cr,
