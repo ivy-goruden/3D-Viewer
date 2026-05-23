@@ -1,4 +1,5 @@
 #include "figure.hpp"
+#include "../affine_transformer/matrix.hpp"
 
 namespace s21{
 
@@ -15,21 +16,8 @@ namespace s21{
             m.push_back({v.x, v.y, v.z, 1.0});
         }
         matrix_ = std::move(m);
+        bounds = Matrix::getBounds(matrix_);
         
-        bounds = {
-            matrix_[0][0], matrix_[0][0],
-            matrix_[0][1], matrix_[0][1],
-            matrix_[0][2], matrix_[0][2]
-        };
-        for (int i = 0; i < matrix_.size(); i++) {
-            if (bounds.maxx < matrix_[i][0]) bounds.maxx = matrix_[i][0];
-            if (bounds.minx > matrix_[i][0]) bounds.minx = matrix_[i][0];
-            if (bounds.maxy < matrix_[i][1]) bounds.maxy = matrix_[i][1];
-            if (bounds.miny > matrix_[i][1]) bounds.miny = matrix_[i][1];
-            if (bounds.maxz < matrix_[i][2]) bounds.maxz = matrix_[i][2];
-            if (bounds.minz > matrix_[i][2]) bounds.minz = matrix_[i][2];
-        }
-
         Edge_t l = Edge_t();
         for (const auto& line : loader.lines) {
             if (line.size() <2) {continue;}
@@ -87,18 +75,6 @@ namespace s21{
 
     Vert_t Figure::getProjection(){
         return projectionVertices_;
-    }
-
-    double Figure::getMinz() {
-        return bounds.minz;
-    }
-
-    double Figure::getMinz(matrix_t& m) {
-        double mz = m[0][2];
-        for (int i = 0; i < m.size(); i++) {
-            if (mz > m[i][2]) mz = m[i][2];
-        }
-        return mz;
     }
 
     Poly_t Figure::getPolygons() {

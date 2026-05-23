@@ -28,8 +28,6 @@ class Figure{
         int getVerticesNum();
         int getNodesNum();
         Vert_t getProjection();
-        double getMinz();
-        double getMinz(matrix_t& m);
         Bounds getBounds();
 };
 
