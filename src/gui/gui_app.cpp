@@ -235,7 +235,6 @@ void GuiApp::bgcolorSelected(double red, double green, double blue, double alpha
 }
 
 void GuiApp::openFileSelected(const std::string& path) {
-    g_print("%s\n", path.c_str());
     getAppData().setPath(path);
     auto* canvas =  getCanvas();
     canvas->loadFigure(path.c_str());
