@@ -30,6 +30,7 @@ class GuiApp {
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
     static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onStatusUpdate();
 
   public:
@@ -62,6 +63,7 @@ class GuiApp {
     GObject* status_vert;
     GObject* status_file;
     GObject* status_edges;
+    GObject* vertSizeButton;
     GuiApp();
     ~GuiApp();
     int run(int argc, char **argv);
@@ -92,6 +94,7 @@ class GuiApp {
     Command* colorCommand;
     Command* bgcolorCommand;
     Command* weightCommand;
+    Command* vertSizeCommand;
     void createCommands();
 
   public:

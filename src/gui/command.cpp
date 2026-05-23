@@ -115,3 +115,9 @@ void WeightCommand::execute() {
     canvas->redraw();
 }
 
+void VertSizeCommand::execute() {
+    SimpleCanvas* canvas = app->getCanvas();
+    canvas->setVertSize(app->getAppData().getVertSize());
+    canvas->redraw();
+}
+

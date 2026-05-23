@@ -108,8 +108,10 @@ namespace s21{
                 }
             }
             Unique(nodes);
+            for (auto node : nodes){
+                printf("%d - %d\n", node.start, node.end);
+            }
             nodesNum = nodes.size();
-            printf("%d", nodes.size());
         }
 
         return *nodesNum;

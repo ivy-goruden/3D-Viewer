@@ -25,6 +25,7 @@ struct AppData {
     Rgb color;
     Rgb bgcolor;
     int weight;
+    int vertSize;
   public:
     AppData() {
       angleX = 135;
@@ -87,6 +88,9 @@ struct AppData {
     int getWeight() const {
         return weight;
     }
+    int getVertSize() const {
+        return vertSize;
+    }
     void setPath(std::string val) {
         path = val;
     }
@@ -131,6 +135,9 @@ struct AppData {
     }
     void setWeight(int val) {
         weight = val;
+    }
+    void setVertSize(int val) {
+        vertSize = val;
     }
     std::string toString() {
         std::string sPath = path == "" ? "не выбран" : path;

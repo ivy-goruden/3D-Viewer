@@ -46,6 +46,7 @@ public:
     void setBgColor(Rgb color);
     void setVertColor(Rgb color);
     void setLineWidth(double width);
+    void setVertSize(double size);
     double getAngleX();
     double getAngleY();
     double getAngleZ();

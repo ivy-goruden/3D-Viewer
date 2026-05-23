@@ -137,6 +137,13 @@ void GuiApp::onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data)
     self->updateStatusBar();
 }
 
+void GuiApp::onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
+    GuiApp *self = static_cast<GuiApp*>(user_data);
+    double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->vertSizeButton));
+    self->getAppData().setVertSize(value);
+    self->executeCommand(self->vertSizeCommand); 
+}
+
 GuiApp::GuiApp() {
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
@@ -176,6 +183,7 @@ void GuiApp::activate(GtkApplication* app) {
     status_vert = gtk_builder_get_object(builder, "status_vert");
     status_file = gtk_builder_get_object(builder, "status_file");
     status_edges = gtk_builder_get_object(builder, "status_edges");
+    vertSizeButton = gtk_builder_get_object(builder, "vert_size_button");
     g_object_set_data(G_OBJECT(noneModeCheck), "mode", GINT_TO_POINTER(None));
     g_object_set_data(G_OBJECT(rectModeCheck), "mode", GINT_TO_POINTER(Rect));
     g_object_set_data(G_OBJECT(circModeCheck), "mode", GINT_TO_POINTER(Circle));
@@ -202,6 +210,7 @@ void GuiApp::activate(GtkApplication* app) {
     g_signal_connect(rectModeCheck, "notify::active", G_CALLBACK(onVertModeToggled), this);
     g_signal_connect(circModeCheck, "notify::active", G_CALLBACK(onVertModeToggled), this);
     g_signal_connect(weightSpinnerButton, "value_changed", G_CALLBACK(onWeightSpinnerValueChanged), this);
+    g_signal_connect(vertSizeButton, "value_changed", G_CALLBACK(onVertSizeSpinnerValueChanged), this);
 
     gtk_window_set_application(GTK_WINDOW(window), app);
     gtk_window_present(GTK_WINDOW(window));
@@ -254,8 +263,8 @@ void GuiApp::openFileSelected(const std::string& path) {
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(xSpinnerButton),0);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(zSpinnerButton),0);
     executeCommand(resetCommand);
-    canvas->redraw();
     updateStatusBar();
+    canvas->redraw();
 }
 
 AppData& GuiApp::getAppData() {
@@ -284,6 +293,7 @@ void GuiApp::createCommands() {
     this->colorCommand = new ColorCommand(this);
     this->bgcolorCommand = new BgColorCommand(this);
     this->weightCommand = new WeightCommand(this);
+    this->vertSizeCommand = new VertSizeCommand(this);
 }
 
 void GuiApp::executeCommand(Command *cmd) {

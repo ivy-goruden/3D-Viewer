@@ -41,8 +41,10 @@ namespace s21 {
             return ((start == other.start && end == other.end) || (start == other.end && end == other.start));
         }
         bool operator<(const Seg_t& other) const {
-            if (start != other.start) return start < other.start;
-            return end < other.end;
+            int a1 = std::min(start, end), b1 = std::max(start, end);
+            int a2 = std::min(other.start, other.end), b2 = std::max(other.start, other.end);
+            if (a1 != a2) return a1 < a2;
+            return b1 < b2;
         }
     };
 

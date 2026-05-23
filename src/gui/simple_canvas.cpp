@@ -84,6 +84,8 @@ void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
 void SimpleCanvas::drawVert(cairo_t* cr) {
     for (const auto& point : projection_) {
         draw_dot(cr, point.x, point.y);
+        // g_print("smth");
+        // g_print("scale: %f, lineWidth: %f", canvas_scale_, lineWidth_/canvas_scale_*0.1);
     }
 }
 
@@ -223,6 +225,11 @@ void SimpleCanvas::setVertColor(Rgb color){
 void SimpleCanvas::setLineWidth(double width){
     lineWidth_ = width;
 }
+
+void SimpleCanvas::setVertSize(double size){
+    vertWidth_ = size;
+}
+
 
 //расстояние до камеры
 void SimpleCanvas::setCamera(int camera) {
