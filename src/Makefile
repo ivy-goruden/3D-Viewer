@@ -35,7 +35,7 @@ tests: $(TESTS_OBJS) 3Dtransformer.a
 	ar rcs lib3Dtransformer.a $^
 
 gtk02: 3Dtransformer.a
-	g++ $(CXXFLAGS) gtk02.cpp $(GUI_SOURCE) controller/controller.cpp -L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
+	g++ $(CXXFLAGS) gtk02.cpp $(GUI_SOURCE) controller/controller.cpp -I . -L. -l3Dtransformer -o gtk02.app $(GTKFLAGS) -lm
 
 gtk02run: gtk02
 	./gtk02.app
