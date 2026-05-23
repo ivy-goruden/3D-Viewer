@@ -22,11 +22,6 @@ void GuiApp::onOpenButtonClick(GtkButton* btn, gpointer user_data) {
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->scaleCommand),self->getAppData().getScale());
 }
 
-void GuiApp::onSaveButtonClick(GtkButton* btn, gpointer user_data) {
-    GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->executeCommand(self->saveCommand);
-}
-
 void GuiApp::onResetButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->executeCommand(self->resetCommand);
@@ -155,7 +150,6 @@ void GuiApp::activate(GtkApplication* app) {
 
     window = gtk_builder_get_object(builder, "main");
     openButton = gtk_builder_get_object(builder, "open_button");
-    saveButton = gtk_builder_get_object(builder, "save_button");
     resetButton = gtk_builder_get_object(builder, "reset_button");
     colorButton = gtk_builder_get_object(builder, "color_button");
     bgcolorButton = gtk_builder_get_object(builder, "bgcolor_button");
@@ -184,7 +178,6 @@ void GuiApp::activate(GtkApplication* app) {
     g_object_unref(builder);
 
     g_signal_connect(openButton, "clicked", G_CALLBACK(onOpenButtonClick), this);
-    g_signal_connect(saveButton, "clicked", G_CALLBACK(onSaveButtonClick), this);
     g_signal_connect(resetButton, "clicked", G_CALLBACK(onResetButtonClick), this);
     g_signal_connect(colorButton, "clicked", G_CALLBACK(onColorButtonClick), this);
     g_signal_connect(bgcolorButton, "clicked", G_CALLBACK(onBgColorButtonClick), this);
@@ -268,7 +261,6 @@ const AppData& GuiApp::getAppData() const {
 
 void GuiApp::createCommands() {
     this->openCommand = new OpenCommand(this);
-    this->saveCommand = new SaveCommand(this);
     this->resetCommand = new ResetCommand(this);
     this->rotateXCommand = new RotateXCommand(this);
     this->rotateYCommand = new RotateYCommand(this);
