@@ -33,10 +33,6 @@ all: $(TARGET)
 $(DISTDIR):
 	mkdir -p $(DISTDIR)
 
-# Создание папок
-$(BINDIR):
-	mkdir -p $(BINDIR)
-
 # Установка программы
 install: $(TARGET)
 	install -d $(INSTALLDIR)
