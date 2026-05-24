@@ -37,8 +37,8 @@ struct AppData {
     AppData(std::string sets) {
         std::cout << "[" << sets << "]" << std::endl;
         settings = sets;
-        angleX = 135;
-        angleY = 90;
+        angleX = 0;
+        angleY = 0;
         angleZ = 0;
         shift = 0;
         shiftV = 0;

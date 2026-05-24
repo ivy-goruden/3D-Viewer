@@ -8,9 +8,9 @@
 namespace s21{
 
     Controller::Controller() {
-        angleX_ = X2_d;
-        angleY_ = Y2_d;
-        angleZ_ = Z2_d;
+        angleX_ = 0;
+        angleY_ = 0;
+        angleZ_ = 0;
         camera_ = 10;
     }
 

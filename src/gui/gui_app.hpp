@@ -31,6 +31,7 @@ class GuiApp {
     static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onStatusUpdate();
+    void restoreSett();
 
   public:
     std::string ui_file;
@@ -71,8 +72,8 @@ class GuiApp {
     void bgcolorSelected(double red, double green, double blue, double alpha);
     void openFileSelected(const std::string& path);
     void updateStatusBar();
-    AppData& getAppData();
-    const AppData& getAppData() const;
+    AppData* getAppData();
+    const AppData* getAppData() const;
     SimpleCanvas* getCanvas();
 
   private:
