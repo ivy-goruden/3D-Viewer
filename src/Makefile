@@ -24,6 +24,12 @@ dvi:
 
 dist:
  
+cf-check:
+	clang-format -i ./**/*.hpp
+	clang-format -i ./**/*.cpp
+	clang-format -i ./**/*.[hc]
+	clang-format -i ./*.cpp
+
 clean:
 	find . -type f \( -name '*.app' -o -name '*.out' -o -name '*.so' -o -name '*.a' -o -name '*.o' \) -exec rm -f {} +
 
@@ -39,12 +45,6 @@ gtk02: 3Dtransformer.a
 
 gtk02run: gtk02
 	./gtk02.app
-
-proj:
-	g++ $(CXXFLAGS) projection/main.cpp include/figure/figure.cpp include/obj_parser/obj_loader.cpp projection/gui.cpp include/affine_transformer/transformer.cpp include/grid.cpp -o projection/projection.app $(GTKFLAGS) -lm -lrt
-
-projrun: proj
-	projection/projection.app
 
 valgrind:
 	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
