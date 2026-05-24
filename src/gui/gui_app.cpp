@@ -239,6 +239,7 @@ void GuiApp::activate(GtkApplication* app) {
     gtk_label_set_text(GTK_LABEL(status_file), "Файл: не выбран");
 
     getAppData().loadFromFile(settings_file);
+    getCanvas()->redraw();
 }
 
 void GuiApp::colorSelected(double red, double green, double blue, double alpha) {

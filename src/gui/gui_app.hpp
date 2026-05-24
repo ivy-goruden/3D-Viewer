@@ -62,12 +62,8 @@ class GuiApp {
     GObject* status_vert;
     GObject* status_file;
     GObject* status_edges;
-<<<<<<< HEAD
-    GuiApp(std::string, std::string);
-=======
     GObject* vertSizeButton;
-    GuiApp();
->>>>>>> 8a39f72bf22ace80665beee90a73f5fbdec93444
+    GuiApp(std::string, std::string);
     ~GuiApp();
     int run(int argc, char **argv);
     void activate(GtkApplication *app);
