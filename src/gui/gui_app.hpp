@@ -29,6 +29,7 @@ class GuiApp {
     static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
     static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
     static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
+    static void onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onStatusUpdate();
 
   public:
@@ -61,7 +62,12 @@ class GuiApp {
     GObject* status_vert;
     GObject* status_file;
     GObject* status_edges;
+<<<<<<< HEAD
     GuiApp(std::string, std::string);
+=======
+    GObject* vertSizeButton;
+    GuiApp();
+>>>>>>> 8a39f72bf22ace80665beee90a73f5fbdec93444
     ~GuiApp();
     int run(int argc, char **argv);
     void activate(GtkApplication *app);
@@ -90,6 +96,7 @@ class GuiApp {
     Command* colorCommand;
     Command* bgcolorCommand;
     Command* weightCommand;
+    Command* vertSizeCommand;
     void createCommands();
 
   public:

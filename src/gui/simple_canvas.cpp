@@ -4,7 +4,8 @@
 #include "../include/globals.h"
 #include "../include/axes.hpp"
 
-// Реализация методов класса SimpleCanvas для GTK4
+//singleton
+SimpleCanvas* simple_canvas_= nullptr;
 
 SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     // Устанавливаем функцию рисования (вместо сигнала "draw")
@@ -17,7 +18,7 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     widget_ = drawing_area;
     c_ = new s21::Controller();
     dotColor_ = Rgb(1,0,0,1);
-    lineColor_ = Rgb(0,1,0,1);
+    lineColor_ = Rgb(0,0,0,1);
     polyColor_ = Rgb(0,0,1,1);
     bgColor_ = Rgb(1,1,1,1);
     fillPoly_ = false;
@@ -27,6 +28,14 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     lineType_ = Solid;
     width_ = 1;
     height_ = 1;
+}
+
+SimpleCanvas *SimpleCanvas::GetInstance(GtkWidget* drawing_area)
+{
+    if(simple_canvas_==nullptr){
+        simple_canvas_ = new SimpleCanvas(drawing_area);
+    }
+    return simple_canvas_;
 }
 
 SimpleCanvas::~SimpleCanvas() {
@@ -113,11 +122,13 @@ void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, 
 }
 
 void SimpleCanvas::loadFigure(const char* filename) {
-    projection_ = c_->loadFigure(filename, width_, height_);    
+    projection_ = c_->loadFigure(filename, width_, height_);
 }
 
 void SimpleCanvas::redraw(){
-    gtk_widget_queue_draw(GTK_WIDGET(widget_));
+    if (widget_ != nullptr){
+        g_idle_add((GSourceFunc)gtk_widget_queue_draw, widget_);
+    }
 }
 
 void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
@@ -133,7 +144,7 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
 void SimpleCanvas::setCanvas(cairo_t* cr){
     if (width_ <= 0 || height_ <= 0)
         return;
-    g_print("Drawing area is %d x %d\n", width_, height_);
+    //g_print("Drawing area is %d x %d\n", width_, height_);
     cairo_translate(cr, width_ / 2.0, height_ / 2.0);
     s21::Bounds bounds = c_->getFigureBounds();
     int fwidth = bounds.maxx-bounds.minx;
@@ -142,7 +153,6 @@ void SimpleCanvas::setCanvas(cairo_t* cr){
         return;
     this->canvas_scale_ = (double)width_/fwidth;
     cairo_scale(cr, canvas_scale_, canvas_scale_);
-    g_print("Scale is %f x %f\n", (double)width_/fwidth, (double)height_/fheight);
 }
 
 void SimpleCanvas::shiftX(int x){
@@ -223,6 +233,11 @@ void SimpleCanvas::setVertColor(Rgb color){
 void SimpleCanvas::setLineWidth(double width){
     lineWidth_ = width;
 }
+
+void SimpleCanvas::setVertSize(double size){
+    vertWidth_ = size;
+}
+
 
 //расстояние до камеры
 void SimpleCanvas::setCamera(int camera) {

@@ -115,4 +115,10 @@ class WeightCommand : public Command {
     void execute() override;
 };
 
+class VertSizeCommand : public Command{
+  public:
+    VertSizeCommand(GuiApp* app) : Command(app) {};
+    void execute() override;
+};
+
 #endif

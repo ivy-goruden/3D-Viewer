@@ -16,7 +16,8 @@ class Figure{
         Vert_t projectionVertices_;     //transformed projection of original figure
         double minz;
         Bounds bounds;
-        void Unique(Edge_t&);
+        void Unique(Edge_t&) const;
+        mutable std::optional<int> nodesNum;
     
     public:
         Figure(matrix_t, Poly_t, Edge_t);
@@ -26,7 +27,7 @@ class Figure{
         matrix_t getMatrix();
         void setMatrix(matrix_t);
         int getVerticesNum();
-        int getNodesNum();
+        int getNodesNum() const;
         Vert_t getProjection();
         Bounds getBounds();
 };

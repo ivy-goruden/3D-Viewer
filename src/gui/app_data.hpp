@@ -32,7 +32,7 @@ struct AppData {
     Rgb color;
     Rgb bgcolor;
     int weight;
-
+    int vertSize;
   public:
     AppData(std::string sets) {
         std::cout << "[" << sets << "]" << std::endl;
@@ -112,7 +112,9 @@ struct AppData {
     int getWeight() const {
         return weight;
     }
-
+    int getVertSize() const {
+        return vertSize;
+    }
     void setPath(std::string val) {
         path = val;
         saveToFile(settings);
@@ -186,6 +188,9 @@ struct AppData {
     void setWeight(int val) {
         weight = val;
         saveToFile(settings);
+    }
+    void setVertSize(int val) {
+        vertSize = val;
     }
 
     json toJson() const {        

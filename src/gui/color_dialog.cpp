@@ -27,7 +27,7 @@ void ColorDialog::onColorSelected(GObject *source, GAsyncResult *result, gpointe
 }
 
 void ColorDialog::open(Rgb color) {
-    g_print("Нач цвет: r=%.2f g=%.2f b=%.2f a=%.2f\n", color.red, color.green, color.blue, color.alpha);
+    //g_print("Нач цвет: r=%.2f g=%.2f b=%.2f a=%.2f\n", color.red, color.green, color.blue, color.alpha);
 
     GdkRGBA initial_color = {
         .red = float(color.red),

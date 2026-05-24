@@ -67,7 +67,7 @@ namespace s21{
         // }
     }
 
-    void Figure::Unique(Edge_t &vec){
+    void Figure::Unique(Edge_t &vec) const {
         std::sort(vec.begin(), vec.end());
         auto last = std::unique(vec.begin(), vec.end());
         vec.erase(last, vec.end());
@@ -98,8 +98,20 @@ namespace s21{
         return edges_;
     }
 
-    int Figure::getNodesNum() {
-        return edges_.size();
+    int Figure::getNodesNum() const {
+        if (!nodesNum.has_value()){
+            std::vector<Seg_t> nodes = {};
+            for(auto dots: polygons_){
+                for(int i=1; i<dots.size(); i++){
+                    Seg_t node = Seg_t(dots[i-1], dots[i]);
+                    nodes.push_back(node);
+                }
+            }
+            Unique(nodes);
+            nodesNum = nodes.size();
+        }
+
+        return *nodesNum;
     }
 
     Bounds Figure::getBounds() {
