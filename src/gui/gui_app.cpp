@@ -132,7 +132,10 @@ void GuiApp::onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data)
     self->updateStatusBar();
 }
 
-GuiApp::GuiApp() {
+GuiApp::GuiApp(std::string ui, std::string sets) {
+    ui_file = ui;
+    settings_file = sets;
+    appData = new AppData(settings_file);
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
 
@@ -218,6 +221,8 @@ void GuiApp::activate(GtkApplication* app) {
     gtk_label_set_text(GTK_LABEL(status_vert), "Вершины: 0");
     gtk_label_set_text(GTK_LABEL(status_edges), "Рёбра: 0");
     gtk_label_set_text(GTK_LABEL(status_file), "Файл: не выбран");
+
+    getAppData().loadFromFile(settings_file);
 }
 
 void GuiApp::colorSelected(double red, double green, double blue, double alpha) {
@@ -251,11 +256,11 @@ void GuiApp::openFileSelected(const std::string& path) {
 }
 
 AppData& GuiApp::getAppData() {
-    return appData;
+    return *appData;
 }
 
 const AppData& GuiApp::getAppData() const {
-    return appData;
+    return *appData;
 }
 
 void GuiApp::createCommands() {

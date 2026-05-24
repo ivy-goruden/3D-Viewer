@@ -11,7 +11,7 @@
 
 class GuiApp {
   private:
-    AppData appData;
+    AppData *appData;
     static void onColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onBgColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onActivate(GtkApplication *app, gpointer user_data);
@@ -33,6 +33,7 @@ class GuiApp {
 
   public:
     std::string ui_file;
+    std::string settings_file;
     GtkApplication *app;
     GObject* window;
     GObject* openButton;
@@ -60,7 +61,7 @@ class GuiApp {
     GObject* status_vert;
     GObject* status_file;
     GObject* status_edges;
-    GuiApp();
+    GuiApp(std::string, std::string);
     ~GuiApp();
     int run(int argc, char **argv);
     void activate(GtkApplication *app);
