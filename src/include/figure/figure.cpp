@@ -5,10 +5,16 @@ namespace s21{
 
     Figure::Figure(matrix_t m, Poly_t p, Edge_t n): matrix_(m), polygons_(p), edges_(n){
         projectionVertices_ = Vert_t();
+        minz = 0.0;
         bounds = {0, 0, 0, 0, 0, 0};
+        nodesNum = 0;
+        projectionVertices_ = Vert_t();
     }
 
     Figure::Figure(ObjLoader loader){
+        minz = 0.0;
+        bounds = {0, 0, 0, 0, 0, 0};
+        nodesNum = 0;
         projectionVertices_ = Vert_t();
 
         matrix_t m = matrix_t();
@@ -44,27 +50,6 @@ namespace s21{
             polygons_.push_back(poly);
         }
         
-        // анализ групп
-        // if (loader.groups.size() > 0) {
-        //     printf("group size %ld\n", loader.groups.at(0).size());
-        //     for (s21::GroupElement_t e : loader.groups.at(0)) {
-        //         if (e.kind == FACE) {
-        //             std::vector<int> poly;
-        //             for (s21::FaceElementObj_t el : loader.faces.at(e.index)){
-        //                 poly.push_back(el.vi-1);
-        //             }
-        //             polygons_.push_back(poly);
-        //         }
-        //     }
-        // } else {
-        //     for (s21::FaceObj_t f : loader.faces) {
-        //         std::vector<int> poly;
-        //         for (FaceElementObj_t el: f) {
-        //             poly.push_back(el.vi-1);
-        //         }
-        //         polygons_.push_back(poly);
-        //     }
-        // }
     }
 
     void Figure::Unique(Edge_t &vec) const {

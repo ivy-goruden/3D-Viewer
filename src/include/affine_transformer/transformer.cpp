@@ -35,6 +35,9 @@ namespace s21{
     }
 
     matrix_t Transformer::Rotate(int angleX_deg, int angleY_deg, int angleZ_deg, const matrix_t& original) {
+        if (original.empty()){
+            return matrix_t();
+        }
         double angleX = angleX_deg * M_PI / 180.0;
         double angleY = angleY_deg * M_PI / 180.0;
         double angleZ = angleZ_deg * M_PI / 180.0;
@@ -63,6 +66,9 @@ namespace s21{
     }
 
     matrix_t Transformer::Translate(double tx, double ty, double tz, const matrix_t& original) {
+        if (original.empty()){
+            return matrix_t();
+        }
         const matrix_t translate = {
             {1, 0, 0, 0},
             {0, 1, 0, 0},
@@ -73,6 +79,9 @@ namespace s21{
     }
 
     matrix_t Transformer::Scale(double sx, double sy, double sz, const matrix_t& original) {
+        if (original.empty()){
+            return matrix_t();
+        }
         const matrix_t sc = {
             {sx, 0, 0, 0},
             {0, sy, 0, 0},

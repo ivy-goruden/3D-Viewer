@@ -4,9 +4,6 @@
 #include "../include/globals.h"
 #include "../include/axes.hpp"
 
-//singleton
-SimpleCanvas* simple_canvas_= nullptr;
-
 SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     // Устанавливаем функцию рисования (вместо сигнала "draw")
     gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(drawing_area),
@@ -28,18 +25,23 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     lineType_ = Solid;
     width_ = 1;
     height_ = 1;
+    canvas_scale_ = 1;
+    projection_ = s21::Vert_t();
 }
 
-SimpleCanvas *SimpleCanvas::GetInstance(GtkWidget* drawing_area)
+std::unique_ptr<SimpleCanvas> SimpleCanvas::simple_canvas_ = nullptr;
+
+SimpleCanvas* SimpleCanvas::GetInstance(GtkWidget* drawing_area)
 {
-    if(simple_canvas_==nullptr){
-        simple_canvas_ = new SimpleCanvas(drawing_area);
+    if (!simple_canvas_) {
+        simple_canvas_ = std::unique_ptr<SimpleCanvas>(new SimpleCanvas(drawing_area));
     }
-    return simple_canvas_;
+    return simple_canvas_.get();
 }
+
 
 SimpleCanvas::~SimpleCanvas() {
-    // Деструктор (можно оставить пустым или освободить ресурсы)
+    delete c_;
 }
 
 void SimpleCanvas::setDash(cairo_t* cr) {
@@ -82,9 +84,11 @@ void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
     switch(vertType_) {
         case Circle:
             cairo_arc(cr, x, y, vertWidth_/canvas_scale_*2, 0, 2 * M_PI);
+            break;
         case Rect:
             double d = vertWidth_/canvas_scale_*2*std::sqrt(2)/2;
             cairo_rectangle (cr, x-d, y-d, 2*d, 2*d);
+            break;
     }
     cairo_set_source_rgb(cr, dotColor_.red, dotColor_.green, dotColor_.blue);
     cairo_fill(cr);
@@ -128,17 +132,22 @@ void SimpleCanvas::loadFigure(const char* filename) {
     projection_ = c_->loadFigure(filename, width_, height_);
 }
 
-void SimpleCanvas::redraw(){
-    if (widget_ != nullptr){
-        g_idle_add((GSourceFunc)gtk_widget_queue_draw, widget_);
+void SimpleCanvas::redraw() {
+    if (widget_ != nullptr) {
+        gtk_widget_queue_draw(widget_);
     }
 }
 
 void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
+    cairo_save(cr);
     cairo_set_source_rgb(cr, bgColor_.red, bgColor_.green, bgColor_.blue);
     cairo_paint(cr);
     cairo_set_line_width(cr, lineWidth_/canvas_scale_*0.1);
     setCanvas(cr);
+    cairo_restore(cr);
+    if (projection_.empty()){
+        return;
+    }
     drawFaces(cr);
     drawEdges(cr);
     drawVert(cr);
@@ -150,16 +159,13 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
 }
 
 void SimpleCanvas::setCanvas(cairo_t* cr){
-    if (width_ <= 0 || height_ <= 0)
-        return;
-    //g_print("Drawing area is %d x %d\n", width_, height_);
-    cairo_translate(cr, width_ / 2.0, height_ / 2.0);
+    if (width_ <= 0 || height_ <= 0) return;
     s21::Bounds bounds = c_->getFigureBounds();
     int fwidth = bounds.maxx-bounds.minx;
     int fheight = bounds.maxy-bounds.miny;
-    if (fwidth <= 0 || fheight <= 0)
-        return;
+    if (fwidth <= 0 || fheight <= 0) return;
     this->canvas_scale_ = (double)width_/fwidth;
+    cairo_translate(cr, width_ / 2.0, height_ / 2.0);
     cairo_scale(cr, canvas_scale_, canvas_scale_);
 }
 

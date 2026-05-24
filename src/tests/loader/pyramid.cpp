@@ -6,7 +6,7 @@
 using namespace s21;
 // Test case 1
 TEST(Pyramid_Test, vertices) {
-    char fname[256] = "../../assets/pyramid.obj";
+    char fname[256] = "assets/pyramid.obj";
     s21::ObjLoader loader = s21::ObjLoader();
     loader.loadObjFile(fname);
 
@@ -14,7 +14,7 @@ TEST(Pyramid_Test, vertices) {
 }
 
 TEST(Pyramid_Test, lines) {
-    char fname[256] = "../../assets/pyramid.obj";
+    char fname[256] = "assets/pyramid.obj";
     s21::ObjLoader loader = s21::ObjLoader();
     loader.loadObjFile(fname);
 
@@ -22,7 +22,7 @@ TEST(Pyramid_Test, lines) {
 }
 
 TEST(Pyramid_Test, faces) {
-    char fname[256] = "../../assets/pyramid.obj";
+    char fname[256] = "assets/pyramid.obj";
     s21::ObjLoader loader = s21::ObjLoader();
     loader.loadObjFile(fname);
 

@@ -43,3 +43,6 @@
 .vscode
 *.glade~
 *.app
+
+!src/assets/cube.obj
+!src/assets/pyramid.obj

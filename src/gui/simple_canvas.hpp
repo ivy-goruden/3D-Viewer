@@ -59,8 +59,10 @@ public:
     int getVerticesNum();
 
 private:
-    SimpleCanvas(GtkWidget* drawing_area);
-    GtkWidget* drawing_area;
+
+    //singleton
+    static std::unique_ptr<SimpleCanvas> simple_canvas_;
+    explicit SimpleCanvas(GtkWidget* drawing_area);
     // Статические колбэки GTK
     static void on_draw_static(GtkDrawingArea* area, cairo_t* cr,
                                int width, int height, gpointer user_data);

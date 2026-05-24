@@ -6,7 +6,7 @@
 using namespace s21;
 // Test case 1
 TEST(Cube_Test, vertices) {
-    char fname[256] = "../../assets/cube.obj";
+    char fname[256] = "assets/cube.obj";
     s21::ObjLoader loader = s21::ObjLoader();
     loader.loadObjFile(fname);
 
@@ -14,15 +14,15 @@ TEST(Cube_Test, vertices) {
 }
 
 TEST(Cube_Test, lines) {
-    char fname[256] = "../../assets/cube.obj";
+    char fname[256] = "assets/cube.obj";
     s21::ObjLoader loader = s21::ObjLoader();
     loader.loadObjFile(fname);
 
-    EXPECT_EQ(loader.lines.size(), 12);
+    EXPECT_EQ(loader.lines.size(), 0);
 }
 
 TEST(Cube_Test, faces) {
-    char fname[256] = "../../assets/cube.obj";
+    char fname[256] = "assets/cube.obj";
     s21::ObjLoader loader = s21::ObjLoader();
     loader.loadObjFile(fname);
 

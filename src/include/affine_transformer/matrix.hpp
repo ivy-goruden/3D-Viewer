@@ -12,7 +12,7 @@ namespace s21 {
 
         static matrix_t multiplyMatrix(const matrix_t *f, const matrix_t *s) {
             int rows = f->size();
-            int cols = s[0].size();
+            int cols = (*s)[0].size();
             int inner = s->size();
             matrix_t nMatrix = createMatrix(rows, cols);
             for (int row = 0; row < rows; row++) {
@@ -33,6 +33,9 @@ namespace s21 {
         }
 
         static Bounds getBounds(matrix_t& matrix_) {
+            if (matrix_.empty()) {
+                return {0,0,0,0,0,0};
+            }
             Bounds bounds = {
                 matrix_[0][0], matrix_[0][0],
                 matrix_[0][1], matrix_[0][1],

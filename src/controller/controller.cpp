@@ -12,6 +12,14 @@ namespace s21{
         angleY_ = 0;
         angleZ_ = 0;
         camera_ = 10;
+        scale_ =1;
+        shiftx_ = 0;
+        shifty_ = 0;
+        diagonal_ = 0;
+    }
+
+    Controller::~Controller(){
+        delete figure_;
     }
 
     double Controller::getAngleX() {
@@ -94,12 +102,12 @@ namespace s21{
     }
 
     Bounds Controller::getFigureBounds(){
-        Bounds bounds = Bounds{};
+        Bounds bounds = {0,0,0,0,0,0};
         if (figure_ != nullptr){
             bounds = figure_->getBounds();
         }
         return bounds;
-    }
+    } 
 
     Vert_t Controller::getFigureProjection(const matrix_t original, double minz) {
         if (parallel_projection_){

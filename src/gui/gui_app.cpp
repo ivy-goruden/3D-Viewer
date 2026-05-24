@@ -148,6 +148,7 @@ GuiApp::GuiApp(std::string ui, std::string sets) {
 
 GuiApp::~GuiApp() {
     g_object_unref(app);
+    delete appData;
 }
 
 int GuiApp::run(int argc, char **argv) {
@@ -238,11 +239,10 @@ void GuiApp::restoreSett(){
     SimpleCanvas* canvas = getCanvas();
     canvas->setBgColor(app->getBgColor());
     canvas->setVertColor(app->getColor());
-    if (app->getPath() != ""){
-        canvas->loadFigure(app->getPath().c_str());
-    }
     canvas->setLineWidth(app->getWeight());
-    canvas->redraw();
+    if (app->getPath() != ""){
+        openFileSelected(app->getPath().c_str());
+    }
 }
 
 void GuiApp::colorSelected(double red, double green, double blue, double alpha) {
@@ -305,6 +305,7 @@ void GuiApp::createCommands() {
 
 void GuiApp::executeCommand(Command *cmd) {
     if (cmd) {
+        std::cout << "command ptr = " << cmd << std::endl;
         cmd->execute();
     }
 }

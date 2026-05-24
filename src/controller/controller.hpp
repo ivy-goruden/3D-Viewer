@@ -20,6 +20,7 @@ namespace s21{
             Vert_t getFigureProjection(const matrix_t original, double minz);
         public:
             Controller();
+            ~Controller();
             Vert_t loadFigure(const char* filename, int, int);
             Vert_t getFigure();            
             void toggleProjection();
