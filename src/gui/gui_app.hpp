@@ -11,7 +11,7 @@
 
 class GuiApp {
   private:
-    AppData appData;
+    AppData *appData;
     static void onColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onBgColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onActivate(GtkApplication *app, gpointer user_data);
@@ -31,9 +31,11 @@ class GuiApp {
     static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onStatusUpdate();
+    void restoreSett();
 
   public:
     std::string ui_file;
+    std::string settings_file;
     GtkApplication *app;
     GObject* window;
     GObject* openButton;
@@ -62,7 +64,7 @@ class GuiApp {
     GObject* status_file;
     GObject* status_edges;
     GObject* vertSizeButton;
-    GuiApp();
+    GuiApp(std::string, std::string);
     ~GuiApp();
     int run(int argc, char **argv);
     void activate(GtkApplication *app);
@@ -70,8 +72,8 @@ class GuiApp {
     void bgcolorSelected(double red, double green, double blue, double alpha);
     void openFileSelected(const std::string& path);
     void updateStatusBar();
-    AppData& getAppData();
-    const AppData& getAppData() const;
+    AppData* getAppData();
+    const AppData* getAppData() const;
     SimpleCanvas* getCanvas();
 
   private:

@@ -4,7 +4,8 @@
 int main (int argc, char **argv) {
     ApplicationPath app_paths(argv[0]);
 
-    GuiApp app;
-    app.ui_file = app_paths.get_path_relative_to_exe("gui/3dviewer.ui").string();
+    std::string ui_file = app_paths.get_path_relative_to_exe("gui/3dviewer.ui").string();
+    std::string settings_file = app_paths.get_path_relative_to_exe("settings.json").string();
+    GuiApp app(ui_file, settings_file);
     return app.run(argc, argv);
 }

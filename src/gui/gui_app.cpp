@@ -18,8 +18,8 @@ void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
 void GuiApp::onOpenButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->executeCommand(self->openCommand);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->zoomCommand),self->getAppData().getZoom());
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->scaleCommand),self->getAppData().getScale());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->zoomCommand),self->getAppData()->getZoom());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->scaleCommand),self->getAppData()->getScale());
 }
 
 void GuiApp::onResetButtonClick(GtkButton* btn, gpointer user_data) {
@@ -35,63 +35,63 @@ void GuiApp::onResetButtonClick(GtkButton* btn, gpointer user_data) {
 void GuiApp::onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->xSpinnerButton));
-    self->getAppData().setAngleX(value);
+    self->getAppData()->setAngleX(value);
     self->executeCommand(self->rotateXCommand);
 }
 
 void GuiApp::onYSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->ySpinnerButton));
-    self->getAppData().setAngleY(value);
+    self->getAppData()->setAngleY(value);
     self->executeCommand(self->rotateYCommand);
 }
 
 void GuiApp::onZSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->zSpinnerButton));
-    self->getAppData().setAngleZ(value);
+    self->getAppData()->setAngleZ(value);
     self->executeCommand(self->rotateZCommand);
 }
 
 void GuiApp::onShiftSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->shiftSpinnerButton));
-    self->getAppData().setShift(value);
+    self->getAppData()->setShift(value);
     self->executeCommand(self->shiftCommand);
 }
 
 void GuiApp::onShiftVSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->shiftVSpinnerButton));
-    self->getAppData().setShiftV(value);
+    self->getAppData()->setShiftV(value);
     self->executeCommand(self->shiftVCommand);
 }
 
 void GuiApp::onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->zoomSpinnerButton));
-    self->getAppData().setZoom(value);
+    self->getAppData()->setZoom(value);
     self->executeCommand(self->zoomCommand);
 }
 
 void GuiApp::onScaleSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->scaleSpinnerButton));
-    self->getAppData().setScale(value);
+    self->getAppData()->setScale(value);
     self->executeCommand(self->scaleCommand);
 }
 
 void GuiApp::onLineSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     bool active = gtk_switch_get_active(GTK_SWITCH(self->lineSwitch));
-    self->getAppData().setLineSwitch(active);
+    self->getAppData()->setLineSwitch(active);
     self->executeCommand(self->lineSwitchCommand);
 }
 
 void GuiApp::onProjSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     bool active = gtk_switch_get_active(GTK_SWITCH(self->projSwitch));
-    self->getAppData().setProjSwitch(active);
+    self->getAppData()->setProjSwitch(active);
     self->executeCommand(self->projSwitchCommand);
     auto* canvas = self->getCanvas();
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(self->scaleSpinnerButton), canvas->getScale());
@@ -100,7 +100,7 @@ void GuiApp::onProjSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer use
 void GuiApp::onFillSwitchActivate(GtkSwitch* sw, GParamSpec *pspec, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     bool active = gtk_switch_get_active(GTK_SWITCH(self->fillSwitch));
-    self->getAppData().setFillSwitch(active);
+    self->getAppData()->setFillSwitch(active);
     self->executeCommand(self->fillSwitchCommand);
 }
 
@@ -110,7 +110,7 @@ void GuiApp::onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer 
     }
     Shape vertMode = Shape(GPOINTER_TO_INT(g_object_get_data(G_OBJECT(btn), "mode")));
     GuiApp *self = static_cast<GuiApp*>(user_data);
-    self->getAppData().setVertMode(vertMode);
+    self->getAppData()->setVertMode(vertMode);
     self->executeCommand(self->vertModeCommand);
 }
 
@@ -127,7 +127,7 @@ void GuiApp::onBgColorButtonClick(GtkButton* btn, gpointer user_data) {
 void GuiApp::onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->weightSpinnerButton));
-    self->getAppData().setWeight(value);
+    self->getAppData()->setWeight(value);
     self->executeCommand(self->weightCommand);    
     self->updateStatusBar();
 }
@@ -135,11 +135,14 @@ void GuiApp::onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data)
 void GuiApp::onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->vertSizeButton));
-    self->getAppData().setVertSize(value);
+    self->getAppData()->setVertSize(value);
     self->executeCommand(self->vertSizeCommand); 
 }
 
-GuiApp::GuiApp() {
+GuiApp::GuiApp(std::string ui, std::string sets) {
+    ui_file = ui;
+    settings_file = sets;
+    appData = new AppData(settings_file);
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
 
@@ -215,36 +218,49 @@ void GuiApp::activate(GtkApplication* app) {
 
     colorDialog = new ColorDialog(GTK_WINDOW(window));
 
-    auto canvas_shared = std::make_shared<SimpleCanvas>(GTK_WIDGET(paper));    
-    // Сохраняем shared_ptr в куче, чтобы передать в колбэки
-    auto* canvas_ptr = new std::shared_ptr<SimpleCanvas>(canvas_shared);    
-    // Привязываем к окну, чтобы удалить shared_ptr при уничтожении окна
-    g_object_set_data_full(G_OBJECT(window), "canvas", canvas_ptr,
-        [](gpointer data) {
-            delete static_cast<std::shared_ptr<SimpleCanvas>*>(data);
-        });
+    SimpleCanvas* canvas = SimpleCanvas::GetInstance(GTK_WIDGET(paper));
+    g_object_set_data_full(G_OBJECT(window), "canvas", canvas,
+    [](gpointer data) {
+        delete static_cast<SimpleCanvas*>(data);
+    });
+
 
     gtk_label_set_text(GTK_LABEL(status_vert), "Вершины: 0");
     gtk_label_set_text(GTK_LABEL(status_edges), "Рёбра: 0");
     gtk_label_set_text(GTK_LABEL(status_file), "Файл: не выбран");
+
+    restoreSett();
+}
+
+void GuiApp::restoreSett(){
+    AppData* app = getAppData();
+    app->loadFromFile(settings_file);
+    SimpleCanvas* canvas = getCanvas();
+    canvas->setBgColor(app->getBgColor());
+    canvas->setVertColor(app->getColor());
+    if (app->getPath() != ""){
+        canvas->loadFigure(app->getPath().c_str());
+    }
+    canvas->setLineWidth(app->getWeight());
+    canvas->redraw();
 }
 
 void GuiApp::colorSelected(double red, double green, double blue, double alpha) {
     Rgb color = Rgb{red, green, blue, alpha};
-    getAppData().setColor(color);
+    getAppData()->setColor(color);
     getCanvas()->setVertColor(color);
     getCanvas()->redraw();
 }
 
 void GuiApp::bgcolorSelected(double red, double green, double blue, double alpha) {
     Rgb color = Rgb{red, green, blue, alpha};
-    getAppData().setBgColor(color);
+    getAppData()->setBgColor(color);
     getCanvas()->setBgColor(color);
     getCanvas()->redraw();
 }
 
 void GuiApp::openFileSelected(const std::string& path) {
-    getAppData().setPath(path);
+    getAppData()->setPath(path);
     auto* canvas =  getCanvas();
     canvas->loadFigure(path.c_str());
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(scaleSpinnerButton), canvas->getScale());
@@ -259,11 +275,11 @@ void GuiApp::openFileSelected(const std::string& path) {
     getCanvas()->redraw();
 }
 
-AppData& GuiApp::getAppData() {
+AppData* GuiApp::getAppData() {
     return appData;
 }
 
-const AppData& GuiApp::getAppData() const {
+const AppData* GuiApp::getAppData() const {
     return appData;
 }
 
@@ -294,9 +310,9 @@ void GuiApp::executeCommand(Command *cmd) {
 }
 
 SimpleCanvas* GuiApp::getCanvas(){
-    auto* canvas =  static_cast<std::shared_ptr<SimpleCanvas>*>(
+    auto* canvas =  static_cast<SimpleCanvas*>(
     g_object_get_data(window, "canvas"));
-    return canvas ? canvas->get() : nullptr;
+    return canvas ? canvas : nullptr;
 }
 
 void GuiApp::updateStatusBar(){
@@ -305,7 +321,7 @@ void GuiApp::updateStatusBar(){
 
     std::string vert_text = "Вершины: " + std::to_string(canvas->getVerticesNum());
     std::string edges_text = "Грани: " + std::to_string(canvas->getEdgesNum());
-    std::string file_text = "Файл: " + getAppData().getPath();
+    std::string file_text = "Файл: " + getAppData()->getPath();
 
     gtk_label_set_text(GTK_LABEL(status_vert), vert_text.c_str());
     gtk_label_set_text(GTK_LABEL(status_edges), edges_text.c_str());

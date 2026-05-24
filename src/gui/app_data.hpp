@@ -16,6 +16,7 @@ class GuiApp;
 
 struct AppData {
   private:
+    std::string settings;
     std::string path;
     int angleX;
     int angleY;
@@ -33,21 +34,23 @@ struct AppData {
     int weight;
     int vertSize;
   public:
-    AppData() {
-      angleX = 135;
-      angleY = 90;
-      angleZ = 0;
-      shift = 0;
-      shiftV = 0;
-      zoom = 10;
-      scale = 10;
-      lineSwitch = false;
-      projSwitch = false;
-      fillSwitch = false;
-      vertMode = None;
-      color = Rgb{0,0,0,1};
-      bgcolor = Rgb{1,1,1,1};
-      weight = 1;
+    AppData(std::string sets) {
+        std::cout << "[" << sets << "]" << std::endl;
+        settings = sets;
+        angleX = 0;
+        angleY = 0;
+        angleZ = 0;
+        shift = 0;
+        shiftV = 0;
+        zoom = 10;
+        scale = 10;
+        lineSwitch = false;
+        projSwitch = false;
+        fillSwitch = false;
+        vertMode = None;
+        color = Rgb{0,0,0,1};
+        bgcolor = Rgb{1,1,1,1};
+        weight = 1;
     }
 
     std::string getPath() const {
@@ -105,6 +108,7 @@ struct AppData {
     Rgb getBgColor() const {
         return bgcolor;
     }
+
     int getWeight() const {
         return weight;
     }
@@ -113,81 +117,99 @@ struct AppData {
     }
     void setPath(std::string val) {
         path = val;
+        saveToFile(settings);
     }
 
     void setAngleX(int val) {
         angleX = val;
+        saveToFile(settings);
     }
 
     void setAngleY(int val) {
         angleY = val;
+        saveToFile(settings);
     }
 
     void setAngleZ(int val) {
         angleZ = val;
+        saveToFile(settings);
     }
 
     void setShift(int val) {
         shift = val;
+        saveToFile(settings);
     }
 
     void setShiftV(int val) {
         shiftV = val;
+        saveToFile(settings);
     }
 
     void setZoom(int val) {
         zoom = val;
+        saveToFile(settings);
     }
 
     void setScale(int val) {
         scale = val;
+        saveToFile(settings);
     }
 
     void setLineSwitch(bool val) {
         lineSwitch = val;
+        saveToFile(settings);
     }
 
     void setProjSwitch(bool val) {
         projSwitch = val;
+        saveToFile(settings);
     }
 
     void setFillSwitch(bool val) {
         fillSwitch = val;
+        saveToFile(settings);
     }
 
     void setVertMode(Shape mode) {
         vertMode = mode;
+        saveToFile(settings);
     }
 
     void setColor(Rgb val) {
         color = val;
+        saveToFile(settings);
     }
     
     void setBgColor(Rgb val) {
         bgcolor = val;
+        saveToFile(settings);
     }
 
     void setWeight(int val) {
         weight = val;
+        saveToFile(settings);
     }
     void setVertSize(int val) {
         vertSize = val;
     }
 
-    json toJson() const {
-        // return json{
-        //     {"name", name},
-        //     {"value", value},
-        //     {"coefficient", coefficient},
-        //     {"data", data}
-        // };
+    json toJson() const {        
+        return json{
+            { "path", getPath() },
+            { "color", { getColor().red, getColor().green, getColor().blue, getColor().alpha } },
+            { "bgcolor", { getBgColor().red, getBgColor().green, getBgColor().blue, getBgColor().alpha } },
+            { "weight", getWeight() }
+        };
     }
     
     void fromJson(const json& j) {
-        // name = j.at("name").get<std::string>();
-        // value = j.at("value").get<int>();
-        // coefficient = j.at("coefficient").get<double>();
-        // data = j.at("data").get<std::vector<int>>();
+        std::vector<double> color_data = j.at("color").get<std::vector<double>>();
+        std::vector<double> bgcolor_data = j.at("bgcolor").get<std::vector<double>>();
+
+        setPath(j.at("path").get<std::string>());
+        setColor(Rgb{color_data[0], color_data[1], color_data[2], color_data[3]});
+        setBgColor(Rgb{bgcolor_data[0], bgcolor_data[1], bgcolor_data[2], bgcolor_data[3]});
+        setWeight(j.at("weight").get<int>());
     }
     
     bool saveToFile(const std::string& filename) const {
@@ -197,6 +219,7 @@ struct AppData {
             file << toJson().dump(4);
             return true;
         } catch (...) {
+            std::cout << "error" << std::endl;
             return false;
         }
     }

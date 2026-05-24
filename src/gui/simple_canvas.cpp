@@ -4,7 +4,8 @@
 #include "../include/globals.h"
 #include "../include/axes.hpp"
 
-// Реализация методов класса SimpleCanvas для GTK4
+//singleton
+SimpleCanvas* simple_canvas_= nullptr;
 
 SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     // Устанавливаем функцию рисования (вместо сигнала "draw")
@@ -27,6 +28,14 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     lineType_ = Solid;
     width_ = 1;
     height_ = 1;
+}
+
+SimpleCanvas *SimpleCanvas::GetInstance(GtkWidget* drawing_area)
+{
+    if(simple_canvas_==nullptr){
+        simple_canvas_ = new SimpleCanvas(drawing_area);
+    }
+    return simple_canvas_;
 }
 
 SimpleCanvas::~SimpleCanvas() {
@@ -95,17 +104,20 @@ void SimpleCanvas::drawEdges(cairo_t* cr){
 }
 
 void SimpleCanvas::drawFaces(cairo_t* cr){
+    int maxSize = projection_.size();
     s21::Poly_t poly = c_->getPolygons();
     for(auto dots: poly) {
         std::vector<s21::Point> points;
         for(int n: dots){
-            points.push_back(projection_[n]);
+            if (n>= maxSize) continue;
+            points.push_back(projection_.at(n));
         }
         draw_polygon(cr, points);
     }
 }
 
 void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer user_data) {
+    
     SimpleCanvas* self = static_cast<SimpleCanvas*>(user_data);
     self->onDraw(cr, width, height);
     self->width_ = width;
@@ -130,6 +142,11 @@ void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
     drawFaces(cr);
     drawEdges(cr);
     drawVert(cr);
+    cairo_rectangle(cr,
+                    -width / 2.0,
+                    -height / 2.0,
+                    width,
+                    height);
 }
 
 void SimpleCanvas::setCanvas(cairo_t* cr){

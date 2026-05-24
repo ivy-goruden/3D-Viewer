@@ -20,49 +20,49 @@ void ResetCommand::execute() {
 
 void RotateXCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->rotateAbs(app->getAppData().getAngleX(), canvas->getAngleY(), canvas->getAngleZ());
+    canvas->rotateAbs(app->getAppData()->getAngleX(), canvas->getAngleY(), canvas->getAngleZ());
     canvas->redraw();
 }
 
 void RotateYCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->rotateAbs(canvas->getAngleX(), app->getAppData().getAngleY(), canvas->getAngleZ());
+    canvas->rotateAbs(canvas->getAngleX(), app->getAppData()->getAngleY(), canvas->getAngleZ());
     canvas->redraw();
 }
 
 void RotateZCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->rotateAbs(canvas->getAngleX(), canvas->getAngleY(), app->getAppData().getAngleZ());
+    canvas->rotateAbs(canvas->getAngleX(), canvas->getAngleY(), app->getAppData()->getAngleZ());
     canvas->redraw();   
 }
 
 void ShiftCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->shiftX(app->getAppData().getShift());
+    canvas->shiftX(app->getAppData()->getShift());
     canvas->redraw();
 }
 
 void ShiftVCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->shiftY(app->getAppData().getShiftV());
+    canvas->shiftY(app->getAppData()->getShiftV());
     canvas->redraw();
 }
 
 void ZoomCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setCamera(app->getAppData().getZoom());
+    canvas->setCamera(app->getAppData()->getZoom());
     canvas->redraw();
 }
 
 void ScaleCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setScale(app->getAppData().getScale());
+    canvas->setScale(app->getAppData()->getScale());
     canvas->redraw();
 }
 
 void LineSwitchCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setLineType(app->getAppData().getLineSwitch());
+    canvas->setLineType(app->getAppData()->getLineSwitch());
     canvas->redraw();
 }
 
@@ -80,7 +80,7 @@ void FillSwitchCommand::execute() {
 
 void VertModeCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setVertType(app->getAppData().getVertMode());
+    canvas->setVertType(app->getAppData()->getVertMode());
     canvas->redraw();
 }
 
@@ -91,7 +91,7 @@ void ColorCommand::execute() {
         }
     );
     if (!app->colorDialog->isActive()) {
-        app->colorDialog->open(app->getAppData().getColor());
+        app->colorDialog->open(app->getAppData()->getColor());
     }
 }
 
@@ -102,19 +102,19 @@ void BgColorCommand::execute() {
         }
     );
     if (!app->colorDialog->isActive()) {
-        app->colorDialog->open(app->getAppData().getBgColor());
+        app->colorDialog->open(app->getAppData()->getBgColor());
     }
 }
 
 void WeightCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setLineWidth(app->getAppData().getWeight());
+    canvas->setLineWidth(app->getAppData()->getWeight());
     canvas->redraw();
 }
 
 void VertSizeCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
-    canvas->setVertSize(app->getAppData().getVertSize());
+    canvas->setVertSize(app->getAppData()->getVertSize());
     canvas->redraw();
 }
 
