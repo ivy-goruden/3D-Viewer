@@ -95,6 +95,7 @@ class GuiApp {
     Command* weightCommand;
     Command* vertSizeCommand;
     void createCommands();
+    void dropCommands();
 
   public:
     void executeCommand(Command* cmd);

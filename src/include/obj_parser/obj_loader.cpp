@@ -264,9 +264,6 @@ namespace s21 {
             if (len == 0) continue;
 
             int kindObj = parseObjKind(line);
-            if (kindObj == GROUP) {
-                printf("Line %d: %d - %s\n", lineNumber, kindObj, line);
-            }
 
             switch (kindObj) {
                 case VERTEX:

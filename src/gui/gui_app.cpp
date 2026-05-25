@@ -11,7 +11,6 @@ namespace fs = std::filesystem;
 void GuiApp::onActivate(GtkApplication *app, gpointer user_data) {
     GuiApp *self = static_cast<GuiApp*>(user_data);
     self->activate(app);
-    self->createCommands();
     self->updateStatusBar();
 }
 
@@ -142,6 +141,7 @@ void GuiApp::onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_dat
 GuiApp::GuiApp(std::string ui, std::string sets) {
     ui_file = ui;
     settings_file = sets;
+    createCommands();
     appData = new AppData(settings_file);
     app = gtk_application_new("com.application", G_APPLICATION_DEFAULT_FLAGS);
 }
@@ -149,6 +149,7 @@ GuiApp::GuiApp(std::string ui, std::string sets) {
 GuiApp::~GuiApp() {
     g_object_unref(app);
     delete appData;
+    dropCommands();
 }
 
 int GuiApp::run(int argc, char **argv) {
@@ -240,7 +241,7 @@ void GuiApp::restoreSett(){
     canvas->setBgColor(app->getBgColor());
     canvas->setVertColor(app->getColor());
     canvas->setLineWidth(app->getWeight());
-    if (app->getPath() != ""){
+    if (app->getPath() != "") {
         openFileSelected(app->getPath().c_str());
     }
 }
@@ -303,9 +304,28 @@ void GuiApp::createCommands() {
     this->vertSizeCommand = new VertSizeCommand(this);
 }
 
+void GuiApp::dropCommands() {
+    delete this->openCommand;
+    delete this->resetCommand;
+    delete this->rotateXCommand;
+    delete this->rotateYCommand;
+    delete this->rotateZCommand;
+    delete this->shiftCommand;
+    delete this->shiftVCommand;
+    delete this->zoomCommand;
+    delete this->scaleCommand;
+    delete this->lineSwitchCommand;
+    delete this->projSwitchCommand;
+    delete this->fillSwitchCommand;
+    delete this->vertModeCommand;
+    delete this->colorCommand;
+    delete this->bgcolorCommand;
+    delete this->weightCommand;
+    delete this->vertSizeCommand;
+}
+
 void GuiApp::executeCommand(Command *cmd) {
-    if (cmd) {
-        std::cout << "command ptr = " << cmd << std::endl;
+    if (cmd != nullptr) {
         cmd->execute();
     }
 }

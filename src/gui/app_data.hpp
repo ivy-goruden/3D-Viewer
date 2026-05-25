@@ -35,7 +35,6 @@ struct AppData {
     int vertSize;
   public:
     AppData(std::string sets) {
-        std::cout << "[" << sets << "]" << std::endl;
         settings = sets;
         angleX = 0;
         angleY = 0;
@@ -189,8 +188,10 @@ struct AppData {
         weight = val;
         saveToFile(settings);
     }
+    
     void setVertSize(int val) {
         vertSize = val;
+        saveToFile(settings);
     }
 
     json toJson() const {        
