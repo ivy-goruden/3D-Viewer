@@ -2,19 +2,20 @@
 #define GUI_APP
 
 #include <gtk/gtk.h>
-#include "gui_globals.h"
+
 #include "app_data.hpp"
-#include "open_dialog.hpp"
 #include "color_dialog.hpp"
 #include "command.hpp"
+#include "gui_globals.h"
+#include "open_dialog.hpp"
 #include "simple_canvas.hpp"
 
 class GuiApp {
-  private:
-    AppData *appData;
+   private:
+    AppData* appData;
     static void onColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onBgColorButtonClick(GtkButton* btn, gpointer user_data);
-    static void onActivate(GtkApplication *app, gpointer user_data);
+    static void onActivate(GtkApplication* app, gpointer user_data);
     static void onOpenButtonClick(GtkButton* btn, gpointer user_data);
     static void onResetButtonClick(GtkButton* btn, gpointer user_data);
     static void onXSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
@@ -24,19 +25,19 @@ class GuiApp {
     static void onShiftVSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onZoomSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onScaleSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
-    static void onLineSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
-    static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
-    static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec *pspec, gpointer user_data);
-    static void onVertModeToggled(GtkCheckButton* btn, GParamSpec *pspec, gpointer user_data);
+    static void onLineSwitchActivate(GtkSwitch* swtch, GParamSpec* pspec, gpointer user_data);
+    static void onProjSwitchActivate(GtkSwitch* swtch, GParamSpec* pspec, gpointer user_data);
+    static void onFillSwitchActivate(GtkSwitch* swtch, GParamSpec* pspec, gpointer user_data);
+    static void onVertModeToggled(GtkCheckButton* btn, GParamSpec* pspec, gpointer user_data);
     static void onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data);
     static void onStatusUpdate();
     void restoreSett();
 
-  public:
+   public:
     std::string ui_file;
     std::string settings_file;
-    GtkApplication *app;
+    GtkApplication* app;
     GObject* window;
     GObject* openButton;
     GObject* resetButton;
@@ -66,8 +67,8 @@ class GuiApp {
     GObject* vertSizeButton;
     GuiApp(std::string, std::string);
     ~GuiApp();
-    int run(int argc, char **argv);
-    void activate(GtkApplication *app);
+    int run(int argc, char** argv);
+    void activate(GtkApplication* app);
     void colorSelected(double red, double green, double blue, double alpha);
     void bgcolorSelected(double red, double green, double blue, double alpha);
     void openFileSelected(const std::string& path);
@@ -76,7 +77,7 @@ class GuiApp {
     const AppData* getAppData() const;
     SimpleCanvas* getCanvas();
 
-  private:
+   private:
     Command* openCommand;
     Command* resetCommand;
     Command* rotateXCommand;
@@ -97,7 +98,7 @@ class GuiApp {
     void createCommands();
     void dropCommands();
 
-  public:
+   public:
     void executeCommand(Command* cmd);
 };
 

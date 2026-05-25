@@ -8,7 +8,7 @@ struct Rgb {
     double alpha;
 };
 
-enum Shape{None, Circle, Rect};
-enum Stroke{Solid, Dotted};
+enum Shape { None, Circle, Rect };
+enum Stroke { Solid, Dotted };
 
 #endif

@@ -1,19 +1,20 @@
 #ifndef SIMPLE_CANVAS_HPP
 #define SIMPLE_CANVAS_HPP
 
-#include <vector>
-#include "../include/main.h"
 #include <gtk/gtk.h>
+
 #include <cmath>
+#include <vector>
+
 #include "../controller/controller.hpp"
-#include "gui_globals.h"
 #include "../include/grid.hpp"
+#include "../include/main.h"
+#include "gui_globals.h"
 
 class SimpleCanvas {
-public:
-
-    SimpleCanvas(SimpleCanvas &other) = delete;
-    void operator=(const SimpleCanvas &) = delete;
+   public:
+    SimpleCanvas(SimpleCanvas& other) = delete;
+    void operator=(const SimpleCanvas&) = delete;
     // Конструктор принимает GtkApplication
     static SimpleCanvas* GetInstance(GtkWidget* drawing_area);
     ~SimpleCanvas();
@@ -30,7 +31,7 @@ public:
     void drawVert(cairo_t* cr);
     void drawEdges(cairo_t* cr);
     void drawFaces(cairo_t* cr);
-    
+
     // Элементы управления
     void loadFigure(const char* filename);
     void setScale(double);
@@ -58,14 +59,12 @@ public:
     int getEdgesNum();
     int getVerticesNum();
 
-private:
-
-    //singleton
+   private:
+    // singleton
     static std::unique_ptr<SimpleCanvas> simple_canvas_;
     explicit SimpleCanvas(GtkWidget* drawing_area);
     // Статические колбэки GTK
-    static void on_draw_static(GtkDrawingArea* area, cairo_t* cr,
-                               int width, int height, gpointer user_data);
+    static void on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer user_data);
     static void on_window_destroy(GtkWidget* widget, gpointer data);
     void setCanvas(cairo_t* cr);
     double scale_;
@@ -90,4 +89,4 @@ private:
     double canvas_scale_;
 };
 
-#endif // SIMPLE_CANVAS_HPP
+#endif  // SIMPLE_CANVAS_HPP

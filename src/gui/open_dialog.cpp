@@ -1,10 +1,12 @@
 #include "open_dialog.hpp"
 
 #include <gtk/gtk.h>
+
 #include <string>
+
 #include "app_data.hpp"
 
-OpenDialog::OpenDialog(GtkWindow* window_) {
+OpenDialog::OpenDialog(GtkWindow *window_) {
     active = false;
     window = window_;
 
@@ -27,19 +29,17 @@ OpenDialog::~OpenDialog() {
     g_object_unref(dialog);
 }
 
-void OpenDialog::setOnFileSelected(FileSelectedCallback callback) {
-    onFileSelected = callback;
-}
+void OpenDialog::setOnFileSelected(FileSelectedCallback callback) { onFileSelected = callback; }
 
 void OpenDialog::onOpenFileSelected(GObject *source, GAsyncResult *result, gpointer user_data) {
-    OpenDialog *self = static_cast<OpenDialog*>(user_data);
+    OpenDialog *self = static_cast<OpenDialog *>(user_data);
 
     GError *error = NULL;
     GtkFileDialog *dialog = GTK_FILE_DIALOG(source);
     GFile *file = gtk_file_dialog_open_finish(dialog, result, &error);
-    
+
     if (file) {
-        char* cstr = g_file_get_path(file);
+        char *cstr = g_file_get_path(file);
         self->openFileSelected(cstr);
         g_object_unref(file);
     } else if (error) {
@@ -51,21 +51,21 @@ void OpenDialog::onOpenFileSelected(GObject *source, GAsyncResult *result, gpoin
     }
 }
 
-GtkFileFilter* OpenDialog::createObjFilter() {
+GtkFileFilter *OpenDialog::createObjFilter() {
     GtkFileFilter *filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, "Графические объекты");
     gtk_file_filter_add_pattern(filter, "*.obj");
     return filter;
 }
 
-GtkFileFilter* OpenDialog::createAllFilesFilter() {
+GtkFileFilter *OpenDialog::createAllFilesFilter() {
     GtkFileFilter *filter = gtk_file_filter_new();
     gtk_file_filter_set_name(filter, "Все файлы");
     gtk_file_filter_add_pattern(filter, "*");
     return filter;
 }
 
-void OpenDialog::openFileSelected(char* p) {
+void OpenDialog::openFileSelected(char *p) {
     active = false;
     if (onFileSelected) {
         std::string selectedFile = p;
@@ -78,6 +78,4 @@ void OpenDialog::open() {
     gtk_file_dialog_open(dialog, window, NULL, onOpenFileSelected, this);
 }
 
-bool OpenDialog::isActive() {
-    return active;
-}
+bool OpenDialog::isActive() { return active; }

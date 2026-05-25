@@ -1,23 +1,23 @@
 #include "simple_canvas.hpp"
-#include <iostream>
+
 #include <format>
-#include "../include/globals.h"
+#include <iostream>
+
 #include "../include/axes.hpp"
+#include "../include/globals.h"
 
 SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
     // Устанавливаем функцию рисования (вместо сигнала "draw")
-    gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(drawing_area),
-                                   on_draw_static,
-                                   this, nullptr);
+    gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(drawing_area), on_draw_static, this, nullptr);
     scale_ = 1;
     xStart_ = 0;
     yStart_ = 0;
     widget_ = drawing_area;
     c_ = new s21::Controller();
-    dotColor_ = Rgb(1,0,0,1);
-    lineColor_ = Rgb(0,0,0,1);
-    polyColor_ = Rgb(0,0,1,1);
-    bgColor_ = Rgb(1,1,1,1);
+    dotColor_ = Rgb(1, 0, 0, 1);
+    lineColor_ = Rgb(0, 0, 0, 1);
+    polyColor_ = Rgb(0, 0, 1, 1);
+    bgColor_ = Rgb(1, 1, 1, 1);
     fillPoly_ = false;
     lineWidth_ = 1;
     vertWidth_ = 1;
@@ -31,22 +31,18 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) {
 
 std::unique_ptr<SimpleCanvas> SimpleCanvas::simple_canvas_ = nullptr;
 
-SimpleCanvas* SimpleCanvas::GetInstance(GtkWidget* drawing_area)
-{
+SimpleCanvas* SimpleCanvas::GetInstance(GtkWidget* drawing_area) {
     if (!simple_canvas_) {
         simple_canvas_ = std::unique_ptr<SimpleCanvas>(new SimpleCanvas(drawing_area));
     }
     return simple_canvas_.get();
 }
 
-
-SimpleCanvas::~SimpleCanvas() {
-    delete c_;
-}
+SimpleCanvas::~SimpleCanvas() { delete c_; }
 
 void SimpleCanvas::setDash(cairo_t* cr) {
     if (lineType_ == Stroke(Dotted)) {
-        double dashes[] = {lineWidth_/canvas_scale_*2, lineWidth_/canvas_scale_};
+        double dashes[] = {lineWidth_ / canvas_scale_ * 2, lineWidth_ / canvas_scale_};
         int num_dashes = 2;
         double offset = 0.0;
         cairo_set_dash(cr, dashes, num_dashes, offset);
@@ -81,13 +77,13 @@ void SimpleCanvas::draw_polygon(cairo_t* cr, const std::vector<s21::Point>& poin
 }
 
 void SimpleCanvas::draw_dot(cairo_t* cr, double x, double y) {
-    switch(vertType_) {
+    switch (vertType_) {
         case Circle:
-            cairo_arc(cr, x, y, vertWidth_/canvas_scale_*2, 0, 2 * M_PI);
+            cairo_arc(cr, x, y, vertWidth_ / canvas_scale_ * 2, 0, 2 * M_PI);
             break;
         case Rect:
-            double d = vertWidth_/canvas_scale_*2*std::sqrt(2)/2;
-            cairo_rectangle (cr, x-d, y-d, 2*d, 2*d);
+            double d = vertWidth_ / canvas_scale_ * 2 * std::sqrt(2) / 2;
+            cairo_rectangle(cr, x - d, y - d, 2 * d, 2 * d);
             break;
     }
     cairo_set_source_rgb(cr, dotColor_.red, dotColor_.green, dotColor_.blue);
@@ -100,20 +96,20 @@ void SimpleCanvas::drawVert(cairo_t* cr) {
     }
 }
 
-void SimpleCanvas::drawEdges(cairo_t* cr){
+void SimpleCanvas::drawEdges(cairo_t* cr) {
     s21::Edge_t edges = c_->getEdges();
-    for (s21::Seg_t s: edges) {
+    for (s21::Seg_t s : edges) {
         draw_line(cr, projection_[s.start].x, projection_[s.start].y, projection_[s.end].x, projection_[s.end].y);
     }
 }
 
-void SimpleCanvas::drawFaces(cairo_t* cr){
+void SimpleCanvas::drawFaces(cairo_t* cr) {
     int maxSize = projection_.size();
     s21::Poly_t poly = c_->getPolygons();
-    for(auto dots: poly) {
+    for (auto dots : poly) {
         std::vector<s21::Point> points;
-        for(int n: dots){
-            if (n>= maxSize) continue;
+        for (int n : dots) {
+            if (n >= maxSize) continue;
             points.push_back(projection_.at(n));
         }
         draw_polygon(cr, points);
@@ -121,17 +117,13 @@ void SimpleCanvas::drawFaces(cairo_t* cr){
 }
 
 void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer user_data) {
-    
     SimpleCanvas* self = static_cast<SimpleCanvas*>(user_data);
     self->width_ = width;
     self->height_ = height;
     self->onDraw(cr);
-
 }
 
-void SimpleCanvas::loadFigure(const char* filename) {
-    projection_ = c_->loadFigure(filename, width_, height_);
-}
+void SimpleCanvas::loadFigure(const char* filename) { projection_ = c_->loadFigure(filename, width_, height_); }
 
 void SimpleCanvas::redraw() {
     if (widget_ != nullptr) {
@@ -143,8 +135,8 @@ void SimpleCanvas::onDraw(cairo_t* cr) {
     cairo_set_source_rgb(cr, bgColor_.red, bgColor_.green, bgColor_.blue);
     cairo_paint(cr);
     setCanvas(cr);
-    cairo_set_line_width(cr, lineWidth_/canvas_scale_*0.1);
-    if (projection_.empty()){
+    cairo_set_line_width(cr, lineWidth_ / canvas_scale_ * 0.1);
+    if (projection_.empty()) {
         return;
     }
     drawFaces(cr);
@@ -152,30 +144,30 @@ void SimpleCanvas::onDraw(cairo_t* cr) {
     drawVert(cr);
 }
 
-void SimpleCanvas::setCanvas(cairo_t* cr){
+void SimpleCanvas::setCanvas(cairo_t* cr) {
     if (width_ <= 0 || height_ <= 0) return;
     s21::Bounds bounds = c_->getFigureBounds();
-    int fwidth = bounds.maxx-bounds.minx;
-    int fheight = bounds.maxy-bounds.miny;
+    int fwidth = bounds.maxx - bounds.minx;
+    int fheight = bounds.maxy - bounds.miny;
     if (fwidth <= 0 || fheight <= 0) return;
-    this->canvas_scale_ = (double)width_/fwidth;
+    this->canvas_scale_ = (double)width_ / fwidth;
     cairo_translate(cr, width_ / 2.0, height_ / 2.0);
     cairo_scale(cr, canvas_scale_, canvas_scale_);
 }
 
-void SimpleCanvas::shiftX(int x){
+void SimpleCanvas::shiftX(int x) {
     c_->shiftX(x);
 
     projection_ = c_->getFigure();
 }
 
-void SimpleCanvas::shiftY(int y){
+void SimpleCanvas::shiftY(int y) {
     c_->shiftY(y);
 
     projection_ = c_->getFigure();
 }
 
-void SimpleCanvas::rotateAbs(double x, double y, double z){
+void SimpleCanvas::rotateAbs(double x, double y, double z) {
     c_->setAngleX(x);
     c_->setAngleY(y);
     c_->setAngleZ(z);
@@ -202,12 +194,10 @@ void SimpleCanvas::toggleProjection() {
     projection_ = c_->getFigure();
 }
 
-void SimpleCanvas::togglePolyFill() {    
-    fillPoly_ = !fillPoly_;
-}
+void SimpleCanvas::togglePolyFill() { fillPoly_ = !fillPoly_; }
 
 void SimpleCanvas::setVertType(int type) {
-    switch(type){
+    switch (type) {
         case 1:
             vertType_ = Shape(Circle);
             break;
@@ -220,8 +210,8 @@ void SimpleCanvas::setVertType(int type) {
     }
 }
 
-void SimpleCanvas::setLineType(int type){
-    switch(type){
+void SimpleCanvas::setLineType(int type) {
+    switch (type) {
         case 1:
             lineType_ = Stroke(Dotted);
             break;
@@ -231,56 +221,33 @@ void SimpleCanvas::setLineType(int type){
     }
 }
 
-void SimpleCanvas::setBgColor(Rgb color){
-    bgColor_ = color;
-}
-void SimpleCanvas::setVertColor(Rgb color){
-    dotColor_ = color;
-}
+void SimpleCanvas::setBgColor(Rgb color) { bgColor_ = color; }
+void SimpleCanvas::setVertColor(Rgb color) { dotColor_ = color; }
 
-void SimpleCanvas::setLineWidth(double width){
-    lineWidth_ = width;
-}
+void SimpleCanvas::setLineWidth(double width) { lineWidth_ = width; }
 
-void SimpleCanvas::setVertSize(double size){
-    vertWidth_ = size;
-}
+void SimpleCanvas::setVertSize(double size) { vertWidth_ = size; }
 
-
-//расстояние до камеры
+// расстояние до камеры
 void SimpleCanvas::setCamera(int camera) {
     c_->setCamera(camera);
     projection_ = c_->getFigure();
 }
 
-void SimpleCanvas::setScale(double scale){
-    c_->setScale(scale/10);
+void SimpleCanvas::setScale(double scale) {
+    c_->setScale(scale / 10);
     projection_ = c_->getFigure();
 }
 
-double SimpleCanvas::getAngleX() {
-    return c_->getAngleX();
-}
+double SimpleCanvas::getAngleX() { return c_->getAngleX(); }
 
-double SimpleCanvas::getAngleY() {
-    return c_->getAngleY();
-}
+double SimpleCanvas::getAngleY() { return c_->getAngleY(); }
 
-double SimpleCanvas::getAngleZ() {
-    return c_->getAngleZ();
-}
+double SimpleCanvas::getAngleZ() { return c_->getAngleZ(); }
 
-int SimpleCanvas::getEdgesNum(){
-    return c_->getEdgesNum();
-}
+int SimpleCanvas::getEdgesNum() { return c_->getEdgesNum(); }
 
-int SimpleCanvas::getVerticesNum(){
-    return c_->getVerticesNum();
-}
+int SimpleCanvas::getVerticesNum() { return c_->getVerticesNum(); }
 
-double SimpleCanvas::getScale(){
-    return c_->getScale();
-}
-int SimpleCanvas::getZoom(){
-    return c_->getZoom();
-}
+double SimpleCanvas::getScale() { return c_->getScale(); }
+int SimpleCanvas::getZoom() { return c_->getZoom(); }

@@ -2,12 +2,12 @@
 #define APP_DATA
 
 #include <format>
-#include <string>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <string>
+
 #include "gui_globals.h"
 #include "simple_canvas.hpp"
-
 #include "third_party/nlohmann/json.hpp"
 
 using json = nlohmann::json;
@@ -15,7 +15,7 @@ using json = nlohmann::json;
 class GuiApp;
 
 struct AppData {
-  private:
+   private:
     std::string settings;
     std::string path;
     int angleX;
@@ -33,7 +33,8 @@ struct AppData {
     Rgb bgcolor;
     int weight;
     int vertSize;
-  public:
+
+   public:
     AppData(std::string sets) {
         settings = sets;
         angleX = 0;
@@ -47,73 +48,41 @@ struct AppData {
         projSwitch = false;
         fillSwitch = false;
         vertMode = None;
-        color = Rgb{0,0,0,1};
-        bgcolor = Rgb{1,1,1,1};
+        color = Rgb{0, 0, 0, 1};
+        bgcolor = Rgb{1, 1, 1, 1};
         weight = 1;
     }
 
-    std::string getPath() const {
-        return path;
-    }
+    std::string getPath() const { return path; }
 
-    int getAngleX() const {
-        return angleX;
-    }
+    int getAngleX() const { return angleX; }
 
-    int getAngleY() const {
-        return angleY;
-    }
+    int getAngleY() const { return angleY; }
 
-    int getAngleZ() const {
-        return angleZ;
-    }
+    int getAngleZ() const { return angleZ; }
 
-    int getShift() const {
-        return shift;
-    }
+    int getShift() const { return shift; }
 
-    int getShiftV() const {
-        return shiftV;
-    }
+    int getShiftV() const { return shiftV; }
 
-    int getZoom() const {
-        return zoom;
-    }
+    int getZoom() const { return zoom; }
 
-    int getScale() const {
-        return scale;
-    }
+    int getScale() const { return scale; }
 
-    bool getLineSwitch() const {
-        return lineSwitch;
-    }
+    bool getLineSwitch() const { return lineSwitch; }
 
-    bool getProjSwitch() const {
-        return projSwitch;
-    }
+    bool getProjSwitch() const { return projSwitch; }
 
-    bool getFillSwitch() const {
-        return fillSwitch;
-    }
+    bool getFillSwitch() const { return fillSwitch; }
 
-    Shape getVertMode() const {
-        return vertMode;
-    }
+    Shape getVertMode() const { return vertMode; }
 
-    Rgb getColor() const {
-        return color;
-    }
+    Rgb getColor() const { return color; }
 
-    Rgb getBgColor() const {
-        return bgcolor;
-    }
+    Rgb getBgColor() const { return bgcolor; }
 
-    int getWeight() const {
-        return weight;
-    }
-    int getVertSize() const {
-        return vertSize;
-    }
+    int getWeight() const { return weight; }
+    int getVertSize() const { return vertSize; }
     void setPath(std::string val) {
         path = val;
         saveToFile(settings);
@@ -178,7 +147,7 @@ struct AppData {
         color = val;
         saveToFile(settings);
     }
-    
+
     void setBgColor(Rgb val) {
         bgcolor = val;
         saveToFile(settings);
@@ -188,21 +157,19 @@ struct AppData {
         weight = val;
         saveToFile(settings);
     }
-    
+
     void setVertSize(int val) {
         vertSize = val;
         saveToFile(settings);
     }
 
-    json toJson() const {        
-        return json{
-            { "path", getPath() },
-            { "color", { getColor().red, getColor().green, getColor().blue, getColor().alpha } },
-            { "bgcolor", { getBgColor().red, getBgColor().green, getBgColor().blue, getBgColor().alpha } },
-            { "weight", getWeight() }
-        };
+    json toJson() const {
+        return json{{"path", getPath()},
+                    {"color", {getColor().red, getColor().green, getColor().blue, getColor().alpha}},
+                    {"bgcolor", {getBgColor().red, getBgColor().green, getBgColor().blue, getBgColor().alpha}},
+                    {"weight", getWeight()}};
     }
-    
+
     void fromJson(const json& j) {
         std::vector<double> color_data = j.at("color").get<std::vector<double>>();
         std::vector<double> bgcolor_data = j.at("bgcolor").get<std::vector<double>>();
@@ -212,7 +179,7 @@ struct AppData {
         setBgColor(Rgb{bgcolor_data[0], bgcolor_data[1], bgcolor_data[2], bgcolor_data[3]});
         setWeight(j.at("weight").get<int>());
     }
-    
+
     bool saveToFile(const std::string& filename) const {
         try {
             std::ofstream file(filename);
@@ -224,7 +191,7 @@ struct AppData {
             return false;
         }
     }
-    
+
     bool loadFromFile(const std::string& filename) {
         try {
             std::ifstream file(filename);
@@ -237,10 +204,8 @@ struct AppData {
             return false;
         }
     }
-    
-    void printJson() const {
-        std::cout << toJson().dump(4) << std::endl;
-    }
+
+    void printJson() const { std::cout << toJson().dump(4) << std::endl; }
 };
 
 #endif

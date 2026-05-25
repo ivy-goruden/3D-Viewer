@@ -1,17 +1,17 @@
 #include "color_dialog.hpp"
 
 #include <gtk/gtk.h>
+
 #include <string>
+
 #include "app_data.hpp"
 
-void ColorDialog::setOnColorSelectedCallback(ColorSelectedCallback callback) {
-    onColorSelectedCallback = callback;
-}
+void ColorDialog::setOnColorSelectedCallback(ColorSelectedCallback callback) { onColorSelectedCallback = callback; }
 
 void ColorDialog::onColorSelected(GObject *source, GAsyncResult *result, gpointer user_data) {
-    ColorDialog *self = static_cast<ColorDialog*>(user_data);    
+    ColorDialog *self = static_cast<ColorDialog *>(user_data);
     GtkColorDialog *dialog = GTK_COLOR_DIALOG(source);
-    GError *error = NULL;    
+    GError *error = NULL;
     GdkRGBA *color = gtk_color_dialog_choose_rgba_finish(dialog, result, &error);
     if (color) {
         if (self->onColorSelectedCallback) {
@@ -22,18 +22,14 @@ void ColorDialog::onColorSelected(GObject *source, GAsyncResult *result, gpointe
         if (!g_error_matches(error, GTK_DIALOG_ERROR, GTK_DIALOG_ERROR_CANCELLED)) {
             g_printerr("Ошибка: %s\n", error->message);
         }
-        g_error_free(error);        
+        g_error_free(error);
     }
     g_object_unref(dialog);
 }
 
 void ColorDialog::open(Rgb color) {
     GdkRGBA initial_color = {
-        .red = float(color.red),
-        .green = float(color.green),
-        .blue = float(color.blue),
-        .alpha = float(color.alpha)
-    };
+        .red = float(color.red), .green = float(color.green), .blue = float(color.blue), .alpha = float(color.alpha)};
 
     active = true;
     GtkColorDialog *dialog = gtk_color_dialog_new();
@@ -42,6 +38,4 @@ void ColorDialog::open(Rgb color) {
     active = false;
 }
 
-bool ColorDialog::isActive() {
-    return active;
-}
+bool ColorDialog::isActive() { return active; }

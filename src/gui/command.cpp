@@ -1,12 +1,13 @@
 #include "command.hpp"
 
-#include "gui_app.hpp"
-#include "app_data.hpp"
 #include <format>
+
+#include "app_data.hpp"
+#include "gui_app.hpp"
 
 void OpenCommand::execute() {
     if (!app->openDialog->isActive()) {
-        app->openDialog->open();    
+        app->openDialog->open();
     }
 }
 
@@ -33,7 +34,7 @@ void RotateYCommand::execute() {
 void RotateZCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
     canvas->rotateAbs(canvas->getAngleX(), canvas->getAngleY(), app->getAppData()->getAngleZ());
-    canvas->redraw();   
+    canvas->redraw();
 }
 
 void ShiftCommand::execute() {
@@ -66,7 +67,7 @@ void LineSwitchCommand::execute() {
     canvas->redraw();
 }
 
-void ProjSwitchCommand::execute(){
+void ProjSwitchCommand::execute() {
     SimpleCanvas* canvas = app->getCanvas();
     canvas->toggleProjection();
     canvas->redraw();
@@ -86,10 +87,7 @@ void VertModeCommand::execute() {
 
 void ColorCommand::execute() {
     app->colorDialog->setOnColorSelectedCallback(
-        [this](double red, double green, double blue, double alpha) {
-            app->colorSelected(red, green, blue, alpha);
-        }
-    );
+        [this](double red, double green, double blue, double alpha) { app->colorSelected(red, green, blue, alpha); });
     if (!app->colorDialog->isActive()) {
         app->colorDialog->open(app->getAppData()->getColor());
     }
@@ -97,10 +95,7 @@ void ColorCommand::execute() {
 
 void BgColorCommand::execute() {
     app->colorDialog->setOnColorSelectedCallback(
-        [this](double red, double green, double blue, double alpha) {
-            app->bgcolorSelected(red, green, blue, alpha);
-        }
-    );
+        [this](double red, double green, double blue, double alpha) { app->bgcolorSelected(red, green, blue, alpha); });
     if (!app->colorDialog->isActive()) {
         app->colorDialog->open(app->getAppData()->getBgColor());
     }
@@ -117,4 +112,3 @@ void VertSizeCommand::execute() {
     canvas->setVertSize(app->getAppData()->getVertSize());
     canvas->redraw();
 }
-

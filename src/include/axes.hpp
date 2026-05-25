@@ -5,16 +5,16 @@
 
 namespace s21 {
 
-    class Axes {
-    private:
-        matrix_t m;
+class Axes {
+   private:
+    matrix_t m;
 
-    public:
-        Axes();
-        ~Axes();
-        matrix_t getMatrix();
-    };
+   public:
+    Axes();
+    ~Axes();
+    matrix_t getMatrix();
+};
 
-}
+}  // namespace s21
 
 #endif

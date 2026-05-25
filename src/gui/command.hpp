@@ -6,7 +6,7 @@
 class GuiApp;
 
 class Command {
-  public:
+   public:
     GuiApp* app;
     Command(GuiApp* app) : app(app) {};
     virtual ~Command() {};
@@ -14,109 +14,109 @@ class Command {
 };
 
 class OpenCommand : public Command {
-  public:
+   public:
     OpenCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class SaveCommand : public Command {
-  public:
+   public:
     SaveCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class ResetCommand : public Command {
-  public:
+   public:
     ResetCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class RotateXCommand : public Command {
-  public:
+   public:
     RotateXCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class RotateYCommand : public Command {
-  public:
+   public:
     RotateYCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class RotateZCommand : public Command {
-  public:
+   public:
     RotateZCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class ShiftCommand : public Command {
-  public:
+   public:
     ShiftCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class ShiftVCommand : public Command {
-  public:
+   public:
     ShiftVCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class ZoomCommand : public Command {
-  public:
+   public:
     ZoomCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
-class ScaleCommand : public Command{
-  public:
-    ScaleCommand(GuiApp *app) : Command(app) {};
+class ScaleCommand : public Command {
+   public:
+    ScaleCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class LineSwitchCommand : public Command {
-  public:
+   public:
     LineSwitchCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class ProjSwitchCommand : public Command {
-  public:
+   public:
     ProjSwitchCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class FillSwitchCommand : public Command {
-  public:
+   public:
     FillSwitchCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class VertModeCommand : public Command {
-  public:
+   public:
     VertModeCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class ColorCommand : public Command {
-  public:
+   public:
     ColorCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class BgColorCommand : public Command {
-  public:
+   public:
     BgColorCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
 class WeightCommand : public Command {
-  public:
+   public:
     WeightCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 
-class VertSizeCommand : public Command{
-  public:
+class VertSizeCommand : public Command {
+   public:
     VertSizeCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };

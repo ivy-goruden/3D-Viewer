@@ -2,31 +2,33 @@
 #define OPENDIALOG_APP
 
 #include <gtk/gtk.h>
-#include <string>
+
 #include <functional>
+#include <string>
+
 #include "app_data.hpp"
 
 class OpenDialog {
-  public:
+   public:
     using FileSelectedCallback = std::function<void(const std::string& filepath)>;
 
-  private:
+   private:
     FileSelectedCallback onFileSelected;
 
-  private:
+   private:
     bool active;
     GtkWindow* window;
-    GtkFileDialog *dialog;
-    GListStore *filters;
-    GtkFileFilter *obj_filter;
-    GtkFileFilter *all_filter;
+    GtkFileDialog* dialog;
+    GListStore* filters;
+    GtkFileFilter* obj_filter;
+    GtkFileFilter* all_filter;
     void openFileSelected(char* p);
-    static void onOpenFileSelected(GObject *source, GAsyncResult *result, gpointer user_data);
+    static void onOpenFileSelected(GObject* source, GAsyncResult* result, gpointer user_data);
     GtkFileFilter* createObjFilter();
     GtkFileFilter* createTextFilter();
     GtkFileFilter* createAllFilesFilter();
 
-  public:
+   public:
     OpenDialog(GtkWindow* window_);
     ~OpenDialog();
     void setOnFileSelected(FileSelectedCallback callback);
