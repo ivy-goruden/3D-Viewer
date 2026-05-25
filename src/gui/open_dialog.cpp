@@ -5,6 +5,7 @@
 #include "app_data.hpp"
 
 OpenDialog::OpenDialog(GtkWindow* window_) {
+    active = false;
     window = window_;
 
     dialog = gtk_file_dialog_new();

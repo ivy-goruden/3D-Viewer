@@ -7,14 +7,12 @@ namespace s21{
         projectionVertices_ = Vert_t();
         minz = 0.0;
         bounds = {0, 0, 0, 0, 0, 0};
-        nodesNum = 0;
         projectionVertices_ = Vert_t();
     }
 
     Figure::Figure(ObjLoader loader){
         minz = 0.0;
         bounds = {0, 0, 0, 0, 0, 0};
-        nodesNum = 0;
         projectionVertices_ = Vert_t();
 
         matrix_t m = matrix_t();
@@ -85,15 +83,13 @@ namespace s21{
 
     int Figure::getNodesNum() const {
         if (!nodesNum.has_value()){
-            std::vector<Seg_t> nodes = {};
-            for(auto dots: polygons_){
-                for(int i=1; i<dots.size(); i++){
-                    Seg_t node = Seg_t(dots[i-1], dots[i]);
-                    nodes.push_back(node);
+            std::set<Seg_t> unique_nodes;
+            for (const auto& dots : polygons_) {
+                for (size_t i = 1; i < dots.size(); ++i) {
+                    unique_nodes.insert(Seg_t(dots[i-1], dots[i]));
                 }
             }
-            Unique(nodes);
-            nodesNum = nodes.size();
+            *nodesNum = unique_nodes.size();
         }
 
         return *nodesNum;

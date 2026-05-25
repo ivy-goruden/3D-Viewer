@@ -19,9 +19,6 @@ class OpenDialog {
     GtkFileDialog *dialog;
     GListStore *filters;
     GtkFileFilter *obj_filter;
-    GtkFileFilter *text_filter;
-    GtkFileFilter *image_filter;
-    GtkFileFilter *pdf_filter;
     GtkFileFilter *all_filter;
     void openFileSelected(char* p);
     static void onOpenFileSelected(GObject *source, GAsyncResult *result, gpointer user_data);

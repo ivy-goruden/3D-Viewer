@@ -20,7 +20,7 @@ class ColorDialog {
     static void onColorSelected(GObject *source, GAsyncResult *result, gpointer user_data);
 
   public:
-    ColorDialog(GtkWindow* window_) : window(window_) {};
+    ColorDialog(GtkWindow* window_) : window(window_), active(false) {};
     ~ColorDialog() {};
     void setOnColorSelectedCallback(ColorSelectedCallback callback);
     bool isActive();

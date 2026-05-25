@@ -139,12 +139,12 @@ void SimpleCanvas::redraw() {
 }
 
 void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
-    cairo_save(cr);
+    //cairo_save(cr);
     cairo_set_source_rgb(cr, bgColor_.red, bgColor_.green, bgColor_.blue);
     cairo_paint(cr);
     cairo_set_line_width(cr, lineWidth_/canvas_scale_*0.1);
     setCanvas(cr);
-    cairo_restore(cr);
+    //cairo_restore(cr);
     if (projection_.empty()){
         return;
     }

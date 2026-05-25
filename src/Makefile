@@ -92,7 +92,10 @@ tests: $(TESTS_OBJS) 3Dtransformer.a
 $(TARGET): 3Dtransformer.a
 	g++ $(CXXFLAGS) gtk02.cpp $(GUI_SOURCE) controller/controller.cpp -I . -L. -l3Dtransformer -o $(TARGET) $(GTKFLAGS) -lm
 
-valgrind:
-	valgrind  --suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
-  --suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp --suppressions=my.supp --leak-check=full --show-leak-kinds=definite,indirect --track-origins=yes -s $(TARGET)
+valgrind: clean $(TARGET)
+	valgrind  --log-file=valgrind_report.txt \
+	--suppressions=/usr/share/glib-2.0/valgrind/glib.supp \
+  	--suppressions=/usr/share/gtk-4.0/valgrind/gtk.supp \
+  	--suppressions=my.supp \
+	--leak-check=full --show-leak-kinds=definite,indirect --track-origins=yes -s ./$(TARGET)
 # 	valgrind --leak-check=full ./gtk02.app 2>&1 | grep -E "definitely.*gtk02.app|lost.*gtk02.app" || true

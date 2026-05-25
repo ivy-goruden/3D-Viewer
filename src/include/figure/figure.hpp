@@ -5,6 +5,7 @@
 #include "../obj_parser/obj_loader.hpp"
 #include <set>
 #include <algorithm>
+#include <optional>
 
 namespace s21{
 

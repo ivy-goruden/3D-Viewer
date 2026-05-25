@@ -128,7 +128,6 @@ void GuiApp::onWeightSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data)
     double value = gtk_spin_button_get_value(GTK_SPIN_BUTTON(self->weightSpinnerButton));
     self->getAppData()->setWeight(value);
     self->executeCommand(self->weightCommand);    
-    self->updateStatusBar();
 }
 
 void GuiApp::onVertSizeSpinnerValueChanged(GtkSpinButton* btn, gpointer user_data) {
@@ -149,6 +148,8 @@ GuiApp::GuiApp(std::string ui, std::string sets) {
 GuiApp::~GuiApp() {
     g_object_unref(app);
     delete appData;
+    delete openDialog;
+    delete colorDialog;
     dropCommands();
 }
 
@@ -223,7 +224,7 @@ void GuiApp::activate(GtkApplication* app) {
     SimpleCanvas* canvas = SimpleCanvas::GetInstance(GTK_WIDGET(paper));
     g_object_set_data_full(G_OBJECT(window), "canvas", canvas,
     [](gpointer data) {
-        delete static_cast<SimpleCanvas*>(data);
+        //delete static_cast<SimpleCanvas*>(data);
     });
 
 
