@@ -123,9 +123,10 @@ void SimpleCanvas::drawFaces(cairo_t* cr){
 void SimpleCanvas::on_draw_static(GtkDrawingArea* area, cairo_t* cr, int width, int height, gpointer user_data) {
     
     SimpleCanvas* self = static_cast<SimpleCanvas*>(user_data);
-    self->onDraw(cr, width, height);
     self->width_ = width;
     self->height_ = height;
+    self->onDraw(cr);
+
 }
 
 void SimpleCanvas::loadFigure(const char* filename) {
@@ -138,24 +139,17 @@ void SimpleCanvas::redraw() {
     }
 }
 
-void SimpleCanvas::onDraw(cairo_t* cr, int width, int height) {
-    //cairo_save(cr);
+void SimpleCanvas::onDraw(cairo_t* cr) {
     cairo_set_source_rgb(cr, bgColor_.red, bgColor_.green, bgColor_.blue);
     cairo_paint(cr);
-    cairo_set_line_width(cr, lineWidth_/canvas_scale_*0.1);
     setCanvas(cr);
-    //cairo_restore(cr);
+    cairo_set_line_width(cr, lineWidth_/canvas_scale_*0.1);
     if (projection_.empty()){
         return;
     }
     drawFaces(cr);
     drawEdges(cr);
     drawVert(cr);
-    cairo_rectangle(cr,
-                    -width / 2.0,
-                    -height / 2.0,
-                    width,
-                    height);
 }
 
 void SimpleCanvas::setCanvas(cairo_t* cr){

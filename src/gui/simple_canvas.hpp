@@ -17,7 +17,7 @@ public:
     // Конструктор принимает GtkApplication
     static SimpleCanvas* GetInstance(GtkWidget* drawing_area);
     ~SimpleCanvas();
-    void onDraw(cairo_t* cr, int width, int height);
+    void onDraw(cairo_t* cr);
     void redraw();
 
     // Примитивы рисования

@@ -245,6 +245,7 @@ void GuiApp::restoreSett(){
     if (app->getPath() != "") {
         openFileSelected(app->getPath().c_str());
     }
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(weightSpinnerButton), app->getWeight());
 }
 
 void GuiApp::colorSelected(double red, double green, double blue, double alpha) {
