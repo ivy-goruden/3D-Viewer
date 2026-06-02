@@ -1,0 +1,28 @@
+{
+   leak_x11_definite
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:XextAddDisplay
+   ...
+   fun:gtk_init_check
+}
+{
+   leak_egl_definite
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   ...
+   obj:*libEGL.so*
+   ...
+   fun:gtk_init
+}
+{
+   leak_fontconfig_realloc_definite
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:realloc
+   obj:*libfontconfig.so*
+   ...
+   fun:pango_layout_get_size
+}

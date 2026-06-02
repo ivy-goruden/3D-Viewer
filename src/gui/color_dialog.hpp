@@ -1,0 +1,32 @@
+#ifndef COLORDIALOG_APP
+#define COLORDIALOG_APP
+
+#include <gtk/gtk.h>
+
+#include <functional>
+#include <string>
+
+#include "app_data.hpp"
+#include "gui_globals.h"
+
+class ColorDialog {
+   public:
+    using ColorSelectedCallback = std::function<void(float r, float g, float b, float a)>;
+
+   private:
+    GtkWindow* window;
+    ColorSelectedCallback onColorSelectedCallback;
+
+   private:
+    bool active;
+    static void onColorSelected(GObject* source, GAsyncResult* result, gpointer user_data);
+
+   public:
+    ColorDialog(GtkWindow* window_) : window(window_), active(false) {};
+    ~ColorDialog() {};
+    void setOnColorSelectedCallback(ColorSelectedCallback callback);
+    bool isActive();
+    void open(Rgb color);
+};
+
+#endif
