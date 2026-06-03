@@ -15,8 +15,18 @@ static void on_unrealize(GtkGLArea *area, gpointer data) {
     gtk_gl_area_make_current(area);              // Делаем контекст текущим, чтобы удалять объекты
     if (!gtk_gl_area_get_error(area)) {          // Если контекст не повреждён
         SimpleCanvas* self = static_cast<SimpleCanvas*>(data);
-        self->delete();
+        self->cleanup();
     }
+}
+
+void SimpleCanvas::cleanup(){
+    glDeleteProgram(shader_program);         // Удаляем программу куба
+    glDeleteProgram(point_program);          // Удаляем программу точек
+    glDeleteVertexArrays(1, &vao);           // Удаляем VAO куба
+    glDeleteBuffers(1, &vbo);                // Удаляем VBO куба
+    glDeleteBuffers(1, &ebo);                // Удаляем EBO куба
+    glDeleteVertexArrays(1, &point_vao);     // Удаляем VAO точек
+    glDeleteBuffers(1, &point_vbo);     
 }
 
 // Таймер, который запрашивает перерисовку каждые 16 мс (~60 кадров в секунду)
@@ -35,31 +45,40 @@ static gboolean on_render(GtkGLArea *area, GdkGLContext *ctx, gpointer data) {
     return TRUE;
 }
 
-SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area) : vao{}, vbo{}, ebo{}, point_vao{}, point_vbo{}, mvp_{}{
+SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area)
+    : scale_(1),
+      width_(1),
+      height_(1),
+      xStart_(0),
+      yStart_(0),
+      projection_(),
+      widget_(drawing_area),
+      lineWidth_(1),
+      vertWidth_(1),
+      dotColor_(1, 0, 0, 1),
+      lineColor_(0, 0, 0, 1),
+      polyColor_(0, 0, 1, 1),
+      bgColor_(1, 1, 1, 1),
+      fillPoly_(false),
+      vertType_(None),
+      lineType_(Solid),
+      canvas_scale_(1.0f),
+      shader_program(0),
+      vao(0), vbo(0), ebo(0),
+      mvp_location(0), poly_color_location(0),
+      point_vao(0), point_vbo(0), point_program(0),
+      point_mvp_location(0), point_color_location(0),
+      texture(0),
+      vertCount(0),
+      polyIndicesCount(0)
+{
     gtk_gl_area_set_required_version(GTK_GL_AREA(drawing_area), 3, 3); // Требуем OpenGL 3.3
     gtk_gl_area_set_has_depth_buffer(GTK_GL_AREA(drawing_area), TRUE); // Включаем буфер глубины
     gtk_gl_area_set_auto_render(GTK_GL_AREA(drawing_area), FALSE); // Мы будем сами запрашивать перерисовку
-    g_signal_connect(drawing_area, "realize", G_CALLBACK(on_realize), NULL);   // При создании контекста
-    g_signal_connect(drawing_area, "unrealize", G_CALLBACK(on_unrealize), NULL); // При удалении
-    g_signal_connect(drawing_area, "render", G_CALLBACK(on_render), NULL);
+    g_signal_connect(drawing_area, "realize", G_CALLBACK(on_realize), this);   // При создании контекста
+    g_signal_connect(drawing_area, "unrealize", G_CALLBACK(on_unrealize), this); // При удалении
+    g_signal_connect(drawing_area, "render", G_CALLBACK(on_render), this);
     //g_timeout_add(16, on_timer, NULL);
-    scale_ = 1;
-    xStart_ = 0;
-    yStart_ = 0;
-    widget_ = drawing_area;
-    dotColor_ = Rgb(1, 0, 0, 1);
-    lineColor_ = Rgb(0, 0, 0, 1);
-    polyColor_ = Rgb(0, 0, 1, 1);
-    bgColor_ = Rgb(1, 1, 1, 1);
-    fillPoly_ = false;
-    lineWidth_ = 1;
-    vertWidth_ = 1;
-    vertType_ = None;
-    lineType_ = Solid;
-    width_ = 1;
-    height_ = 1;
-    s21::Poly_Proj_t projection_ = s21::Poly_Proj_t();
-
 }
 
 std::unique_ptr<SimpleCanvas> SimpleCanvas::simple_canvas_ = nullptr;
@@ -88,22 +107,23 @@ void SimpleCanvas::draw_dot(cairo_t* cr, float x, float y) {
 }
 
 void SimpleCanvas::draw(GdkGLContext *ctx){
+    glClearColor(bgColor_.red, bgColor_.green, bgColor_.blue, bgColor_.alpha);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Очищаем экран и буфер глубины
     glUseProgram(shader_program);                // Активируем шейдерную программу куба
+    glUniform3f(poly_color_location, polyColor_.red, polyColor_.green, polyColor_.blue);
     glUniformMatrix4fv(mvp_location, 1, GL_FALSE, mvp_); // Передаём матрицу MVP в uniform
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Очищаем экран и буфер глубины
     glBindVertexArray(vao);                      // Привязываем VAO куба (все настройки вершин)
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); // Рисуем куб: 36 индексов, треугольники
-
+    glDrawElements(GL_TRIANGLES, polyIndicesCount, GL_UNSIGNED_INT, 0); // Рисуем куб: 36 индексов, треугольники
     // --- Рисуем 8 вершин куба точками ПОВЕРХ ---
     glUseProgram(point_program);                 // Активируем шейдерную программу для точек
     glUniformMatrix4fv(point_mvp_location, 1, GL_FALSE, mvp_); // Передаём ту же матрицу MVP
-    // Задаём цвет точек (белый)
+    glUniform3f(point_color_location, dotColor_.red, dotColor_.green, dotColor_.blue);
 
     glPointSize(vertWidth_ / canvas_scale_);
     glDisable(GL_DEPTH_TEST);                    // Временно отключаем тест глубины – точки будут видны даже если перекрыты гранями
     glBindVertexArray(point_vao);                // Привязываем VAO точек
-    glDrawArrays(GL_POINTS, 0, 8);               // Рисуем 8 точек (по количеству вершин в буфере)
+    glDrawArrays(GL_POINTS, 0, vertCount);               // Рисуем 8 точек (по количеству вершин в буфере)
     glEnable(GL_DEPTH_TEST);                     // Включаем тест глубины обратно
     glBindVertexArray(0);                        // Отвязываем VAO
 }
@@ -153,6 +173,7 @@ void SimpleCanvas::setProjection(s21::Poly_Proj_t proj) { projection_ = proj; }
 
 
 void SimpleCanvas::setMVP(const GLfloat* mvp){
+    gtk_gl_area_make_current(GTK_GL_AREA(widget_));
     std::copy(mvp, mvp + 16, mvp_);
 }
 
@@ -162,8 +183,69 @@ void SimpleCanvas::redraw() {
     }
 }
 
-void SimpleCanvas::updateFigure(std::vector<GLfloat> vertices, std::vector<GLuint> indices){
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Загружаем вершины куба в буфер
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); // Загружаем индексы
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Загружаем 8 вершин
+void printVertices(const std::vector<GLfloat>& vertices) {
+    std::cout << "Vertices (x, y, z, u, v):\n";
+    for (size_t i = 0; i < vertices.size(); i += 5) {
+        std::cout << "v" << i/5 << ": ("
+                  << vertices[i] << ", " << vertices[i+1] << ", " << vertices[i+2]
+                  << ") uv: (" << vertices[i+3] << ", " << vertices[i+4] << ")\n";
+    }
+}
+
+void printIndices(const std::vector<GLuint>& indices) {
+    std::cout << "Indices (triangles):\n";
+    for (size_t i = 0; i < indices.size(); i += 3) {
+        std::cout << "tri " << i/3 << ": " 
+                  << indices[i] << ", " << indices[i+1] << ", " << indices[i+2] << "\n";
+    }
+}
+
+void printCubeVertices(const std::vector<GLfloat>& cube_vertices) {
+    std::cout << "Cube vertices (only positions):\n";
+    for (size_t i = 0; i < cube_vertices.size(); i += 3) {
+        std::cout << "p" << i/3 << ": ("
+                  << cube_vertices[i] << ", " << cube_vertices[i+1] << ", " << cube_vertices[i+2] << ")\n";
+    }
+}
+
+void printMVP(const GLfloat* mvp, const char* name = "MVP") {
+    std::cout << name << " matrix (column-major):\n";
+    for (int row = 0; row < 4; ++row) {
+        std::cout << "| ";
+        for (int col = 0; col < 4; ++col) {
+            std::cout << mvp[col * 4 + row] << "\t";
+        }
+        std::cout << "|\n";
+    }
+}
+
+void SimpleCanvas::updateFigure(std::vector<GLfloat> vertices, std::vector<GLuint> indices, std::vector<GLfloat> cube_vertices){
+    gtk_gl_area_make_current(GTK_GL_AREA(widget_));
+    if (gtk_gl_area_get_error(GTK_GL_AREA(widget_))) return;
+    glBindVertexArray(vao);                        // активируем VAO куба
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);            // привязываем VBO куба
+    glBufferData(GL_ARRAY_BUFFER,
+                 vertices.size() * sizeof(GLfloat), // правильный размер
+                 vertices.data(),
+                 GL_STATIC_DRAW);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);    // привязываем EBO куба
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 indices.size() * sizeof(GLuint),   // правильный размер
+                 indices.data(),
+                 GL_STATIC_DRAW);
+    
+    glBindVertexArray(point_vao);                  // активируем VAO точек
+    glBindBuffer(GL_ARRAY_BUFFER, point_vbo);      // привязываем point_vbo
+    glBufferData(GL_ARRAY_BUFFER,
+                 cube_vertices.size() * sizeof(GLfloat),            // если cube_vertices – массив фиксированного размера
+                 cube_vertices.data(),GL_STATIC_DRAW);
+    
+    glBindVertexArray(0);                          // отвязываем VAO
+    vertCount = vertices.size()/5;
+    polyIndicesCount = indices.size();
+    printVertices(vertices);
+    printIndices(indices);
+    printCubeVertices(cube_vertices);
+    printMVP(mvp_);
 }

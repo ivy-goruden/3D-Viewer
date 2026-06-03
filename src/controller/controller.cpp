@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "../include/affine_transformer/matrix.hpp"
+#include "../include/figure/figure.hpp"
 #include "../include/affine_transformer/transformer.hpp"
 #include "../include/obj_parser/obj_loader.hpp"
 
@@ -18,13 +19,6 @@ Controller::Controller() {
     shiftx_ = 0;
     shifty_ = 0;
     diagonal_ = 0;
-
-    prev_angleX_ = 0;
-    prev_angleY_ = 0;
-    prev_angleZ_ = 0;
-
-    prev_shiftX_ = 0;
-    prev_shiftY_ = 0;
     Poly_Proj_t projection_ = Poly_Proj_t();
 }
 
@@ -40,17 +34,14 @@ float Controller::getAngleY() { return angleY_; }
 float Controller::getAngleZ() { return angleZ_; }
 
 void Controller::setAngleX(int angle) {
-    prev_angleX_ = angleX_;
     angleX_ = angle;
 }
 
 void Controller::setAngleY(int angle) {
-    prev_angleY_ = angleY_;
     angleY_ = angle;
 }
 
 void Controller::setAngleZ(int angle) {
-    prev_angleZ_ = angleZ_;
     angleZ_ = angle;
 }
 
@@ -61,12 +52,10 @@ float Controller::getScale() { return scale_; }
 float Controller::getCameraZ() { return camera_->z; }
 
 void Controller::shiftX(int shiftx) {
-    prev_shiftX_ = shiftx_;
     shiftx_ = shiftx;
 }
 
 void Controller::shiftY(int shifty) {
-    prev_shiftY_ = shifty_;
     shifty_ = shifty;
 }
 
@@ -82,7 +71,7 @@ void Controller::loadFigure(const char* filename, int canvasW, int canvasH) {
         s21::Transformer::Translate(-(b.maxx + b.minx) / 2, -(b.maxy + b.miny) / 2, -(b.maxz + b.minz) / 2, shapeVert);
     figure->setMatrix(fig);
 
-    FigureView_Sett(canvasW, canvasH);
+    //FigureView_Sett(canvasW, canvasH);
 }
 
 void Controller::FigureView_Sett(int canvasW, int canvasH) {
@@ -98,20 +87,10 @@ void Controller::FigureView_Sett(int canvasW, int canvasH) {
 
 Poly_Proj_t Controller::getFigure() {
     if (figure_ != nullptr) {
-        if (prev_angleX_ != angleX_ || prev_angleY_ != angleY_ || prev_angleZ_ != angleZ_) {
-            matrix_t rotate = s21::Transformer::Rotate(angleX_ - prev_angleX_, angleY_ - prev_angleY_,
-                                                       angleZ_ - prev_angleZ_, figure_->getMatrix());
-            prev_angleX_ = angleX_;
-            prev_angleY_ = angleY_;
-            prev_angleZ_ = angleZ_;
-            figure_->setMatrix(rotate);
-        }
-        if (prev_shiftX_ != shiftx_ || prev_shiftY_ != shifty_) {
-            matrix_t translate =
-                s21::Transformer::Translate(shiftx_ - prev_shiftX_, shifty_ - prev_shiftY_, 0, figure_->getMatrix());
-            figure_->setMatrix(translate);
-        }
-        projection_ = getFigureProjection(figure_->getMatrix());
+        matrix_t rotate = Transformer::Rotate(angleX_, angleY_, angleZ_, figure_->getMatrix());
+        matrix_t scale = Transformer::Scale(scale_, scale_, scale_, rotate);
+        matrix_t translate = Transformer::Translate(shiftx_, shiftx_, 0, scale);
+        projection_ = getFigureProjection(translate);
     }
     return projection_;
 }
@@ -183,12 +162,18 @@ int Controller::getVerticesNum() {
 
 void Controller::setScale(float scale) { scale_ = scale; }
 
-}  // namespace s21
-
-matrix_t Controller::getMVP(){
-    matrix_t orig = {{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1}};
-    matrix_t rotate = Transformer::rotate(angleX_, angleY_, angleZ_, orig);
-    matrix_t scale = Transformer::scale(scale_, scale_, scale_, rotate);
+matrix_t Controller::getMVP(float aspect){
+    matrix_t orig = figure_->getMatrix();
+    matrix_t rotate = Transformer::Rotate(angleX_, angleY_, angleZ_, orig);
+    matrix_t scale = Transformer::Scale(scale_, scale_, scale_, rotate);
     matrix_t translate = Transformer::Translate(shiftx_, shiftx_, 0, scale);
-    return translate;
+    matrix_t mvp = Transformer::setView(&translate, *camera_, Point3d(0,0,0));
+    if (parallel_projection_){
+        mvp = Transformer::perspective(&mvp, *camera_, aspect);
+    }else{
+        mvp = Transformer::ortho(&mvp, *camera_, aspect);
+    }
+    return mvp;
 }
+
+}  // namespace s21

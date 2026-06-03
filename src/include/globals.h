@@ -62,7 +62,7 @@ struct Seg_t {
 struct Vector_t {
     float x, y, z;
     Vector_t(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
-    Vector_t(Point3d& start, Point3d& end) : x(end.x - start.x), y(end.y - start.y), z(end.z - start.z) {}
+    Vector_t(const Point3d& start, const Point3d& end) : x(end.x - start.x), y(end.y - start.y), z(end.z - start.z) {}
 
     Vector_t operator-(const Point3d& P) const { return Vector_t(x - P.x, y - P.y, z - P.z); }
     Vector_t operator+(const Point3d& P) const { return Vector_t(x + P.x, y + P.y, z + P.z); }

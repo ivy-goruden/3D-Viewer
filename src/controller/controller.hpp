@@ -51,6 +51,6 @@ class Controller {
     int getVerticesNum();
     Bounds getFigureBounds();
     void FigureView_Sett(int canvasW, int canvasH);
-    matrix_t getMVP();
+    matrix_t getMVP(float aspect);
 };
 }  // namespace s21

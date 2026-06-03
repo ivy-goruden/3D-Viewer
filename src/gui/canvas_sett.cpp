@@ -19,10 +19,10 @@ static const char *vertex_shader_src =
 
 static const char *fragment_shader_src =
     "#version 330 core\n"
-    "in vec3 ourColor;\n"
+    "uniform vec3 polyColor;\n"
     "out vec4 FragColor;\n"
     "void main() {\n"
-    "    FragColor = vec4(ourColor, 1.0);\n"
+    "    FragColor = vec4(polyColor, 1.0);\n"
     "}\n";
 
 static const char *point_vert_src =
@@ -96,8 +96,8 @@ void SimpleCanvas::init_gl(GtkGLArea *area) {
     point_color_location = glGetUniformLocation(point_program, "pointColor"); // Адрес uniform pointColor
     poly_color_location = glGetUniformLocation(shader_program, "polyColor"); // Адрес uniform pointColor
 
-    glUniform3f(point_color_location, dotColor_.red, dotColor_.green, dotColor_.blue);
-    glUniform3f(poly_color_location, polyColor_.red, polyColor_.green, polyColor_.blue);
+
+
 
     // --- Создание VAO, VBO и EBO для куба ---
     glGenVertexArrays(1, &vao);                  // Генерируем идентификатор VAO для куба
@@ -111,12 +111,12 @@ void SimpleCanvas::init_gl(GtkGLArea *area) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);  // Привязываем EBO как индексный буфер
 
     // Настройка атрибутов вершин куба (позиция и цвет)
-    // Атрибут 0: позиция (3 float), смещение 0, шаг 6 * sizeof(GLfloat) (позиция+цвет)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
-    glEnableVertexAttribArray(0);                // Включаем использование атрибута 0
-    // Атрибут 1: цвет (3 float), смещение 3 * sizeof(GLfloat) после начала вершины
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Атрибут 1: текстурные координаты (2 float)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);                // Включаем атрибут 1
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);                        // Отвязываем VAO (настройки запомнены)
 
@@ -132,5 +132,5 @@ void SimpleCanvas::init_gl(GtkGLArea *area) {
 
     // --- Глобальные настройки OpenGL ---
     glEnable(GL_DEPTH_TEST);                     // Включаем тест глубины (чтобы ближние грани перекрывали дальние)
-    glClearColor(bgColor_.red, bgColor_.green, bgColor_.blue, bgColor_.alpha);       // Цвет очистки экрана: тёмно-синий
+    glClearColor(bgColor_.red, bgColor_.green, bgColor_.blue, bgColor_.alpha);
 }

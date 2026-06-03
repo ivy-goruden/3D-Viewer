@@ -20,6 +20,7 @@ class SimpleCanvas {
     ~SimpleCanvas();
     void onDraw(cairo_t* cr);
     void redraw();
+    void cleanup();
     // Статические колбэки GTK
     void init_gl(GtkGLArea *area);
     void draw(GdkGLContext *ctx);
@@ -38,7 +39,7 @@ class SimpleCanvas {
     void setLineWidth(float width);
     void setVertSize(float size);
     void setProjection(s21::Poly_Proj_t proj);
-    void updateFigure(std::vector<GLfloat> vertices, std::vector<GLuint> indices);
+    void updateFigure(std::vector<GLfloat> vertices, std::vector<GLuint> indices, std::vector<GLfloat> cube_vertices);
     void setMVP(const GLfloat* mvp);
 
    private:
@@ -78,6 +79,9 @@ class SimpleCanvas {
 
     GLuint texture;
     GLfloat mvp_[16];
+
+    int vertCount;
+    int polyIndicesCount;
 };
 
 #endif  // SIMPLE_CANVAS_HPP

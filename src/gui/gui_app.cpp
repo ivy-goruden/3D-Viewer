@@ -324,21 +324,23 @@ void GuiApp::dropCommands() {
 void GuiApp::executeCommand(Command* cmd) {
     if (cmd != nullptr) {
         cmd->execute();
-        s21::matrix_t mvp_matrix = c_->getMVP();
-        GLfloat mvp = GLfloat();
+        int w = gtk_widget_get_width(GTK_WIDGET(paper));
+        int h = gtk_widget_get_height(GTK_WIDGET(paper));
+        if (w==0 || h== 0) return;
+        s21::matrix_t mvp_matrix = c_->getMVP(w/h);
+        std::vector<GLfloat> mvp; 
         for (size_t i = 0; i<4; i++){
             for (size_t x = 0; x<4; x++){
-                mvp.push_back(mvp_matrix[i][x])
+                mvp.push_back(mvp_matrix[x][i]);
             }
         }
-        getCanvas()->setMVP(&mvp);
+        getCanvas()->setMVP(mvp.data());
         getCanvas()->redraw();
     }
 }
 
 SimpleCanvas* GuiApp::getCanvas() {
-    auto* canvas = static_cast<SimpleCanvas*>(g_object_get_data(window, "canvas"));
-    return canvas ? canvas : nullptr;
+    return SimpleCanvas::GetInstance(GTK_WIDGET(paper));
 }
 
 s21::Controller* GuiApp::getController() { return c_; }
@@ -360,6 +362,7 @@ s21::Bounds GuiApp::getFigureBounds() { return c_->getFigureBounds(); }
 void GuiApp::UpdateFigure(){
     s21::matrix_t m = c_->getMatrix();
     std::vector<GLfloat> vertices = {};
+    std::vector<GLfloat> cube_vertices = {};
     std::vector<GLuint> indices = {};
     for (auto row : m){
         vertices.push_back(row[0]);
@@ -367,6 +370,10 @@ void GuiApp::UpdateFigure(){
         vertices.push_back(row[2]);
         vertices.push_back(0); //uv надо правильные поставить
         vertices.push_back(0); //uv надо правильные поставить
+
+        cube_vertices.push_back(row[0]);
+        cube_vertices.push_back(row[1]);
+        cube_vertices.push_back(row[2]);
     }
     s21::Poly_t polies = c_->getPolygons();
     for (auto poly : polies){
@@ -375,6 +382,6 @@ void GuiApp::UpdateFigure(){
         }
 
     }
-    getCanvas()->updateFigure(vertices, indices);
+    getCanvas()->updateFigure(vertices, indices, cube_vertices);
 }
 

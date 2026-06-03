@@ -56,7 +56,7 @@
                 <property name="hexpand">1</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkDrawingArea" id="paper">
+                  <object class="GtkGLArea" id="paper">
                     <property name="margin-end">15</property>
                     <property name="vexpand">1</property>
                   </object>
