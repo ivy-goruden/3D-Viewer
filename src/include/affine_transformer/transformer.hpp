@@ -23,9 +23,9 @@ namespace s21{
             Poly_Filled_t static cropFigure(Poly_t &polygons, const matrix_t &m, Camera& camera);
             std::vector<Point3d> static cropPoly(std::vector<int> &polygon, const matrix_t &m, Camera& camera);
 
-            matrix_t static perspective(matrix_t* original, const Camera camera, float aspect);
-            matrix_t static ortho(matrix_t* original, const Camera camera, float aspect);
-            matrix_t static setView(matrix_t* original, const Camera camera, const Point3d center);
+            matrix_t static perspective(matrix_t* original, const Camera* camera, float aspect);
+            matrix_t static ortho(matrix_t* original, const Camera* camera, float aspect);
+            matrix_t static setView(matrix_t* original, const Camera* camera, const Point3d center);
     };
 }
 

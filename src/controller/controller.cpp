@@ -14,12 +14,13 @@ Controller::Controller() {
     angleX_ = 0;
     angleY_ = 0;
     angleZ_ = 0;
-    camera_ = new Camera(0.0, 0.0, -10.0, 45, 10.0, 100.0);
+    camera_ = new Camera(0.0, 0.0, 12.0, 45, 10.0, 100.0);
     scale_ = 1;
     shiftx_ = 0;
     shifty_ = 0;
     diagonal_ = 0;
     Poly_Proj_t projection_ = Poly_Proj_t();
+    parallel_projection_ = true;
 }
 
 Controller::~Controller() {
@@ -71,7 +72,7 @@ void Controller::loadFigure(const char* filename, int canvasW, int canvasH) {
         s21::Transformer::Translate(-(b.maxx + b.minx) / 2, -(b.maxy + b.miny) / 2, -(b.maxz + b.minz) / 2, shapeVert);
     figure->setMatrix(fig);
 
-    //FigureView_Sett(canvasW, canvasH);
+    FigureView_Sett(canvasW, canvasH);
 }
 
 void Controller::FigureView_Sett(int canvasW, int canvasH) {
@@ -80,9 +81,10 @@ void Controller::FigureView_Sett(int canvasW, int canvasH) {
     int x = b.maxx - b.minx;
     int y = b.maxy - b.miny;
     int z = b.maxz - b.minz;
-    diagonal_ = std::sqrt(std::pow(x, 2) + std::pow(y, 2) + std::pow(z, 2)) + 10;
-    camera_->z = (diagonal_ + camera_->d) * -1;
+    diagonal_ = std::sqrt(std::pow(x, 2) + std::pow(y, 2) + std::pow(z, 2));
+    camera_->z = (b.maxz + camera_->d);
     scale_ = 0.8 * std::min(canvasW, canvasH) / diagonal_;
+    camera_->far = (camera_->z - diagonal_)*1.1;
 }
 
 Poly_Proj_t Controller::getFigure() {
@@ -113,11 +115,11 @@ Poly_Proj_t Controller::getFigureProjection(const matrix_t original) {
 
 void Controller::toggleProjection() {
     parallel_projection_ = !parallel_projection_;
-    if (parallel_projection_) {
-        scale_ = 1 / 2;
-    } else {
-        scale_ = diagonal_;
-    }
+    // if (parallel_projection_) {
+    //     scale_ = 1 / 2;
+    // } else {
+    //     scale_ = diagonal_;
+    // }
 }
 
 matrix_t Controller::getMatrix() {
@@ -163,16 +165,20 @@ int Controller::getVerticesNum() {
 void Controller::setScale(float scale) { scale_ = scale; }
 
 matrix_t Controller::getMVP(float aspect){
-    matrix_t orig = figure_->getMatrix();
+    matrix_t orig = {{1,0,0,0}, {0,1,0,0},{0,0,1,0},{0,0,0,1}};
     matrix_t rotate = Transformer::Rotate(angleX_, angleY_, angleZ_, orig);
     matrix_t scale = Transformer::Scale(scale_, scale_, scale_, rotate);
     matrix_t translate = Transformer::Translate(shiftx_, shiftx_, 0, scale);
-    matrix_t mvp = Transformer::setView(&translate, *camera_, Point3d(0,0,0));
+    //Matrix::print_matrix(&translate, "model matrix after affine transformations");
+    matrix_t mvp = Transformer::setView(&translate, camera_, Point3d(0,0,0));
+    //Matrix::print_matrix(&mvp, "view mult by model");
     if (parallel_projection_){
-        mvp = Transformer::perspective(&mvp, *camera_, aspect);
+        mvp = Transformer::perspective(&mvp, camera_, aspect);
     }else{
-        mvp = Transformer::ortho(&mvp, *camera_, aspect);
+        mvp = Transformer::ortho(&mvp, camera_, aspect);
     }
+    //printf("Aspect: %f\n", aspect);
+    //Matrix::print_matrix(&mvp, "final projected matrix");
     return mvp;
 }
 

@@ -178,7 +178,7 @@ void GuiApp::activate(GtkApplication* app) {
     zoomSpinnerButton = gtk_builder_get_object(builder, "zoom_spinner");
     scaleSpinnerButton = gtk_builder_get_object(builder, "scale_spinner");
     paper = gtk_builder_get_object(builder, "paper");
-
+    getCanvas(); //инициализируем виджет перед добавлением
     lineSwitch = gtk_builder_get_object(builder, "line_switch");
     projSwitch = gtk_builder_get_object(builder, "proj_switch");
     fillSwitch = gtk_builder_get_object(builder, "poli_fill_switch");

@@ -8,6 +8,9 @@
 static void on_realize(GtkGLArea *area, gpointer data) {
     SimpleCanvas* self = static_cast<SimpleCanvas*>(data);
     self->init_gl(area);
+    std::cout << "realize" << std::endl;
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) std::cerr << "OpenGL error: " << err << std::endl;
 }
 
 // Вызывается при уничтожении GtkGLArea (освобождаем ресурсы)
@@ -112,8 +115,9 @@ void SimpleCanvas::draw(GdkGLContext *ctx){
     glUseProgram(shader_program);                // Активируем шейдерную программу куба
     glUniform3f(poly_color_location, polyColor_.red, polyColor_.green, polyColor_.blue);
     glUniformMatrix4fv(mvp_location, 1, GL_FALSE, mvp_); // Передаём матрицу MVP в uniform
-
     glBindVertexArray(vao);                      // Привязываем VAO куба (все настройки вершин)
+    glDisable(GL_DEPTH_TEST);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // каркасный режим – легче понять, рисуется ли что-то
     glDrawElements(GL_TRIANGLES, polyIndicesCount, GL_UNSIGNED_INT, 0); // Рисуем куб: 36 индексов, треугольники
     // --- Рисуем 8 вершин куба точками ПОВЕРХ ---
     glUseProgram(point_program);                 // Активируем шейдерную программу для точек
@@ -126,6 +130,9 @@ void SimpleCanvas::draw(GdkGLContext *ctx){
     glDrawArrays(GL_POINTS, 0, vertCount);               // Рисуем 8 точек (по количеству вершин в буфере)
     glEnable(GL_DEPTH_TEST);                     // Включаем тест глубины обратно
     glBindVertexArray(0);                        // Отвязываем VAO
+        std::cout << "drawing" << std::endl;
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) std::cerr << "OpenGL error: " << err << std::endl;
 }
     
 
@@ -163,7 +170,9 @@ void SimpleCanvas::setLineType(int type) {
 }
 
 void SimpleCanvas::setBgColor(Rgb color) { bgColor_ = color; }
-void SimpleCanvas::setVertColor(Rgb color) { dotColor_ = color; glUniform3f(point_color_location, dotColor_.red, dotColor_.green, dotColor_.blue); }
+void SimpleCanvas::setVertColor(Rgb color) { 
+    dotColor_ = color; 
+}
 
 void SimpleCanvas::setLineWidth(float width) { lineWidth_ = width; }
 
@@ -180,6 +189,7 @@ void SimpleCanvas::setMVP(const GLfloat* mvp){
 void SimpleCanvas::redraw() {
     if (widget_ != nullptr) {
         gtk_gl_area_queue_render(GTK_GL_AREA(widget_));
+        std::cout << "redrew" << std::endl;
     }
 }
 
@@ -220,6 +230,9 @@ void printMVP(const GLfloat* mvp, const char* name = "MVP") {
 }
 
 void SimpleCanvas::updateFigure(std::vector<GLfloat> vertices, std::vector<GLuint> indices, std::vector<GLfloat> cube_vertices){
+                std::cout << "update figure" << std::endl;
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) std::cerr << "OpenGL error: " << err << std::endl;
     gtk_gl_area_make_current(GTK_GL_AREA(widget_));
     if (gtk_gl_area_get_error(GTK_GL_AREA(widget_))) return;
     glBindVertexArray(vao);                        // активируем VAO куба
@@ -244,8 +257,8 @@ void SimpleCanvas::updateFigure(std::vector<GLfloat> vertices, std::vector<GLuin
     glBindVertexArray(0);                          // отвязываем VAO
     vertCount = vertices.size()/5;
     polyIndicesCount = indices.size();
-    printVertices(vertices);
-    printIndices(indices);
-    printCubeVertices(cube_vertices);
-    printMVP(mvp_);
+    //printVertices(vertices);
+    //printIndices(indices);
+    //printCubeVertices(cube_vertices);
+    //printMVP(mvp_);
 }

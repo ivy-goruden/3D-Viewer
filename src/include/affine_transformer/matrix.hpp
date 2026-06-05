@@ -51,6 +51,17 @@ namespace s21 {
             }
             return bounds;
         }
+
+        static void print_matrix(const matrix_t* mvp, const char* name = "MVP") {
+            std::cout << name << " matrix_t :\n";
+            for (int row = 0; row < 4; ++row) {
+                std::cout << "| ";
+                for (int col = 0; col < 4; ++col) {
+                    std::cout << (*mvp)[row][col] << "\t";
+                }
+                std::cout << "|\n";
+            }
+        }
     };
 
 }

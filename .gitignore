@@ -51,3 +51,5 @@ settings.json
 
 !src/assets/cube.obj
 !src/assets/pyramid.obj
+
+src/example.c

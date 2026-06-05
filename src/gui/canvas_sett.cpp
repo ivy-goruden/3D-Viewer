@@ -9,6 +9,7 @@
 static const char *vertex_shader_src =
     "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec2 texCoord;\n"
     "uniform vec3 polyColor;\n"
     "out vec3 ourColor;\n"
     "uniform mat4 mvp;\n"
