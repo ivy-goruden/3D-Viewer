@@ -74,7 +74,7 @@ class GuiApp {
     void bgcolorSelected(float red, float green, float blue, float alpha);
     void openFileSelected(const std::string& path);
     void updateStatusBar();
-    s21::Poly_Proj_t getFigure();
+    //s21::Poly_Proj_t getFigure();
     AppData* getAppData();
     const AppData* getAppData() const;
     SimpleCanvas* getCanvas();

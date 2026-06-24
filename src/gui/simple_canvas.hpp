@@ -1,8 +1,6 @@
 #ifndef SIMPLE_CANVAS_HPP
 #define SIMPLE_CANVAS_HPP
 
-#include <gtk/gtk.h>
-#include <epoxy/gl.h>
 #include <cmath>
 #include <vector>
 
@@ -10,6 +8,26 @@
 #include "../include/grid.hpp"
 #include "../include/main.h"
 #include "gui_globals.h"
+
+struct Point_Program{
+    Glint program;
+    GLint mvp;
+    GLint color;
+}
+
+struct Light_Program{
+    Glint program;
+    GLint model;
+    GLint view;
+    GLint projection;
+    GLint poly_color;
+    GLint lightPos;
+    GLint lightColor;
+    Glint texture;
+    Glint objectColor;
+    GLint ambientLight;
+    GLint specularStrength;
+}
 
 class SimpleCanvas {
    public:
@@ -41,8 +59,16 @@ class SimpleCanvas {
     void setProjection(s21::Poly_Proj_t proj);
     void updateFigure(std::vector<GLfloat> vertices, std::vector<GLuint> indices, std::vector<GLfloat> cube_vertices);
     void setMVP(const GLfloat* mvp);
+    void initPrograms();
+    void initTexture();
+    void initFigure();
+    void initDots();
+    void loadTexture(const char* file);
+
+
 
    private:
+    Light_Program getLightProgram();
     // singleton
     static std::unique_ptr<SimpleCanvas> simple_canvas_;
     explicit SimpleCanvas(GtkWidget* drawing_area);
@@ -67,18 +93,19 @@ class SimpleCanvas {
     Stroke lineType_;
     float canvas_scale_;
 
-    GLuint shader_program;
+    Light_Program fong_program;
+    Light_Program flatColor_program;
+    Light_Program guro_program;
     GLuint vao, vbo, ebo;
-    GLuint mvp_location;
-    GLuint poly_color_location;
 
-    GLuint point_mvp_location;
-    GLuint point_color_location;
+    Point_Program point_program;
     GLuint point_vao, point_vbo;
-    GLuint point_program;
-
+    
+    GLuint ourTexture;
     GLuint texture;
     GLfloat mvp_[16];
+
+
 
     int vertCount;
     int polyIndicesCount;

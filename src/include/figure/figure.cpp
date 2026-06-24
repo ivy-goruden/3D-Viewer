@@ -3,12 +3,12 @@
 
 namespace s21{
 
-    Figure::Figure(matrix_t& m, Poly_t p, Edge_t n): matrix_(m), polygons_(p), edges_(n){
-        projectionVertices_ = Vert_t();
-        minz = 0.0;
-        bounds = {0, 0, 0, 0, 0, 0};
-        projectionVertices_ = Vert_t();
-    }
+    // Figure::Figure(matrix_t& m, FaceObj_t p, Edge_t n): matrix_(m), polygons_(p), edges_(n){
+    //     projectionVertices_ = Vert_t();
+    //     minz = 0.0;
+    //     bounds = {0, 0, 0, 0, 0, 0};
+    //     projectionVertices_ = Vert_t();
+    // }
 
     Figure::Figure(ObjLoader loader){
         minz = 0.0;
@@ -37,16 +37,9 @@ namespace s21{
         }
         Unique(l);
         edges_ = std::move(l);
-        polygons_ = Poly_t();
 
-        // без учета групп
-        for (FaceObj_t face: loader.faces){
-            std::vector<int> poly;
-            for (FaceElementObj_t el: face){
-                poly.push_back(el.vi-1);
-            }
-            polygons_.push_back(poly);
-        }
+        polygons_ = loader.faces;
+        textures_ = loader.textures;
         
     }
 
@@ -60,8 +53,12 @@ namespace s21{
         return projectionVertices_;
     }
 
-    Poly_t Figure::getPolygons() {
+    std::vector<FaceObj_t> Figure::getPolygons() {
         return polygons_;
+    }
+
+    std::vector<TextureObj_t> Figure::getTextures(){
+        return textures_;
     }
 
     matrix_t Figure::getMatrix() {
@@ -86,7 +83,7 @@ namespace s21{
             std::set<Seg_t> unique_nodes;
             for (const auto& dots : polygons_) {
                 for (size_t i = 1; i < dots.size(); ++i) {
-                    unique_nodes.insert(Seg_t(dots[i-1], dots[i]));
+                    unique_nodes.insert(Seg_t(dots[i-1].vi, dots[i].vi));
                 }
             }
             *nodesNum = unique_nodes.size();

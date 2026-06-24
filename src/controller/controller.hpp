@@ -30,13 +30,14 @@ class Controller {
     Controller();
     ~Controller();
     void loadFigure(const char* filename, int, int);
-    Poly_Proj_t getFigure();
+    //Poly_Proj_t getFigure();
     void toggleProjection();
     void shiftX(int);
     void shiftY(int);
     matrix_t getMatrix();
     Edge_t getEdges();
-    Poly_t getPolygons();
+    std::vector<s21::FaceObj_t> getPolygons();
+    std::vector<TextureObj_t> getTextures();
     float getAngleX();
     float getAngleY();
     float getAngleZ();

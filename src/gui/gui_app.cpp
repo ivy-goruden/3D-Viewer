@@ -355,7 +355,7 @@ void GuiApp::updateStatusBar() {
     gtk_label_set_text(GTK_LABEL(status_file), file_text.c_str());
 }
 
-s21::Poly_Proj_t GuiApp::getFigure() { return c_->getFigure(); }
+// s21::Poly_Proj_t GuiApp::getFigure() { return c_->getFigure(); }
 
 s21::Bounds GuiApp::getFigureBounds() { return c_->getFigureBounds(); }
 
@@ -364,24 +364,38 @@ void GuiApp::UpdateFigure(){
     std::vector<GLfloat> vertices = {};
     std::vector<GLfloat> cube_vertices = {};
     std::vector<GLuint> indices = {};
-    for (auto row : m){
-        vertices.push_back(row[0]);
-        vertices.push_back(row[1]);
-        vertices.push_back(row[2]);
-        vertices.push_back(0); //uv надо правильные поставить
-        vertices.push_back(0); //uv надо правильные поставить
-
-        cube_vertices.push_back(row[0]);
-        cube_vertices.push_back(row[1]);
-        cube_vertices.push_back(row[2]);
-    }
-    s21::Poly_t polies = c_->getPolygons();
-    for (auto poly : polies){
-        for (auto i : poly){
-            indices.push_back(i);
+    std::vector<s21::FaceObj_t> polies = c_->getPolygons();
+    std::vector<s21::TextureObj_t> textures = c_->getTextures();
+    for (size_t i =0; i< m.size(); i++){
+        vertices.push_back(m[i][0]);
+        vertices.push_back(m[i][1]);
+        vertices.push_back(m[i][2]);
+        if (textures.empty() || i>= textures.size()) {
+            // Если текстур нет, можно передавать нулевые UV или пропустить
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+        } else {
+            vertices.push_back(textures[i].u);
+            vertices.push_back(textures[i].v);
         }
 
+        cube_vertices.push_back(m[i][0]);
+        cube_vertices.push_back(m[i][1]);
+        cube_vertices.push_back(m[i][2]);
     }
+    for (auto poly : polies) {
+        if (poly.size() < 3) continue;               // не polygon
+        for (size_t i = 1; i + 1 < poly.size(); ++i) {
+            indices.push_back(poly[0].vi - 1);           // первая вершина
+            indices.push_back(poly[i].vi -1);           // текущая
+            indices.push_back(poly[i + 1].vi -1);       // следующая
+        }
+    }
+    // for (auto poly : polies){
+    //     for (auto i : poly){
+    //         indices.push_back(i.vi);
+    //     }
+    // }
+
     getCanvas()->updateFigure(vertices, indices, cube_vertices);
 }
-

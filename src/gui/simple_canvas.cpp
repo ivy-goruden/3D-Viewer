@@ -1,5 +1,7 @@
 #include "simple_canvas.hpp"
 
+#include <gtk/gtk.h>
+#include <epoxy/gl.h>
 #include <format>
 #include <iostream>
 #include "../include/axes.hpp"
@@ -23,8 +25,10 @@ static void on_unrealize(GtkGLArea *area, gpointer data) {
 }
 
 void SimpleCanvas::cleanup(){
-    glDeleteProgram(shader_program);         // Удаляем программу куба
-    glDeleteProgram(point_program);          // Удаляем программу точек
+    glDeleteProgram(fong_program);
+    glDeleteProgram(flatColor_program);
+    glDeleteProgram(guro_program);
+    glDeleteProgram(point_program);
     glDeleteVertexArrays(1, &vao);           // Удаляем VAO куба
     glDeleteBuffers(1, &vbo);                // Удаляем VBO куба
     glDeleteBuffers(1, &ebo);                // Удаляем EBO куба
@@ -66,7 +70,9 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area)
       vertType_(None),
       lineType_(Solid),
       canvas_scale_(1.0f),
-      shader_program(0),
+      guro_program(0),
+      flatColor_program(0),
+      fong_program(0),
       vao(0), vbo(0), ebo(0),
       mvp_location(0), poly_color_location(0),
       point_vao(0), point_vbo(0), point_program(0),
@@ -110,29 +116,33 @@ void SimpleCanvas::draw_dot(cairo_t* cr, float x, float y) {
 }
 
 void SimpleCanvas::draw(GdkGLContext *ctx){
+    if (texture != 0) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
     glClearColor(bgColor_.red, bgColor_.green, bgColor_.blue, bgColor_.alpha);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Очищаем экран и буфер глубины
-    glUseProgram(shader_program);                // Активируем шейдерную программу куба
+    glUseProgram(getLightProgram());                // Активируем шейдерную программу
     glUniform3f(poly_color_location, polyColor_.red, polyColor_.green, polyColor_.blue);
     glUniformMatrix4fv(mvp_location, 1, GL_FALSE, mvp_); // Передаём матрицу MVP в uniform
-    glBindVertexArray(vao);                      // Привязываем VAO куба (все настройки вершин)
+    glBindVertexArray(vao);                      // Привязываем VAO
     glDisable(GL_DEPTH_TEST);
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // каркасный режим – легче понять, рисуется ли что-то
+    // if (fillPoly_ == false){
+    //     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // }
     glDrawElements(GL_TRIANGLES, polyIndicesCount, GL_UNSIGNED_INT, 0); // Рисуем куб: 36 индексов, треугольники
-    // --- Рисуем 8 вершин куба точками ПОВЕРХ ---
-    glUseProgram(point_program);                 // Активируем шейдерную программу для точек
+    
+
+    glUseProgram(getPointProgram());                 // Активируем шейдерную программу для точек
     glUniformMatrix4fv(point_mvp_location, 1, GL_FALSE, mvp_); // Передаём ту же матрицу MVP
     glUniform3f(point_color_location, dotColor_.red, dotColor_.green, dotColor_.blue);
 
     glPointSize(vertWidth_ / canvas_scale_);
     glDisable(GL_DEPTH_TEST);                    // Временно отключаем тест глубины – точки будут видны даже если перекрыты гранями
     glBindVertexArray(point_vao);                // Привязываем VAO точек
-    glDrawArrays(GL_POINTS, 0, vertCount);               // Рисуем 8 точек (по количеству вершин в буфере)
+    glDrawArrays(GL_POINTS, 0, vertCount); 
     glEnable(GL_DEPTH_TEST);                     // Включаем тест глубины обратно
     glBindVertexArray(0);                        // Отвязываем VAO
-        std::cout << "drawing" << std::endl;
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR) std::cerr << "OpenGL error: " << err << std::endl;
 }
     
 
@@ -257,8 +267,16 @@ void SimpleCanvas::updateFigure(std::vector<GLfloat> vertices, std::vector<GLuin
     glBindVertexArray(0);                          // отвязываем VAO
     vertCount = vertices.size()/5;
     polyIndicesCount = indices.size();
-    //printVertices(vertices);
-    //printIndices(indices);
-    //printCubeVertices(cube_vertices);
-    //printMVP(mvp_);
+    printVertices(vertices);
+    // printIndices(indices);
+    // printCubeVertices(cube_vertices);
+    // printMVP(mvp_);
+}
+
+Light_Program SimpleCanvas::getLightProgram(){
+    return fong_program;
+}
+
+Point_Program SimpleCanvas::getPointProgram(){
+    return point_program;
 }

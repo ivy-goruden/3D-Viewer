@@ -84,18 +84,18 @@ void Controller::FigureView_Sett(int canvasW, int canvasH) {
     diagonal_ = std::sqrt(std::pow(x, 2) + std::pow(y, 2) + std::pow(z, 2));
     camera_->z = (b.maxz + camera_->d);
     scale_ = 0.8 * std::min(canvasW, canvasH) / diagonal_;
-    camera_->far = (camera_->z - diagonal_)*1.1;
+    camera_->far = (camera_->z - diagonal_)*2;
 }
 
-Poly_Proj_t Controller::getFigure() {
-    if (figure_ != nullptr) {
-        matrix_t rotate = Transformer::Rotate(angleX_, angleY_, angleZ_, figure_->getMatrix());
-        matrix_t scale = Transformer::Scale(scale_, scale_, scale_, rotate);
-        matrix_t translate = Transformer::Translate(shiftx_, shiftx_, 0, scale);
-        projection_ = getFigureProjection(translate);
-    }
-    return projection_;
-}
+// Poly_Proj_t Controller::getFigure() {
+//     if (figure_ != nullptr) {
+//         matrix_t rotate = Transformer::Rotate(angleX_, angleY_, angleZ_, figure_->getMatrix());
+//         matrix_t scale = Transformer::Scale(scale_, scale_, scale_, rotate);
+//         matrix_t translate = Transformer::Translate(shiftx_, shiftx_, 0, scale);
+//         projection_ = getFigureProjection(translate);
+//     }
+//     return projection_;
+// }
 
 Bounds Controller::getFigureBounds() {
     Bounds bounds = {0, 0, 0, 0, 0, 0};
@@ -105,13 +105,13 @@ Bounds Controller::getFigureBounds() {
     return bounds;
 }
 
-Poly_Proj_t Controller::getFigureProjection(const matrix_t original) {
-    Poly_t poly = figure_->getPolygons();
-    if (parallel_projection_) {
-        return s21::Transformer::getParallelProjection(poly, original, scale_);
-    }
-    return s21::Transformer::getPerspectiveProjection(poly, original, *camera_, scale_);
-}
+// Poly_Proj_t Controller::getFigureProjection(const matrix_t original) {
+//     Poly_t poly = figure_->getPolygons();
+//     if (parallel_projection_) {
+//         return s21::Transformer::getParallelProjection(poly, original, scale_);
+//     }
+//     return s21::Transformer::getPerspectiveProjection(poly, original, *camera_, scale_);
+// }
 
 void Controller::toggleProjection() {
     parallel_projection_ = !parallel_projection_;
@@ -138,12 +138,20 @@ Edge_t Controller::getEdges() {
     return edges;
 }
 
-Poly_t Controller::getPolygons() {
-    Poly_t polygon;
+std::vector<s21::FaceObj_t> Controller::getPolygons() {
+    std::vector<s21::FaceObj_t> polygon;
     if (figure_ != nullptr) {
         polygon = figure_->getPolygons();
     }
     return polygon;
+}
+
+std::vector<TextureObj_t> Controller::getTextures(){
+    std::vector<TextureObj_t> texture;
+    if (figure_ != nullptr) {
+        texture = figure_->getTextures();
+    }
+    return texture;
 }
 
 int Controller::getEdgesNum() {
