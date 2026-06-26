@@ -53,5 +53,9 @@ class Controller {
     Bounds getFigureBounds();
     void FigureView_Sett(int canvasW, int canvasH);
     matrix_t getMVP(float aspect);
+    matrix_t getViewMatrix();
+    matrix_t getProjMatrix(float aspect);
+    matrix_t getModelMatrix();
+    std::vector<NormalObj_t> getNormals();
 };
 }  // namespace s21

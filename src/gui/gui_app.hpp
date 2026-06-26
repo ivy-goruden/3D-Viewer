@@ -13,7 +13,8 @@
 class GuiApp {
    private:
     AppData* appData;
-    static void onColorButtonClick(GtkButton* btn, gpointer user_data);
+    static void onDotColorButtonClick(GtkButton* btn, gpointer user_data);
+    static void onPolyColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onBgColorButtonClick(GtkButton* btn, gpointer user_data);
     static void onActivate(GtkApplication* app, gpointer user_data);
     static void onOpenButtonClick(GtkButton* btn, gpointer user_data);
@@ -55,8 +56,9 @@ class GuiApp {
     GObject* noneModeCheck;
     GObject* rectModeCheck;
     GObject* circModeCheck;
-    GObject* colorButton;
+    GObject* dotColorButton;
     GObject* bgcolorButton;
+    GObject* figureColorButton;
     GObject* weightSpinnerButton;
     GObject* statusLabel;
     OpenDialog* openDialog;
@@ -70,7 +72,8 @@ class GuiApp {
     ~GuiApp();
     int run(int argc, char** argv);
     void activate(GtkApplication* app);
-    void colorSelected(float red, float green, float blue, float alpha);
+    void dotColorSelected(float red, float green, float blue, float alpha);
+    void polyColorSelected(float red, float green, float blue, float alpha);
     void bgcolorSelected(float red, float green, float blue, float alpha);
     void openFileSelected(const std::string& path);
     void updateStatusBar();
@@ -95,10 +98,11 @@ class GuiApp {
     Command* projSwitchCommand;
     Command* fillSwitchCommand;
     Command* vertModeCommand;
-    Command* colorCommand;
+    Command* dotColorCommand;
     Command* bgcolorCommand;
     Command* weightCommand;
     Command* vertSizeCommand;
+    Command* polyColorCommand;
     void createCommands();
     void dropCommands();
     void UpdateFigure();

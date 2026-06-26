@@ -108,8 +108,6 @@ typedef std::vector<std::vector<Point3d>> Poly_Filled_t;  // polygons with verti
 typedef std::vector<std::vector<Point>> Poly_Proj_t;      // projection of polygons
 typedef std::vector<Seg_t> Edge_t;                        // edges грани
 
-// typedef std::map<Point3d, Rgb> Colour_Map_t;  // цвета пикселей фигуры
-// typedef std::map<Point, Rgb> Color_Mask_t;    // цвета пикселей проекции фигуры
 
 struct ProjectedVertex {
     int x, y;        // экранные координаты (пиксели)

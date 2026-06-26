@@ -20,6 +20,7 @@ class Figure{
         Bounds bounds;
         void Unique(Edge_t&) const;
         mutable std::optional<int> nodesNum;
+        std::vector<NormalObj_t> normals_;
     
     public:
         Figure(matrix_t&, Poly_t, Edge_t);
@@ -33,6 +34,7 @@ class Figure{
         Vert_t getProjection();
         Bounds getBounds();
         std::vector<TextureObj_t> getTextures();
+        std::vector<NormalObj_t> getNormals();
 };
 
 }

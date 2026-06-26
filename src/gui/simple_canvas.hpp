@@ -10,24 +10,25 @@
 #include "gui_globals.h"
 
 struct Point_Program{
-    Glint program;
+    GLint program;
     GLint mvp;
     GLint color;
-}
+};
 
 struct Light_Program{
-    Glint program;
+    GLint program;
     GLint model;
     GLint view;
     GLint projection;
     GLint poly_color;
     GLint lightPos;
     GLint lightColor;
-    Glint texture;
-    Glint objectColor;
+    GLint texture;
+    GLint objectColor;
     GLint ambientLight;
     GLint specularStrength;
-}
+    GLint viewPos;
+};
 
 class SimpleCanvas {
    public:
@@ -54,11 +55,20 @@ class SimpleCanvas {
     void setLineType(int type);
     void setBgColor(Rgb color);
     void setVertColor(Rgb color);
+    void setPolyColor(Rgb color);
     void setLineWidth(float width);
     void setVertSize(float size);
     void setProjection(s21::Poly_Proj_t proj);
     void updateFigure(std::vector<GLfloat> vertices, std::vector<GLuint> indices, std::vector<GLfloat> cube_vertices);
+    void draw_figure();
+    void draw_dots();
+    
+    //FIGURE
     void setMVP(const GLfloat* mvp);
+    void setModelMatrix(const GLfloat*);
+    void setViewMatrix(const GLfloat*);
+    void setProjMatrix(const GLfloat*);
+
     void initPrograms();
     void initTexture();
     void initFigure();
@@ -69,6 +79,7 @@ class SimpleCanvas {
 
    private:
     Light_Program getLightProgram();
+    Point_Program getPointProgram();
     // singleton
     static std::unique_ptr<SimpleCanvas> simple_canvas_;
     explicit SimpleCanvas(GtkWidget* drawing_area);
@@ -94,17 +105,18 @@ class SimpleCanvas {
     float canvas_scale_;
 
     Light_Program fong_program;
-    Light_Program flatColor_program;
+    Light_Program flat_program;
     Light_Program guro_program;
     GLuint vao, vbo, ebo;
 
     Point_Program point_program;
     GLuint point_vao, point_vbo;
     
-    GLuint ourTexture;
-    GLuint texture;
     GLfloat mvp_[16];
-
+    GLfloat model_[16];
+    GLfloat view_[16];
+    GLfloat proj_[16];
+    GLuint texture;
 
 
     int vertCount;

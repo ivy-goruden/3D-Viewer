@@ -172,22 +172,41 @@ int Controller::getVerticesNum() {
 
 void Controller::setScale(float scale) { scale_ = scale; }
 
-matrix_t Controller::getMVP(float aspect){
+
+
+matrix_t Controller::getViewMatrix(){
+    return Transformer::getViewMatrix(camera_, Point3d(0,0,0));
+}
+
+matrix_t Controller::getProjMatrix(float aspect){
+    if (parallel_projection_){
+        return Transformer::getPerspMatrix(camera_, aspect);
+    }else{
+        return Transformer::getOrthoMatrix(camera_, aspect);
+    }
+}
+
+matrix_t Controller::getModelMatrix(){
     matrix_t orig = {{1,0,0,0}, {0,1,0,0},{0,0,1,0},{0,0,0,1}};
     matrix_t rotate = Transformer::Rotate(angleX_, angleY_, angleZ_, orig);
     matrix_t scale = Transformer::Scale(scale_, scale_, scale_, rotate);
     matrix_t translate = Transformer::Translate(shiftx_, shiftx_, 0, scale);
-    //Matrix::print_matrix(&translate, "model matrix after affine transformations");
-    matrix_t mvp = Transformer::setView(&translate, camera_, Point3d(0,0,0));
-    //Matrix::print_matrix(&mvp, "view mult by model");
+    return translate;
+}
+
+matrix_t Controller::getMVP(float aspect){
+    matrix_t mat = getModelMatrix();
+    matrix_t mvp = Transformer::setView(&mat, camera_, Point3d(0,0,0));
     if (parallel_projection_){
         mvp = Transformer::perspective(&mvp, camera_, aspect);
     }else{
         mvp = Transformer::ortho(&mvp, camera_, aspect);
     }
-    //printf("Aspect: %f\n", aspect);
-    //Matrix::print_matrix(&mvp, "final projected matrix");
     return mvp;
+}
+
+std::vector<NormalObj_t> Controller::getNormals(){
+    return figure_->getNormals();
 }
 
 }  // namespace s21

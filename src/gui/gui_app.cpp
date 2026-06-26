@@ -115,9 +115,14 @@ void GuiApp::onVertModeToggled(GtkCheckButton* btn, GParamSpec* pspec, gpointer 
     self->executeCommand(self->vertModeCommand);
 }
 
-void GuiApp::onColorButtonClick(GtkButton* btn, gpointer user_data) {
+void GuiApp::onDotColorButtonClick(GtkButton* btn, gpointer user_data) {
     GuiApp* self = static_cast<GuiApp*>(user_data);
-    self->executeCommand(self->colorCommand);
+    self->executeCommand(self->dotColorCommand);
+}
+
+void GuiApp::onPolyColorButtonClick(GtkButton* btn, gpointer user_data) {
+    GuiApp* self = static_cast<GuiApp*>(user_data);
+    self->executeCommand(self->polyColorCommand);
 }
 
 void GuiApp::onBgColorButtonClick(GtkButton* btn, gpointer user_data) {
@@ -168,8 +173,9 @@ void GuiApp::activate(GtkApplication* app) {
     window = gtk_builder_get_object(builder, "main");
     openButton = gtk_builder_get_object(builder, "open_button");
     resetButton = gtk_builder_get_object(builder, "reset_button");
-    colorButton = gtk_builder_get_object(builder, "color_button");
+    dotColorButton = gtk_builder_get_object(builder, "color_button");
     bgcolorButton = gtk_builder_get_object(builder, "bgcolor_button");
+    figureColorButton = gtk_builder_get_object(builder, "figure_color_button");
     xSpinnerButton = gtk_builder_get_object(builder, "rotate_x_spinner");
     ySpinnerButton = gtk_builder_get_object(builder, "rotate_y_spinner");
     zSpinnerButton = gtk_builder_get_object(builder, "rotate_z_spinner");
@@ -198,8 +204,9 @@ void GuiApp::activate(GtkApplication* app) {
 
     g_signal_connect(openButton, "clicked", G_CALLBACK(onOpenButtonClick), this);
     g_signal_connect(resetButton, "clicked", G_CALLBACK(onResetButtonClick), this);
-    g_signal_connect(colorButton, "clicked", G_CALLBACK(onColorButtonClick), this);
+    g_signal_connect(dotColorButton, "clicked", G_CALLBACK(onDotColorButtonClick), this);
     g_signal_connect(bgcolorButton, "clicked", G_CALLBACK(onBgColorButtonClick), this);
+    g_signal_connect(figureColorButton, "clicked", G_CALLBACK(onPolyColorButtonClick), this);
     g_signal_connect(xSpinnerButton, "value_changed", G_CALLBACK(onXSpinnerValueChanged), this);
     g_signal_connect(ySpinnerButton, "value_changed", G_CALLBACK(onYSpinnerValueChanged), this);
     g_signal_connect(zSpinnerButton, "value_changed", G_CALLBACK(onZSpinnerValueChanged), this);
@@ -237,7 +244,7 @@ void GuiApp::restoreSett() {
     app->loadFromFile(settings_file);
     SimpleCanvas* canvas = getCanvas();
     canvas->setBgColor(app->getBgColor());
-    canvas->setVertColor(app->getColor());
+    canvas->setVertColor(app->getDotColor());
     canvas->setLineWidth(app->getWeight());
     if (app->getPath() != "") {
         openFileSelected(app->getPath().c_str());
@@ -245,10 +252,17 @@ void GuiApp::restoreSett() {
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(weightSpinnerButton), app->getWeight());
 }
 
-void GuiApp::colorSelected(float red, float green, float blue, float alpha) {
+void GuiApp::dotColorSelected(float red, float green, float blue, float alpha) {
     Rgb color = Rgb{red, green, blue, alpha};
-    getAppData()->setColor(color);
+    getAppData()->setDotColor(color);
     getCanvas()->setVertColor(color);
+    getCanvas()->redraw();
+}
+
+void GuiApp::polyColorSelected(float red, float green, float blue, float alpha) {
+    Rgb color = Rgb{red, green, blue, alpha};
+    getAppData()->setPolyColor(color);
+    getCanvas()->setPolyColor(color);
     getCanvas()->redraw();
 }
 
@@ -295,7 +309,8 @@ void GuiApp::createCommands() {
     this->projSwitchCommand = new ProjSwitchCommand(this);
     this->fillSwitchCommand = new FillSwitchCommand(this);
     this->vertModeCommand = new VertModeCommand(this);
-    this->colorCommand = new ColorCommand(this);
+    this->dotColorCommand = new DotColorCommand(this);
+    this->polyColorCommand = new PolyColorCommand(this);
     this->bgcolorCommand = new BgColorCommand(this);
     this->weightCommand = new WeightCommand(this);
     this->vertSizeCommand = new VertSizeCommand(this);
@@ -315,7 +330,8 @@ void GuiApp::dropCommands() {
     delete this->projSwitchCommand;
     delete this->fillSwitchCommand;
     delete this->vertModeCommand;
-    delete this->colorCommand;
+    delete this->dotColorCommand;
+    delete this->polyColorCommand;
     delete this->bgcolorCommand;
     delete this->weightCommand;
     delete this->vertSizeCommand;
@@ -327,14 +343,28 @@ void GuiApp::executeCommand(Command* cmd) {
         int w = gtk_widget_get_width(GTK_WIDGET(paper));
         int h = gtk_widget_get_height(GTK_WIDGET(paper));
         if (w==0 || h== 0) return;
+        s21::matrix_t view_matrix = c_->getViewMatrix();
+        s21::matrix_t proj_matrix = c_->getProjMatrix(w/h);
+        s21::matrix_t model_matrix = c_->getModelMatrix();
         s21::matrix_t mvp_matrix = c_->getMVP(w/h);
+        std::vector<GLfloat> view;
+        std::vector<GLfloat> proj;
+        std::vector<GLfloat> model;
         std::vector<GLfloat> mvp; 
+
         for (size_t i = 0; i<4; i++){
             for (size_t x = 0; x<4; x++){
+                view.push_back(view_matrix[x][i]);
+                model.push_back(model_matrix[x][i]);
+                proj.push_back(proj_matrix[x][i]);
                 mvp.push_back(mvp_matrix[x][i]);
+
             }
         }
         getCanvas()->setMVP(mvp.data());
+        getCanvas()->setViewMatrix(view.data());
+        getCanvas()->setProjMatrix(proj.data());
+        getCanvas()->setModelMatrix(model.data());
         getCanvas()->redraw();
     }
 }
@@ -366,12 +396,23 @@ void GuiApp::UpdateFigure(){
     std::vector<GLuint> indices = {};
     std::vector<s21::FaceObj_t> polies = c_->getPolygons();
     std::vector<s21::TextureObj_t> textures = c_->getTextures();
+    std::vector<s21::NormalObj_t> normals = c_->getNormals();
     for (size_t i =0; i< m.size(); i++){
         vertices.push_back(m[i][0]);
         vertices.push_back(m[i][1]);
         vertices.push_back(m[i][2]);
+        if (normals.empty() || i>= normals.size()) {
+            // Если нормалей нет, можно передавать нулевые
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+        } else {
+            vertices.push_back(normals[i].i);
+            vertices.push_back(normals[i].j);
+            vertices.push_back(normals[i].k);
+        }
         if (textures.empty() || i>= textures.size()) {
-            // Если текстур нет, можно передавать нулевые UV или пропустить
+            // Если текстур нет, можно передавать нулевые UV
             vertices.push_back(0.0f);
             vertices.push_back(0.0f);
         } else {

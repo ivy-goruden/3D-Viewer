@@ -100,9 +100,15 @@ class VertModeCommand : public Command {
     void execute() override;
 };
 
-class ColorCommand : public Command {
+class DotColorCommand : public Command {
    public:
-    ColorCommand(GuiApp* app) : Command(app) {};
+    DotColorCommand(GuiApp* app) : Command(app) {};
+    void execute() override;
+};
+
+class PolyColorCommand : public Command {
+   public:
+    PolyColorCommand(GuiApp* app) : Command(app) {};
     void execute() override;
 };
 

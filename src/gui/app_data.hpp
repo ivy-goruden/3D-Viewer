@@ -29,7 +29,8 @@ struct AppData {
     bool projSwitch;
     bool fillSwitch;
     Shape vertMode;
-    Rgb color;
+    Rgb dotColor;
+    Rgb polyColor;
     Rgb bgcolor;
     int weight;
     int vertSize;
@@ -48,7 +49,8 @@ struct AppData {
         projSwitch = false;
         fillSwitch = false;
         vertMode = None;
-        color = Rgb(0, 0, 0, 1);
+        polyColor = Rgb(0, 0, 0, 1);
+        dotColor = Rgb(0,0,0,1);
         bgcolor = Rgb(1, 1, 1, 1);
         weight = 1;
     }
@@ -77,7 +79,9 @@ struct AppData {
 
     Shape getVertMode() const { return vertMode; }
 
-    Rgb getColor() const { return color; }
+    Rgb getDotColor() const { return dotColor; }
+    
+    Rgb getPolyColor() const { return polyColor; }
 
     Rgb getBgColor() const { return bgcolor; }
 
@@ -143,8 +147,13 @@ struct AppData {
         saveToFile(settings);
     }
 
-    void setColor(Rgb val) {
-        color = val;
+    void setDotColor(Rgb val) {
+        dotColor = val;
+        saveToFile(settings);
+    }
+
+    void setPolyColor(Rgb val) {
+        polyColor = val;
         saveToFile(settings);
     }
 
@@ -165,7 +174,7 @@ struct AppData {
 
     json toJson() const {
         return json{{"path", getPath()},
-                    {"color", {getColor().red, getColor().green, getColor().blue, getColor().alpha}},
+                    {"color", {getDotColor().red, getDotColor().green, getDotColor().blue, getDotColor().alpha}},
                     {"bgcolor", {getBgColor().red, getBgColor().green, getBgColor().blue, getBgColor().alpha}},
                     {"weight", getWeight()}};
     }
@@ -175,7 +184,7 @@ struct AppData {
         std::vector<float> bgcolor_data = j.at("bgcolor").get<std::vector<float>>();
 
         setPath(j.at("path").get<std::string>());
-        setColor(Rgb{color_data[0], color_data[1], color_data[2], color_data[3]});
+        setDotColor(Rgb{color_data[0], color_data[1], color_data[2], color_data[3]});
         setBgColor(Rgb{bgcolor_data[0], bgcolor_data[1], bgcolor_data[2], bgcolor_data[3]});
         setWeight(j.at("weight").get<int>());
     }

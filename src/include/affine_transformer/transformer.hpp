@@ -26,6 +26,9 @@ namespace s21{
             matrix_t static perspective(matrix_t* original, const Camera* camera, float aspect);
             matrix_t static ortho(matrix_t* original, const Camera* camera, float aspect);
             matrix_t static setView(matrix_t* original, const Camera* camera, const Point3d center);
+            matrix_t static getPerspMatrix(const Camera *camera, float aspect);
+            matrix_t static getOrthoMatrix(const Camera *camera, float aspect);
+            matrix_t static getViewMatrix(const Camera *camera, const Point3d center);
     };
 }
 

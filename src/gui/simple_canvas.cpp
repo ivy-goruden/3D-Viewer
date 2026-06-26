@@ -25,10 +25,10 @@ static void on_unrealize(GtkGLArea *area, gpointer data) {
 }
 
 void SimpleCanvas::cleanup(){
-    glDeleteProgram(fong_program);
-    glDeleteProgram(flatColor_program);
-    glDeleteProgram(guro_program);
-    glDeleteProgram(point_program);
+    glDeleteProgram(fong_program.program);
+    glDeleteProgram(flat_program.program);
+    glDeleteProgram(guro_program.program);
+    glDeleteProgram(point_program.program);
     glDeleteVertexArrays(1, &vao);           // Удаляем VAO куба
     glDeleteBuffers(1, &vbo);                // Удаляем VBO куба
     glDeleteBuffers(1, &ebo);                // Удаляем EBO куба
@@ -71,13 +71,9 @@ SimpleCanvas::SimpleCanvas(GtkWidget* drawing_area)
       lineType_(Solid),
       canvas_scale_(1.0f),
       guro_program(0),
-      flatColor_program(0),
+      flat_program(0),
       fong_program(0),
       vao(0), vbo(0), ebo(0),
-      mvp_location(0), poly_color_location(0),
-      point_vao(0), point_vbo(0), point_program(0),
-      point_mvp_location(0), point_color_location(0),
-      texture(0),
       vertCount(0),
       polyIndicesCount(0)
 {
@@ -116,33 +112,50 @@ void SimpleCanvas::draw_dot(cairo_t* cr, float x, float y) {
 }
 
 void SimpleCanvas::draw(GdkGLContext *ctx){
-    if (texture != 0) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
-    }
     glClearColor(bgColor_.red, bgColor_.green, bgColor_.blue, bgColor_.alpha);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Очищаем экран и буфер глубины
-    glUseProgram(getLightProgram());                // Активируем шейдерную программу
-    glUniform3f(poly_color_location, polyColor_.red, polyColor_.green, polyColor_.blue);
-    glUniformMatrix4fv(mvp_location, 1, GL_FALSE, mvp_); // Передаём матрицу MVP в uniform
-    glBindVertexArray(vao);                      // Привязываем VAO
-    glDisable(GL_DEPTH_TEST);
-    // if (fillPoly_ == false){
-    //     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    // }
-    glDrawElements(GL_TRIANGLES, polyIndicesCount, GL_UNSIGNED_INT, 0); // Рисуем куб: 36 индексов, треугольники
+    glEnable(GL_DEPTH_TEST);
+    draw_figure();
     
+    //draw_dots();
+    glBindVertexArray(0);
+}
 
-    glUseProgram(getPointProgram());                 // Активируем шейдерную программу для точек
-    glUniformMatrix4fv(point_mvp_location, 1, GL_FALSE, mvp_); // Передаём ту же матрицу MVP
-    glUniform3f(point_color_location, dotColor_.red, dotColor_.green, dotColor_.blue);
+void SimpleCanvas::draw_figure(){
+    Light_Program program = getLightProgram();
+    if (program.texture != 0) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glUniform1i(program.texture, 0);
+    }
+    glUseProgram(program.program);
+    glUniformMatrix4fv(program.model, 1, GL_FALSE, model_);
+    glUniformMatrix4fv(program.view, 1, GL_FALSE, view_);
+    glUniformMatrix4fv(program.projection, 1, GL_FALSE, proj_);
+    glUniform3f(program.lightPos, 100, 100, 100);
+    glUniform3f(program.lightColor, 1.0,1.0,1.0);
+    glUniform3f(program.viewPos, 0,0,0);
+    glUniform1f(program.ambientLight, 0.2);
+    glUniform3f(program.objectColor, polyColor_.red, polyColor_.green, polyColor_.blue);
+    glBindVertexArray(vao);
+    if (fillPoly_) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    glDrawElements(GL_TRIANGLES, polyIndicesCount, GL_UNSIGNED_INT, 0);
+}
+
+void SimpleCanvas::draw_dots(){
+    Point_Program program = getPointProgram();
+    glUseProgram(program.program);
+    glUniformMatrix4fv(program.mvp, 1, GL_FALSE, mvp_);
+    glUniform3f(program.color, dotColor_.red, dotColor_.green, dotColor_.blue);
 
     glPointSize(vertWidth_ / canvas_scale_);
     glDisable(GL_DEPTH_TEST);                    // Временно отключаем тест глубины – точки будут видны даже если перекрыты гранями
-    glBindVertexArray(point_vao);                // Привязываем VAO точек
+    glBindVertexArray(point_vao);
     glDrawArrays(GL_POINTS, 0, vertCount); 
-    glEnable(GL_DEPTH_TEST);                     // Включаем тест глубины обратно
-    glBindVertexArray(0);                        // Отвязываем VAO
 }
     
 
@@ -184,6 +197,10 @@ void SimpleCanvas::setVertColor(Rgb color) {
     dotColor_ = color; 
 }
 
+void SimpleCanvas::setPolyColor(Rgb color) { 
+    polyColor_ = color; 
+}
+
 void SimpleCanvas::setLineWidth(float width) { lineWidth_ = width; }
 
 void SimpleCanvas::setVertSize(float size) { vertWidth_ = size; }
@@ -196,6 +213,19 @@ void SimpleCanvas::setMVP(const GLfloat* mvp){
     std::copy(mvp, mvp + 16, mvp_);
 }
 
+void SimpleCanvas::setViewMatrix(const GLfloat* view){
+    gtk_gl_area_make_current(GTK_GL_AREA(widget_));
+    std::copy(view, view + 16, view_);
+}
+void SimpleCanvas::setModelMatrix(const GLfloat* model){
+    gtk_gl_area_make_current(GTK_GL_AREA(widget_));
+    std::copy(model, model + 16, model_);
+}
+void SimpleCanvas::setProjMatrix(const GLfloat* proj){
+    gtk_gl_area_make_current(GTK_GL_AREA(widget_));
+    std::copy(proj, proj + 16, proj_);
+}
+
 void SimpleCanvas::redraw() {
     if (widget_ != nullptr) {
         gtk_gl_area_queue_render(GTK_GL_AREA(widget_));
@@ -204,11 +234,11 @@ void SimpleCanvas::redraw() {
 }
 
 void printVertices(const std::vector<GLfloat>& vertices) {
-    std::cout << "Vertices (x, y, z, u, v):\n";
+    std::cout << "Vertices (x, y, z, n1, n2, n3, u, v):\n";
     for (size_t i = 0; i < vertices.size(); i += 5) {
         std::cout << "v" << i/5 << ": ("
                   << vertices[i] << ", " << vertices[i+1] << ", " << vertices[i+2]
-                  << ") uv: (" << vertices[i+3] << ", " << vertices[i+4] << ")\n";
+                  << ") normals: (" << vertices[i+3] << ", " << vertices[i+4] << ", " << vertices[i+5] << ") uv: (" << vertices[i+6] << ", " << vertices[i+7] << ")\n";
     }
 }
 
@@ -240,7 +270,7 @@ void printMVP(const GLfloat* mvp, const char* name = "MVP") {
 }
 
 void SimpleCanvas::updateFigure(std::vector<GLfloat> vertices, std::vector<GLuint> indices, std::vector<GLfloat> cube_vertices){
-                std::cout << "update figure" << std::endl;
+    std::cout << "update figure" << std::endl;
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) std::cerr << "OpenGL error: " << err << std::endl;
     gtk_gl_area_make_current(GTK_GL_AREA(widget_));
@@ -274,7 +304,9 @@ void SimpleCanvas::updateFigure(std::vector<GLfloat> vertices, std::vector<GLuin
 }
 
 Light_Program SimpleCanvas::getLightProgram(){
-    return fong_program;
+    //return fong_program;
+    return flat_program;
+    //return guro_program;
 }
 
 Point_Program SimpleCanvas::getPointProgram(){

@@ -28,7 +28,7 @@ namespace s21{
             for (auto i = 0; i < line.size()-1; i++){
                 int start = line[i].vi-1;
                 int end = line[i+1].vi-1;
-                printf("strt: %d, end: %d", start, end);
+                //printf("strt: %d, end: %d", start, end);
                 if (start >=0 && start < matrix_.size() && end >=0 && end <matrix_.size()){
                     Seg_t segment = Seg_t(start, end);
                     l.push_back(segment);
@@ -40,6 +40,8 @@ namespace s21{
 
         polygons_ = loader.faces;
         textures_ = loader.textures;
+        normals_ = loader.normals;
+
         
     }
 
@@ -60,6 +62,10 @@ namespace s21{
     std::vector<TextureObj_t> Figure::getTextures(){
         return textures_;
     }
+    std::vector<NormalObj_t> Figure::getNormals(){
+        return normals_;
+    }
+
 
     matrix_t Figure::getMatrix() {
         return matrix_;

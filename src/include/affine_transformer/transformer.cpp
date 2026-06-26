@@ -243,10 +243,7 @@ namespace s21{
         return cropped;
     }
 
-    matrix_t Transformer::perspective(matrix_t* original, const Camera *camera, float aspect) {
-        if (original->empty()){
-            return matrix_t();
-        }
+    matrix_t Transformer::getPerspMatrix(const Camera *camera, float aspect){
         float fov = camera->viewAngle_*2;
         float near = camera->d;
         float far = camera->far;
@@ -257,15 +254,10 @@ namespace s21{
             {0, 0, (far + near) / (near - far), (2.0f * far * near) / (near - far)},
             {0, 0, -1.0f, 0}
         };
-        //Matrix::print_matrix(&sc, "naked perspective matrix");
-        
-        return Matrix::multiplyMatrix(&sc, &(*original));
-    }   
+        return sc;
+    }
 
-    matrix_t Transformer::ortho(matrix_t* original, const Camera *camera, float aspect) {
-        if (original->empty()){
-            return matrix_t();
-        }
+    matrix_t Transformer::getOrthoMatrix(const Camera *camera, float aspect){
         float fov = camera->viewAngle_*2;
         float tan = std::tan(fov * 3.1415926535f / 360.0f);
         float near = camera->d;
@@ -280,7 +272,23 @@ namespace s21{
             {0, 0, -2.0f / (far - near), -(far + near) / (far - near)},
             {0, 0, 0, 1.0f}
         };
-        return Matrix::multiplyMatrix(&sc, &(*original));
+        return sc;
+    }
+
+    matrix_t Transformer::perspective(matrix_t* original, const Camera *camera, float aspect) {
+        if (original->empty()){
+            return matrix_t();
+        }
+        matrix_t mat = getPerspMatrix(camera, aspect);
+        return Matrix::multiplyMatrix(&mat, &(*original));
+    }   
+
+    matrix_t Transformer::ortho(matrix_t* original, const Camera *camera, float aspect) {
+        if (original->empty()){
+            return matrix_t();
+        }
+        matrix_t mat = getOrthoMatrix(camera, aspect);
+        return Matrix::multiplyMatrix(&mat, &(*original));
     }
 
     inline void normalize(Vector_t &v){
@@ -293,9 +301,8 @@ namespace s21{
         v.z = v.z/v.size();
     }
 
-    matrix_t Transformer::setView(matrix_t* original, 
-            const Camera *camera, const Point3d center) {
-        
+    matrix_t Transformer::getViewMatrix(const Camera *camera, const Point3d center){
+                
         const Vector_t up = Vector_t(0,1,0);
         Point3d eye = Point3d(camera->x, camera->y, camera->z);
 
@@ -311,21 +318,19 @@ namespace s21{
         Vector_t u = f^r;
 
         Vector_t eye_v = Vector_t(eye.x,eye.y, eye.z);
-        
-        // const matrix_t sc = {
-        //     {r.x, u.x, -f.x, 0},
-        //     {r.y, u.y, -f.y, 0},
-        //     {r.z,  u.z, -f.z, 0},
-        //     {r*eye_v *-1,  u*eye_v*-1, f*eye_v, 1.0f}
-        // };
         const matrix_t sc = {
             { r.x,   r.y,   r.z,   r*eye_v },
             { u.x,  u.y,  u.z,  u*eye_v*-1 },
             { f.x*-1, f.y*-1, f.z, f*eye_v*-1 },
             { 0, 0, 0, 1 }
         };
-        //Matrix::print_matrix(&sc, "naked view matrix");
-        return Matrix::multiplyMatrix(&sc, &(*original));
+        return sc;
+    }
+
+    matrix_t Transformer::setView(matrix_t* original, 
+        const Camera *camera, const Point3d center) {
+        matrix_t mat = getViewMatrix(camera, center);
+        return Matrix::multiplyMatrix(&mat, &(*original));
     }
 
 

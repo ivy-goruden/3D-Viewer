@@ -75,11 +75,11 @@ void VertModeCommand::execute() {
     canvas->setVertType(app->getAppData()->getVertMode());
 }
 
-void ColorCommand::execute() {
+void DotColorCommand::execute() {
     app->colorDialog->setOnColorSelectedCallback(
-        [this](float red, float green, float blue, float alpha) { app->colorSelected(red, green, blue, alpha); });
+        [this](float red, float green, float blue, float alpha) { app->dotColorSelected(red, green, blue, alpha); });
     if (!app->colorDialog->isActive()) {
-        app->colorDialog->open(app->getAppData()->getColor());
+        app->colorDialog->open(app->getAppData()->getDotColor());
     }
 }
 
@@ -90,6 +90,15 @@ void BgColorCommand::execute() {
         app->colorDialog->open(app->getAppData()->getBgColor());
     }
 }
+
+void PolyColorCommand::execute() {
+    app->colorDialog->setOnColorSelectedCallback(
+        [this](float red, float green, float blue, float alpha) { app->polyColorSelected(red, green, blue, alpha); });
+    if (!app->colorDialog->isActive()) {
+        app->colorDialog->open(app->getAppData()->getPolyColor());
+    }
+}
+
 
 void WeightCommand::execute() {
     SimpleCanvas *canvas = app->getCanvas();
